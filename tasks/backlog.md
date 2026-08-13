@@ -1,0 +1,83 @@
+# Development Backlog
+
+Each item is intended to fit in one implementation commit. Tasks marked **Waiting for Human** are explicit checkpoints: dependent AI work must not start until the required input or external setup is available.
+
+- [ ] T-001 Initialize the Next.js modular-monolith workspace
+- [ ] T-002 Establish code quality and automated test tooling
+- [ ] T-003 Confirm initial restaurant operating configuration
+- [ ] T-004 Provision the Supabase development project and credentials
+- [ ] T-005 Implement typed environment configuration and startup validation
+- [ ] T-006 Add Prisma database foundation and migration workflow
+- [ ] T-007 Model RBAC, employee profiles, and immutable audit records
+- [ ] T-008 Model restaurant configuration and service locations
+- [ ] T-009 Model the versioned product catalog and configurable modifications
+- [ ] T-010 Model orders, baskets, lines, and lifecycle timestamps
+- [ ] T-011 Model payments and immutable payment history
+- [ ] T-012 Model inventory ledger, balances, and alerts
+- [ ] T-013 Model recipes, production batches, and operating expenses
+- [ ] T-014 Enforce database-level integrity and historical-record protections
+- [ ] T-015 Seed the initial roles, permissions, and development reference data
+- [ ] T-016 Create shared domain error and result conventions
+- [ ] T-017 Implement centralized permission evaluation
+- [ ] T-018 Implement the immutable audit-event application service
+- [ ] T-019 Define domain-event and transaction boundary interfaces
+- [ ] T-020 Implement the Supabase Realtime event adapter
+- [ ] T-021 Define the printer service port and safe no-op adapter
+- [ ] T-022 Integrate Supabase Authentication and session lifecycle
+- [ ] T-023 Enforce authenticated and authorized server routes
+- [ ] T-024 Build the role-aware authenticated application shell
+- [ ] T-025 Build administrator user invitation and activation management
+- [ ] T-026 Build role assignment and permission inspection administration
+- [ ] T-027 Build restaurant and operational-settings administration
+- [ ] T-028 Build service-location administration
+- [ ] T-029 Build payment-method and receipt-settings administration
+- [ ] T-030 Build product-category administration
+- [ ] T-031 Build product catalog and modification administration
+- [ ] T-032 Build inventory-item administration
+- [ ] T-033 Build versioned recipe administration
+- [ ] T-034 Build the read-only audit-log view
+- [ ] T-035 Expose active menu and service-location data for PoS
+- [ ] T-036 Build the client-only PoS order draft composer
+- [ ] T-037 Implement the order confirmation domain use case
+- [ ] T-038 Add resale-item consumption to order confirmation
+- [ ] T-039 Expose the transactional order-confirmation API
+- [ ] T-040 Connect PoS draft confirmation and recovery feedback
+- [ ] T-041 Expose active-order queries for authorized operations
+- [ ] T-042 Implement pending-order modification domain rules
+- [ ] T-079 Reconcile resale inventory for pending-order modifications
+- [ ] T-043 Expose the pending-order modification API
+- [ ] T-044 Build the active-order editing experience
+- [ ] T-045 Implement authorized order cancellation with inventory rollback
+- [ ] T-046 Expose order cancellation API and confirmation interface
+- [ ] T-047 Expose the kitchen pending-order queue
+- [ ] T-048 Build the live Kitchen Display System queue
+- [ ] T-049 Implement and expose the Kitchen Ready transition
+- [ ] T-050 Expose the ready-order delivery queue
+- [ ] T-051 Build the Waiter Delivery Panel
+- [ ] T-052 Implement and expose the On-the-Way transition
+- [ ] T-053 Implement and expose the Delivered transition
+- [ ] T-054 Implement payment registration and order settlement rules
+- [ ] T-055 Expose payment queries and registration API
+- [ ] T-056 Build split and partial payment experience
+- [ ] T-057 Generate and dispatch configurable payment receipts
+- [ ] T-058 Implement inventory purchase registration
+- [ ] T-059 Build inventory purchase registration UI
+- [ ] T-060 Implement inventory adjustment and waste registration
+- [ ] T-061 Build inventory adjustment and waste UI
+- [ ] T-062 Implement low-stock calculation and inventory alert events
+- [ ] T-063 Build inventory balance, movement, and alert views
+- [ ] T-064 Implement transactional production-batch completion
+- [ ] T-065 Build production registration and history UI
+- [ ] T-066 Build the daily sales dashboard
+- [ ] T-067 Build product, kitchen, and delivery performance reports
+- [ ] T-068 Build payment reporting
+- [ ] T-069 Build inventory, production, and expense reporting
+- [ ] T-070 Add PDF and spreadsheet report exports
+- [ ] T-071 Add end-to-end coverage for the core order lifecycle
+- [ ] T-072 Add end-to-end coverage for inventory and production integrity
+- [ ] T-073 Conduct authorization and input-security regression testing
+- [ ] T-074 Add operational logging and application telemetry
+- [ ] T-075 Optimize tablet accessibility, responsiveness, and critical-path performance
+- [ ] T-076 Prepare backup, recovery, and production deployment runbooks
+- [ ] T-077 Configure and verify production backup and deployment services
+- [ ] T-078 Confirm printer hardware and local print-service deployment

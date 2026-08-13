@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carnales KDS Mockup</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../backEnd/public/images/carnalesMod.png" alt="Carnales">
+        <div>
+          <div class="brand-title">Kitchen Display</div>
+          <div class="table-name">Live queue</div>
+        </div>
+      </div>
+      <div class="station-meta">
+        <span><span class="status-dot"></span> Receiving orders</span>
+        <strong>6 active</strong>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="kds-grid">
+        <article class="card order-card critical">
+          <header class="card-header">
+            <div>
+              <div class="order-id">#42</div>
+              <div class="table-name">Mesa 4</div>
+            </div>
+            <span class="badge critical timer">1m 18s</span>
+          </header>
+          <div class="card-body order-lines">
+            <div class="order-line">
+              <span class="qty">2</span>
+              <div>
+                <div class="line-title">Taco Chingon Al Pastor</div>
+                <div class="line-note">Sin Piña, Sin Cebolla</div>
+              </div>
+            </div>
+            <div class="order-line">
+              <span class="qty">1</span>
+              <div>
+                <div class="line-title">Burrito Carnitas</div>
+                <div class="line-note">Dividido</div>
+              </div>
+            </div>
+          </div>
+          <footer class="card-footer">
+            <button class="btn primary" style="width:100%;">Listo</button>
+          </footer>
+        </article>
+
+        <article class="card order-card warning">
+          <header class="card-header">
+            <div>
+              <div class="order-id">#43</div>
+              <div class="table-name">Ventana</div>
+            </div>
+            <span class="badge warning timer">0m 41s</span>
+          </header>
+          <div class="card-body order-lines">
+            <div class="order-line">
+              <span class="qty">4</span>
+              <div>
+                <div class="line-title">Taco Carne Asada</div>
+              </div>
+            </div>
+            <div class="order-line">
+              <span class="qty">1</span>
+              <div>
+                <div class="line-title">Tortillas Artesanales</div>
+              </div>
+            </div>
+          </div>
+          <footer class="card-footer">
+            <button class="btn primary" style="width:100%;">Listo</button>
+          </footer>
+        </article>
+
+        <article class="card order-card">
+          <header class="card-header">
+            <div>
+              <div class="order-id">#44</div>
+              <div class="table-name">Mesa 1</div>
+            </div>
+            <span class="badge new timer">0m 12s</span>
+          </header>
+          <div class="card-body order-lines">
+            <div class="order-line">
+              <span class="qty">1</span>
+              <div>
+                <div class="line-title">Quesadilla Pollo Asado</div>
+                <div class="line-note">Sin Aguacate</div>
+              </div>
+            </div>
+            <div class="order-line">
+              <span class="qty">2</span>
+              <div>
+                <div class="line-title">Nachos</div>
+              </div>
+            </div>
+          </div>
+          <footer class="card-footer">
+            <button class="btn primary" style="width:100%;">Listo</button>
+          </footer>
+        </article>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carnales Accounts Mockup</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../backEnd/public/images/carnalesMod.png" alt="Carnales">
+        <div>
+          <div class="brand-title">Pending Accounts</div>
+          <div class="table-name">Cashier station</div>
+        </div>
+      </div>
+      <div class="station-meta">
+        <span>Cash drawer open</span>
+        <strong>$128.50 today</strong>
+      </div>
+    </header>
+
+    <main class="page two-col">
+      <section>
+        <div class="kds-grid">
+          <article class="card order-card">
+            <header class="card-header">
+              <div>
+                <div class="order-id">#42</div>
+                <div class="table-name">Mesa 4 · 3 customers</div>
+              </div>
+              <span class="badge new">$18.50</span>
+            </header>
+            <div class="card-body order-lines">
+              <div class="order-line">
+                <span class="qty">2</span>
+                <div>
+                  <div class="line-title">Taco Chingon Al Pastor</div>
+                  <div class="line-note">Cliente 1</div>
+                </div>
+                <div>$3.00</div>
+              </div>
+              <div class="order-line">
+                <span class="qty">1</span>
+                <div>
+                  <div class="line-title">Burrito Carnitas</div>
+                  <div class="line-note">Cliente 2</div>
+                </div>
+                <div>$3.00</div>
+              </div>
+              <div class="order-line">
+                <span class="qty">3</span>
+                <div>
+                  <div class="line-title">Jamaica</div>
+                  <div class="line-note">General</div>
+                </div>
+                <div>$1.50</div>
+              </div>
+            </div>
+            <footer class="card-footer">
+              <button class="btn selected" style="width:100%; margin-bottom:8px;">Split by Customer</button>
+              <button class="btn primary" style="width:100%;">Close Account</button>
+            </footer>
+          </article>
+
+          <article class="card order-card warning">
+            <header class="card-header">
+              <div>
+                <div class="order-id">#43</div>
+                <div class="table-name">Ventana · to go</div>
+              </div>
+              <span class="badge warning">$7.00</span>
+            </header>
+            <div class="card-body order-lines">
+              <div class="order-line">
+                <span class="qty">4</span>
+                <div>
+                  <div class="line-title">Taco Carne Asada</div>
+                </div>
+                <div>$4.00</div>
+              </div>
+              <div class="order-line">
+                <span class="qty">1</span>
+                <div>
+                  <div class="line-title">Cerveza</div>
+                </div>
+                <div>$2.00</div>
+              </div>
+            </div>
+            <footer class="card-footer">
+              <button class="btn primary" style="width:100%;">Close Account</button>
+            </footer>
+          </article>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2 class="panel-title">Payment</h2>
+        <div style="display:flex; justify-content:space-between; align-items:end;">
+          <span>Selected account</span>
+          <span class="total">$18.50</span>
+        </div>
+        <div class="segmented" style="margin-top:16px;">
+          <button class="btn selected">Cash</button>
+          <button class="btn">Card</button>
+          <button class="btn">Transfer</button>
+        </div>
+        <div class="form-grid" style="grid-template-columns:1fr; margin-top:16px;">
+          <div class="field">
+            <label>Amount received</label>
+            <input value="$20.00">
+          </div>
+          <div class="field">
+            <label>Change</label>
+            <input value="$1.50">
+          </div>
+        </div>
+        <div class="footer-actions">
+          <button class="btn primary">Mark Paid</button>
+          <button class="btn">Print Receipt</button>
+          <button class="btn danger">Cancel Order</button>
+        </div>
+      </aside>
+    </main>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carnales PoS Mockup</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../backEnd/public/images/carnalesMod.png" alt="Carnales">
+        <div>
+          <div class="brand-title">Point of Sale</div>
+          <div class="table-name">Waiter station</div>
+        </div>
+      </div>
+      <div class="station-meta">
+        <span><span class="status-dot"></span> Online</span>
+        <span>Printer ready</span>
+        <strong>12:42</strong>
+      </div>
+    </header>
+
+    <main class="page page-grid">
+      <aside class="panel">
+        <h2 class="panel-title">Table</h2>
+        <div class="segmented">
+          <button class="btn">Ventana</button>
+          <button class="btn selected">Mesa 1</button>
+          <button class="btn">Mesa 2</button>
+          <button class="btn">Mesa 3</button>
+          <button class="btn">Mesa 4</button>
+          <button class="btn">Mesa 5</button>
+          <button class="btn">Mesa 6</button>
+          <button class="btn">Mesa 7</button>
+        </div>
+
+        <h2 class="panel-title" style="margin-top: 24px;">Order Type</h2>
+        <div class="segmented">
+          <button class="btn selected">Servirse</button>
+          <button class="btn">Llevar</button>
+        </div>
+
+        <h2 class="panel-title" style="margin-top: 24px;">Customer</h2>
+        <div class="stack">
+          <button class="btn selected">General</button>
+          <button class="btn">Cliente 1</button>
+          <button class="btn">Cliente 2</button>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <h2 class="panel-title">Products</h2>
+        <div class="segmented" style="margin-bottom: 16px;">
+          <button class="btn selected">Tacos</button>
+          <button class="btn">Chingones</button>
+          <button class="btn">Burritos</button>
+          <button class="btn">Quesadillas</button>
+          <button class="btn">Bebidas</button>
+        </div>
+
+        <div class="product-grid">
+          <button class="btn product selected">Pollo Asado <span>$1.00</span></button>
+          <button class="btn product">Carne Asada <span>$1.00</span></button>
+          <button class="btn product">Carne Guisada <span>$1.00</span></button>
+          <button class="btn product">Al Pastor <span>$1.00</span></button>
+          <button class="btn product">Chicharron <span>$1.50</span></button>
+          <button class="btn product">Carnitas <span>$1.50</span></button>
+          <button class="btn product">Cabeza <span>$1.50</span></button>
+          <button class="btn product">Tortillas Artesanales <span>$1.00</span></button>
+        </div>
+
+        <div class="panel" style="margin-top: 20px;">
+          <h2 class="panel-title">Selected Product</h2>
+          <div class="two-col" style="grid-template-columns: minmax(0, 1fr) 220px;">
+            <div>
+              <strong>Taco Pollo Asado</strong>
+              <div class="segmented" style="margin-top: 12px;">
+                <button class="btn selected">Aguacate</button>
+                <button class="btn selected">Cebolla</button>
+                <button class="btn">Sin picante</button>
+                <button class="btn">Extra tortilla</button>
+              </div>
+            </div>
+            <div class="segmented">
+              <button class="btn">-</button>
+              <button class="btn selected">3</button>
+              <button class="btn">+</button>
+              <button class="btn primary" style="grid-column: 1 / -1;">Add</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2 class="panel-title">Current Order</h2>
+        <div class="basket-list">
+          <div class="basket-item">
+            <span class="qty">3</span>
+            <div>
+              <div class="line-title">Taco Pollo Asado</div>
+              <div class="line-note">Sin Cebolla</div>
+            </div>
+            <div class="price">$3.00</div>
+          </div>
+          <div class="basket-item">
+            <span class="qty">1</span>
+            <div>
+              <div class="line-title">Burrito Al Pastor</div>
+              <div class="line-note">Dividido</div>
+            </div>
+            <div class="price">$2.50</div>
+          </div>
+          <div class="basket-item">
+            <span class="qty">2</span>
+            <div>
+              <div class="line-title">Jamaica</div>
+            </div>
+            <div class="price">$1.00</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:end; margin-top:24px;">
+          <span class="panel-title" style="margin:0;">Total</span>
+          <span class="total">$6.50</span>
+        </div>
+
+        <div class="footer-actions">
+          <button class="btn primary">Review Order</button>
+          <button class="btn">Hold Table</button>
+          <button class="btn danger">Clear</button>
+        </div>
+      </aside>
+    </main>
+  </div>
+</body>
+</html>
+

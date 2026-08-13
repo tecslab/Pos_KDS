@@ -1,0 +1,24 @@
+# T-028 — Build service-location administration
+
+## Metadata
+
+| Field | Value |
+| --- | --- |
+| Status | Todo |
+| Priority | High |
+| Estimated Size | Small |
+| Type | Feature |
+| Dependencies | T-008, T-018, T-023 |
+| Owner | AI |
+| Reviewer | AI Reviewer |
+| Requires Human | No |
+| PRD References | PRD 5.1 FR-POS-002, 5.8 FR-ADM-004, 6.5 |
+
+## Expected Outcome
+
+- Provide audited create/edit/activate/deactivate and display ordering for tables, dispatch window, and future location types, including the multiple-active-orders rule.
+
+## Not Included
+
+- PoS order creation.
+

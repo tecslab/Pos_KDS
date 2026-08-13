@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carnales Admin Mockup</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../backEnd/public/images/carnalesMod.png" alt="Carnales">
+        <div>
+          <div class="brand-title">Admin Dashboard</div>
+          <div class="table-name">Operations overview</div>
+        </div>
+      </div>
+      <div class="station-meta">
+        <span><span class="status-dot"></span> Database connected</span>
+        <strong>Today</strong>
+      </div>
+    </header>
+
+    <main class="page admin-grid">
+      <aside class="panel">
+        <h2 class="panel-title">Modules</h2>
+        <div class="stack">
+          <button class="btn selected">Dashboard</button>
+          <button class="btn">Daily Sales</button>
+          <button class="btn">Inventory</button>
+          <button class="btn">Expenses</button>
+          <button class="btn">Production</button>
+          <button class="btn">Menu</button>
+        </div>
+      </aside>
+
+      <section>
+        <div class="metric-grid">
+          <div class="card metric">
+            <div class="metric-label">Sales</div>
+            <div class="metric-value">$342.50</div>
+          </div>
+          <div class="card metric">
+            <div class="metric-label">Orders</div>
+            <div class="metric-value">48</div>
+          </div>
+          <div class="card metric">
+            <div class="metric-label">Avg ticket</div>
+            <div class="metric-value">$7.14</div>
+          </div>
+          <div class="card metric">
+            <div class="metric-label">Low stock</div>
+            <div class="metric-value" style="color:var(--status-warning);">3</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="panel">
+            <h2 class="panel-title">Inventory Alerts</h2>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Available</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cebolla</td>
+                  <td>850 g</td>
+                  <td><span class="badge warning">Low</span></td>
+                </tr>
+                <tr>
+                  <td>Barbacoa</td>
+                  <td>420 g</td>
+                  <td><span class="badge critical">Critical</span></td>
+                </tr>
+                <tr>
+                  <td>Servilletas</td>
+                  <td>36 u</td>
+                  <td><span class="badge new">OK</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel">
+            <h2 class="panel-title">Register Movement</h2>
+            <div class="form-grid">
+              <div class="field">
+                <label>Type</label>
+                <select>
+                  <option>Ingredient purchase</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Item</label>
+                <select>
+                  <option>Cebolla</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Quantity</label>
+                <input value="3.00">
+              </div>
+              <div class="field">
+                <label>Unit</label>
+                <input value="kg">
+              </div>
+              <div class="field">
+                <label>Cost</label>
+                <input value="$2.25">
+              </div>
+              <div class="field">
+                <label>Mode</label>
+                <select>
+                  <option>Add to stock</option>
+                  <option>Set stock count</option>
+                </select>
+              </div>
+            </div>
+            <div class="footer-actions">
+              <button class="btn primary">Register</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+
