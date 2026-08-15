@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-001
-last_completed_task: null
-last_commit: null
-completed_tasks: 0
+next_suggested_task: T-002
+last_completed_task: T-001
+last_commit: pending
+completed_tasks: 1
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -24,7 +24,7 @@ M1 — Foundation and Domain Infrastructure
 
 ## Completed
 
-No development tasks completed.
+T-001 — Initialize the Next.js modular-monolith workspace (pending commit).
 
 ## Current Task
 
@@ -32,7 +32,7 @@ None.
 
 ## Next Suggested Task
 
-T-001 — Initialize the Next.js modular-monolith workspace.
+T-002 — Establish code quality and automated test tooling.
 
 ## Human Checkpoints
 

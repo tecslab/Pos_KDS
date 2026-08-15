@@ -1,7 +1,7 @@
 ---
 id: T-001
 title: "Initialize the Next.js modular-monolith workspace"
-status: todo
+status: done
 priority: critical
 size: small
 type: infrastructure

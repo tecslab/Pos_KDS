@@ -1,8 +1,39 @@
-# Local secrets
-.env.local
-.env.*.local
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Temporary AI harness packets and transcripts
+# testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# production
+/build
+
+# local and generated files
+.DS_Store
+*.pem
+*.tsbuildinfo
+next-env.d.ts
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# environment files and deployment metadata
+.env*
+.vercel
+
+# temporary AI harness packets and transcripts
 harness/runtime/*
 !harness/runtime/.gitkeep
-

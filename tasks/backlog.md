@@ -2,7 +2,7 @@
 
 Each item is intended to fit in one implementation commit. Tasks marked **Waiting for Human** are explicit checkpoints: dependent AI work must not start until the required input or external setup is available.
 
-- [ ] T-001 Initialize the Next.js modular-monolith workspace
+- [x] T-001 Initialize the Next.js modular-monolith workspace
 - [ ] T-002 Establish code quality and automated test tooling
 - [ ] T-003 Confirm initial restaurant operating configuration
 - [ ] T-004 Provision the Supabase development project and credentials
