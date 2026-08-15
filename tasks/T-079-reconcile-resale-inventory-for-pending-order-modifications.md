@@ -1,18 +1,21 @@
+---
+id: T-079
+title: "Reconcile resale inventory for pending-order modifications"
+status: todo
+priority: critical
+size: medium
+type: domain
+dependencies: [T-012, T-014, T-016, T-031, T-038, T-042]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: true
+prd_references:
+  - "PRD 5.1 FR-POS-006, 5.5 FR-INV-002/006/007, 6.3/6.12/6.14, BI-018–021"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-079 — Reconcile resale inventory for pending-order modifications
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Critical |
-| Estimated Size | Medium |
-| Type | Domain |
-| Dependencies | T-012, T-014, T-016, T-031, T-038, T-042 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.1 FR-POS-006, 5.5 FR-INV-002/006/007, 6.3/6.12/6.14, BI-018–021 |
 
 ## Expected Outcome
 
@@ -22,3 +25,7 @@
 ## Not Included
 
 - Consumption of raw ingredients, direct mutation of prior movements, or changes to completed/cancelled orders.
+
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

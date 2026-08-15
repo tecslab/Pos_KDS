@@ -1,18 +1,21 @@
+---
+id: T-016
+title: "Create shared domain error and result conventions"
+status: todo
+priority: high
+size: small
+type: domain
+dependencies: [T-002]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: true
+prd_references:
+  - "PRD 12.13, 11.9"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-016 — Create shared domain error and result conventions
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Small |
-| Type | Domain |
-| Dependencies | T-002 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 12.13, 11.9 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Feature-specific validation.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

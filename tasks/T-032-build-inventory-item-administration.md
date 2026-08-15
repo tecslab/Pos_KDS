@@ -1,18 +1,21 @@
+---
+id: T-032
+title: "Build inventory-item administration"
+status: todo
+priority: high
+size: medium
+type: feature
+dependencies: [T-012, T-018, T-023]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.5 FR-INV-001, 6.12, BI-018–021"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-032 — Build inventory-item administration
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Medium |
-| Type | Feature |
-| Dependencies | T-012, T-018, T-023 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.5 FR-INV-001, 6.12, BI-018–021 |
 
 ## Expected Outcome
 
@@ -22,3 +25,6 @@
 
 - Purchases, adjustments, or production execution.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

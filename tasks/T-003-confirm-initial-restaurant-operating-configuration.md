@@ -1,18 +1,21 @@
+---
+id: T-003
+title: "Confirm initial restaurant operating configuration"
+status: waiting_for_human
+priority: high
+size: small
+type: human_checkpoint
+dependencies: []
+owner: human
+reviewer: null
+requires_human: true
+architecture_required: false
+prd_references:
+  - "PRD 5.4, 5.8, 6.8, 6.18"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-003 — Confirm initial restaurant operating configuration
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Waiting for Human |
-| Priority | High |
-| Estimated Size | Small |
-| Type | Human Checkpoint |
-| Dependencies | None |
-| Owner | Human |
-| Reviewer | N/A |
-| Requires Human | Yes |
-| PRD References | PRD 5.4, 5.8, 6.8, 6.18 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Entering the configuration into the application or supplying secrets.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

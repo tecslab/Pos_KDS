@@ -1,18 +1,21 @@
+---
+id: T-041
+title: "Expose active-order queries for authorized operations"
+status: todo
+priority: high
+size: small
+type: api
+dependencies: [T-010, T-023]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.1 FR-POS-006, 5.4 FR-PAY-001, 6.16"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-041 — Expose active-order queries for authorized operations
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Small |
-| Type | API |
-| Dependencies | T-010, T-023 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.1 FR-POS-006, 5.4 FR-PAY-001, 6.16 |
 
 ## Expected Outcome
 
@@ -22,3 +25,6 @@
 
 - Order changes, payments, or reports.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

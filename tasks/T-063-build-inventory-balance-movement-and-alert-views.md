@@ -1,18 +1,21 @@
+---
+id: T-063
+title: "Build inventory balance, movement, and alert views"
+status: todo
+priority: high
+size: medium
+type: feature
+dependencies: [T-020, T-023, T-032, T-062]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.5 FR-INV-002/007/008, 5.7 FR-REP-006"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-063 — Build inventory balance, movement, and alert views
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Medium |
-| Type | Feature |
-| Dependencies | T-020, T-023, T-032, T-062 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.5 FR-INV-002/007/008, 5.7 FR-REP-006 |
 
 ## Expected Outcome
 
@@ -22,3 +25,6 @@
 
 - Purchase, adjustment, waste, or production forms.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

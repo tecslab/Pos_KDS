@@ -1,18 +1,21 @@
+---
+id: T-006
+title: "Add Prisma database foundation and migration workflow"
+status: todo
+priority: critical
+size: small
+type: infrastructure
+dependencies: [T-005]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: true
+prd_references:
+  - "PRD 12.4, 12.10–12.11"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-006 — Add Prisma database foundation and migration workflow
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Critical |
-| Estimated Size | Small |
-| Type | Infrastructure |
-| Dependencies | T-005 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 12.4, 12.10–12.11 |
 
 ## Expected Outcome
 
@@ -24,3 +27,6 @@
 
 - Business tables or seed data.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

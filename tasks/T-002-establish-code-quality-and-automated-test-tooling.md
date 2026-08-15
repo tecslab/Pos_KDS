@@ -1,18 +1,21 @@
+---
+id: T-002
+title: "Establish code quality and automated test tooling"
+status: todo
+priority: high
+size: small
+type: infrastructure
+dependencies: [T-001]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 11.9, 11.16, 12.18"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-002 — Establish code quality and automated test tooling
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Small |
-| Type | Infrastructure |
-| Dependencies | T-001 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 11.9, 11.16, 12.18 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Feature tests or deployment configuration.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

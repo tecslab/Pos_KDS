@@ -1,18 +1,21 @@
+---
+id: T-029
+title: "Build payment-method and receipt-settings administration"
+status: todo
+priority: medium
+size: small
+type: feature
+dependencies: [T-008, T-018, T-023, T-003]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.4 FR-PAY-004/008, 5.8 FR-ADM-005, 12.15"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-029 — Build payment-method and receipt-settings administration
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Medium |
-| Estimated Size | Small |
-| Type | Feature |
-| Dependencies | T-008, T-018, T-023, T-003 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.4 FR-PAY-004/008, 5.8 FR-ADM-005, 12.15 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Printing hardware integration or payment gateway processing.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

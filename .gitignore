@@ -1,0 +1,8 @@
+# Local secrets
+.env.local
+.env.*.local
+
+# Temporary AI harness packets and transcripts
+harness/runtime/*
+!harness/runtime/.gitkeep
+

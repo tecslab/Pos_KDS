@@ -1,18 +1,21 @@
+---
+id: T-061
+title: "Build inventory adjustment and waste UI"
+status: todo
+priority: high
+size: small
+type: ui
+dependencies: [T-023, T-032, T-060]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.5 FR-INV-004/005, 8.11"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-061 — Build inventory adjustment and waste UI
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Small |
-| Type | UI |
-| Dependencies | T-023, T-032, T-060 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.5 FR-INV-004/005, 8.11 |
 
 ## Expected Outcome
 
@@ -22,3 +25,6 @@
 
 - Editing historic movements or purchasing.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

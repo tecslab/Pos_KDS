@@ -1,18 +1,21 @@
+---
+id: T-010
+title: "Model orders, baskets, lines, and lifecycle timestamps"
+status: todo
+priority: critical
+size: medium
+type: database
+dependencies: [T-006]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: true
+prd_references:
+  - "PRD 7.3–7.5, 9.1/9.3/9.8, BI-001–011"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-010 — Model orders, baskets, lines, and lifecycle timestamps
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Critical |
-| Estimated Size | Medium |
-| Type | Database |
-| Dependencies | T-006 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 7.3–7.5, 9.1/9.3/9.8, BI-001–011 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Order use cases, payment records, or UI.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

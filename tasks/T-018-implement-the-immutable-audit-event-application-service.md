@@ -1,18 +1,21 @@
+---
+id: T-018
+title: "Implement the immutable audit-event application service"
+status: todo
+priority: critical
+size: small
+type: domain
+dependencies: [T-007, T-016]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: true
+prd_references:
+  - "PRD 5.8 FR-ADM-007, 6.15, 10.6, BI-022–023"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-018 — Implement the immutable audit-event application service
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Critical |
-| Estimated Size | Small |
-| Type | Domain |
-| Dependencies | T-007, T-016 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.8 FR-ADM-007, 6.15, 10.6, BI-022–023 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - A specific business workflow or audit UI.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

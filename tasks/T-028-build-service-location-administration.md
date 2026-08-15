@@ -1,18 +1,21 @@
+---
+id: T-028
+title: "Build service-location administration"
+status: todo
+priority: high
+size: small
+type: feature
+dependencies: [T-008, T-018, T-023]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.1 FR-POS-002, 5.8 FR-ADM-004, 6.5"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-028 — Build service-location administration
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Small |
-| Type | Feature |
-| Dependencies | T-008, T-018, T-023 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.1 FR-POS-002, 5.8 FR-ADM-004, 6.5 |
 
 ## Expected Outcome
 
@@ -22,3 +25,6 @@
 
 - PoS order creation.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

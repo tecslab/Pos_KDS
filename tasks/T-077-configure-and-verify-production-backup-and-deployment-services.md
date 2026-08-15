@@ -1,18 +1,21 @@
+---
+id: T-077
+title: "Configure and verify production backup and deployment services"
+status: waiting_for_human
+priority: high
+size: small
+type: human_checkpoint
+dependencies: [T-004, T-076]
+owner: human
+reviewer: null
+requires_human: true
+architecture_required: false
+prd_references:
+  - "PRD 11.3/11.14, 12.4"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-077 — Configure and verify production backup and deployment services
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Waiting for Human |
-| Priority | High |
-| Estimated Size | Small |
-| Type | Human Checkpoint |
-| Dependencies | T-004, T-076 |
-| Owner | Human |
-| Reviewer | N/A |
-| Requires Human | Yes |
-| PRD References | PRD 11.3/11.14, 12.4 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Writing application code, exposing secrets, or an irreversible production release.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

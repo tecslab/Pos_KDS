@@ -1,18 +1,21 @@
+---
+id: T-001
+title: "Initialize the Next.js modular-monolith workspace"
+status: todo
+priority: critical
+size: small
+type: infrastructure
+dependencies: []
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: true
+prd_references:
+  - "PRD 12.3–12.6, 12.19"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-001 — Initialize the Next.js modular-monolith workspace
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Critical |
-| Estimated Size | Small |
-| Type | Infrastructure |
-| Dependencies | None |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 12.3–12.6, 12.19 |
 
 ## Expected Outcome
 
@@ -24,3 +27,6 @@
 
 - Product features, authentication, database connectivity.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

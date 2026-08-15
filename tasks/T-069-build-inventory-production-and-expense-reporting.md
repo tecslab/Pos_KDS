@@ -1,18 +1,21 @@
+---
+id: T-069
+title: "Build inventory, production, and expense reporting"
+status: todo
+priority: medium
+size: medium
+type: feature
+dependencies: [T-012, T-013, T-023]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.7 FR-REP-006/007, 3 Inventory/Financial KPIs"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-069 — Build inventory, production, and expense reporting
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Medium |
-| Estimated Size | Medium |
-| Type | Feature |
-| Dependencies | T-012, T-013, T-023 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.7 FR-REP-006/007, 3 Inventory/Financial KPIs |
 
 ## Expected Outcome
 
@@ -22,3 +25,6 @@
 
 - Forecasting or stock ordering.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

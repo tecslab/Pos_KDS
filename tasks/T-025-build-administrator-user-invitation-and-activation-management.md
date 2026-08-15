@@ -1,18 +1,21 @@
+---
+id: T-025
+title: "Build administrator user invitation and activation management"
+status: todo
+priority: high
+size: medium
+type: feature
+dependencies: [T-007, T-018, T-022, T-023]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.8 FR-ADM-001, 10.6"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-025 — Build administrator user invitation and activation management
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Medium |
-| Type | Feature |
-| Dependencies | T-007, T-018, T-022, T-023 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.8 FR-ADM-001, 10.6 |
 
 ## Expected Outcome
 
@@ -22,3 +25,6 @@
 
 - Role-management editing or direct password management.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

@@ -1,18 +1,21 @@
+---
+id: T-021
+title: "Define the printer service port and safe no-op adapter"
+status: todo
+priority: medium
+size: small
+type: infrastructure
+dependencies: [T-019]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: true
+prd_references:
+  - "PRD 5.4 FR-PAY-008, 12.14"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-021 — Define the printer service port and safe no-op adapter
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Medium |
-| Estimated Size | Small |
-| Type | Infrastructure |
-| Dependencies | T-019 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.4 FR-PAY-008, 12.14 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - A vendor-specific printer integration or hardware installation.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

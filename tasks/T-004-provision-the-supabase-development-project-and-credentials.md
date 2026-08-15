@@ -1,18 +1,21 @@
+---
+id: T-004
+title: "Provision the Supabase development project and credentials"
+status: waiting_for_human
+priority: critical
+size: small
+type: human_checkpoint
+dependencies: []
+owner: human
+reviewer: null
+requires_human: true
+architecture_required: false
+prd_references:
+  - "PRD 11.5, 12.4, 12.15–12.16"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-004 — Provision the Supabase development project and credentials
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Waiting for Human |
-| Priority | Critical |
-| Estimated Size | Small |
-| Type | Human Checkpoint |
-| Dependencies | None |
-| Owner | Human |
-| Reviewer | N/A |
-| Requires Human | Yes |
-| PRD References | PRD 11.5, 12.4, 12.15–12.16 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Schema migrations, user creation, or production credentials.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

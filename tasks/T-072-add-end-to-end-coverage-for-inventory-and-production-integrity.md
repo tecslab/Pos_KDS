@@ -1,18 +1,21 @@
+---
+id: T-072
+title: "Add end-to-end coverage for inventory and production integrity"
+status: todo
+priority: critical
+size: medium
+type: testing
+dependencies: [T-059, T-061, T-063, T-065]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.5–5.6, 8.9–8.11, BI-016/018–021, 12.18"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-072 — Add end-to-end coverage for inventory and production integrity
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Critical |
-| Estimated Size | Medium |
-| Type | Testing |
-| Dependencies | T-059, T-061, T-063, T-065 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.5–5.6, 8.9–8.11, BI-016/018–021, 12.18 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Physical stock reconciliation or supplier integrations.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

@@ -1,18 +1,21 @@
+---
+id: T-040
+title: "Connect PoS draft confirmation and recovery feedback"
+status: todo
+priority: critical
+size: small
+type: ui
+dependencies: [T-021, T-036, T-039]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: false
+prd_references:
+  - "PRD 5.1 FR-POS-007–010, 11.1 NFR-002, 11.3, 11.8"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-040 — Connect PoS draft confirmation and recovery feedback
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | Critical |
-| Estimated Size | Small |
-| Type | UI |
-| Dependencies | T-021, T-036, T-039 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 5.1 FR-POS-007–010, 11.1 NFR-002, 11.3, 11.8 |
 
 ## Expected Outcome
 
@@ -22,3 +25,6 @@
 
 - Vendor printing or confirmed-order editing.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

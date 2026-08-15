@@ -1,18 +1,21 @@
+---
+id: T-074
+title: "Add operational logging and application telemetry"
+status: todo
+priority: high
+size: small
+type: infrastructure
+dependencies: [T-005, T-019]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: true
+prd_references:
+  - "PRD 11.10, 12.17"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-074 — Add operational logging and application telemetry
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Small |
-| Type | Infrastructure |
-| Dependencies | T-005, T-019 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 11.10, 12.17 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Replacing the audit log or subscribing a production monitoring vendor.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).

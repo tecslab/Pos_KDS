@@ -1,18 +1,21 @@
+---
+id: T-019
+title: "Define domain-event and transaction boundary interfaces"
+status: todo
+priority: high
+size: small
+type: domain
+dependencies: [T-016]
+owner: ai
+reviewer: ai_reviewer
+requires_human: false
+architecture_required: true
+prd_references:
+  - "PRD 12.11–12.12, 11.4"
+definition_of_done: harness/definition-of-done.md
+---
+
 # T-019 — Define domain-event and transaction boundary interfaces
-
-## Metadata
-
-| Field | Value |
-| --- | --- |
-| Status | Todo |
-| Priority | High |
-| Estimated Size | Small |
-| Type | Domain |
-| Dependencies | T-016 |
-| Owner | AI |
-| Reviewer | AI Reviewer |
-| Requires Human | No |
-| PRD References | PRD 12.11–12.12, 11.4 |
 
 ## Expected Outcome
 
@@ -23,3 +26,6 @@
 
 - Supabase Realtime transport or asynchronous workers.
 
+## Definition of Done
+
+Inherits the [Shared Definition of Done](../harness/definition-of-done.md).
