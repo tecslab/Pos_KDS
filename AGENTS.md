@@ -34,6 +34,7 @@ Mockup values and sample data never override business rules or configured values
 - Only one task may be implemented at a time in the shared working tree.
 - Every AI-owned task requires an independent Reviewer.
 - Use an Architect only when `architecture_required: true`.
+- Follow the mandatory model-routing policy in `harness/orchestration.md`; record every specialist assignment in the task packet.
 - Architect and Reviewer agents are read-only and must not edit production or harness files.
 - Human-owned tasks are checkpoints. Do not architect or implement them.
 - If independent review is unavailable, the task cannot be marked Done.

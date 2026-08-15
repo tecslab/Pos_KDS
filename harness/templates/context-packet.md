@@ -8,6 +8,17 @@
 - Not included:
 - Definition of Done:
 
+## Model Assignment
+
+- Complexity: Low | Medium | High
+- Classification evidence:
+- Coordinator: `gpt-5.6-terra`, `medium`
+- Requirements Router:
+- Architect:
+- Implementer:
+- Reviewer: `gpt-5.6-sol`, `high`
+- Authorized substitution: None
+
 ## Exact PRD Context
 
 | Source | Heading | Why applicable |

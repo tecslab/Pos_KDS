@@ -18,9 +18,51 @@ Leader
 
 Only one implementation task runs at a time in the shared working tree.
 
+## Model Routing Policy
+
+The human initializes the Leader, so the harness does not prescribe the Leader's model.
+
+The Leader must create every Task Coordinator with:
+
+| Role | Model | Reasoning effort |
+| --- | --- | --- |
+| Task Coordinator | `gpt-5.6-terra` | `medium` |
+
+The Task Coordinator assigns all remaining agents. Use the lowest tier that satisfies the task, according to the following deterministic classification.
+
+### Complexity Classification
+
+Classify the task before spawning an Architect or Implementer. Record the level and concrete reason in the context packet.
+
+- **High** when any of these apply: authentication or authorization; security; database schema or migration; business invariants; payments; inventory or production transactions; immutable history; transaction/event/realtime boundaries; backup or deployment safety; cross-module consistency; destructive-risk behavior; or unresolved architectural ambiguity.
+- **Medium** when High does not apply and any of these apply: a multi-file feature, API or external integration, non-trivial UI state, persistence access using an established pattern, performance work, report/export behavior, or task size `medium`/`large`.
+- **Low** only when the change is isolated, explicit, reversible, task size `small`, and does not cross a security, data, transaction, infrastructure, or module boundary.
+
+When uncertain between two levels, choose the higher level. Task priority is not a substitute for complexity, and task size alone cannot lower a risk-triggered High classification.
+
+### Specialist Assignment
+
+| Complexity | Architect, when required | Implementer |
+| --- | --- | --- |
+| Low | `gpt-5.6-terra`, `medium` | `gpt-5.6-terra`, `medium` |
+| Medium | `gpt-5.6-terra`, `high` | `gpt-5.6-terra`, `high` |
+| High | `gpt-5.6-sol`, `high` | `gpt-5.6-sol`, `high` |
+
+Use `gpt-5.6-terra` with `medium` reasoning for a separately spawned Requirements Router because its work is bounded extraction and summarization.
+
+Every Reviewer uses:
+
+| Role | Model | Reasoning effort |
+| --- | --- | --- |
+| Reviewer | `gpt-5.6-sol` | `high` |
+
+Reviewer quality must not be reduced based on task size. The Reviewer is the independent quality gate, while its compact context packet controls token usage. A repair cycle uses the original Implementer tier and a fresh `gpt-5.6-sol` High Reviewer.
+
+If a prescribed model is unavailable, stop and report the unavailable assignment to the Leader. Do not silently downgrade, substitute an unlisted model, or weaken reasoning effort. The Leader or human may explicitly authorize an equal-or-stronger available substitute, which must be recorded in the context packet and completion receipt.
+
 ## 1. Leader
 
-The Leader reads compact state, identifies a dependency-ready task, and creates a fresh Coordinator. It does not supervise file-level work or load the full PRD.
+The Leader reads compact state, identifies a dependency-ready task, and creates a fresh `gpt-5.6-terra` Medium Coordinator. It does not supervise file-level work or load the full PRD.
 
 Before dispatch, the Leader confirms:
 
@@ -40,6 +82,7 @@ The Coordinator:
 3. Creates an ignored runtime directory for the task.
 4. Invokes the Requirements Router.
 5. Uses the task's explicit `architecture_required` value to route the next step.
+6. Classifies task complexity and records every model/reasoning assignment before spawning specialists.
 
 The Coordinator coordinates but does not make product or architecture decisions on behalf of specialists.
 
