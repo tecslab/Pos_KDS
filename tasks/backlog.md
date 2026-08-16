@@ -8,7 +8,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-004 Provision the Supabase development project and credentials
 - [x] T-005 Implement typed environment configuration and startup validation
 - [x] T-006 Add Prisma database foundation and migration workflow
-- [ ] T-007 Model RBAC, employee profiles, and immutable audit records
+- [x] T-007 Model RBAC, employee profiles, and immutable audit records
 - [ ] T-008 Model restaurant configuration and service locations
 - [ ] T-009 Model the versioned product catalog and configurable modifications
 - [ ] T-010 Model orders, baskets, lines, and lifecycle timestamps

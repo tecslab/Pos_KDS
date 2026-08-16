@@ -1,7 +1,7 @@
 ---
 id: T-007
 title: "Model RBAC, employee profiles, and immutable audit records"
-status: todo
+status: done
 priority: critical
 size: medium
 type: database

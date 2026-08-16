@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-007
-last_completed_task: T-006
+next_suggested_task: T-008
+last_completed_task: T-007
 last_commit: Pending task commit
-completed_tasks: 8
+completed_tasks: 9
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -38,13 +38,15 @@ T-005 — Implement typed environment configuration and startup validation (comm
 
 T-006 — Add Prisma database foundation and migration workflow (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-007 — Model RBAC, employee profiles, and immutable audit records (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-007 — Model RBAC, employee profiles, and immutable audit records.
+T-008 — Model restaurant configuration and service locations.
 
 ## Human Checkpoints
 
