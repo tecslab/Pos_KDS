@@ -1,7 +1,7 @@
 ---
 id: T-004
 title: "Provision the Supabase development project and credentials"
-status: waiting_for_human
+status: done
 priority: critical
 size: small
 type: human_checkpoint
@@ -29,3 +29,12 @@ definition_of_done: harness/definition-of-done.md
 ## Definition of Done
 
 Inherits the [Shared Definition of Done](../harness/definition-of-done.md).
+
+## Confirmed Provisioning
+
+Confirmed by the restaurant owner on 2026-08-15:
+
+- Development project: `carnales` in São Paulo (`sa-east-1`), project ref `qsujkexjecpkcqawryqi`.
+- Client configuration: the Supabase project URL and publishable key have been populated outside server-only secret storage.
+- Server-only key: not required by the current implementation. A mistakenly exposed key was revoked and replaced; no server-only key is stored in the repository.
+- Remote migrations: governed by ADR-001 and performed through the connected Supabase MCP.
