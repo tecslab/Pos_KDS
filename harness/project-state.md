@@ -4,13 +4,12 @@ current_milestone: M1
 current_task: null
 current_phase: idle
 next_suggested_task: T-021
-last_completed_task: T-019
-last_commit: 21460aa710f32f93c43d9ee3e98c870ed055889f
-completed_tasks: 4
+last_completed_task: T-003
+last_commit: 63b45c8a70b8bebae15e701e58c6bd31e91128d6
+completed_tasks: 5
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
-  - T-003
   - T-004
   - T-077
   - T-078
@@ -30,7 +29,9 @@ T-002 — Establish code quality and automated test tooling (`97cda38`).
 
 T-016 — Create shared domain error and result conventions (`21460aa`).
 
-T-019 — Define domain-event and transaction boundary interfaces (commit pending; the task commit cannot self-reference in this tracked state file).
+T-019 — Define domain-event and transaction boundary interfaces (`63b45c8`).
+
+T-003 — Confirm initial restaurant operating configuration (commit pending; the checkpoint commit cannot self-reference in this tracked state file).
 
 ## Current Task
 
@@ -42,7 +43,6 @@ T-021 — Define the printer service port and safe no-op adapter.
 
 ## Human Checkpoints
 
-- T-003 — Initial restaurant operating configuration awaits explicit human approval of the supplied values.
 - T-004 — Supabase development project and credentials are required before dependent work.
 - T-077 — Production backup and deployment configuration is a later release checkpoint.
 - T-078 — Printer hardware and local print-service deployment is a later release checkpoint.

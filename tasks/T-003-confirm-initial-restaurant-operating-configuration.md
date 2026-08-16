@@ -1,7 +1,7 @@
 ---
 id: T-003
 title: "Confirm initial restaurant operating configuration"
-status: waiting_for_human
+status: done
 priority: high
 size: small
 type: human_checkpoint
@@ -29,3 +29,18 @@ definition_of_done: harness/definition-of-done.md
 ## Definition of Done
 
 Inherits the [Shared Definition of Done](../harness/definition-of-done.md).
+
+## Confirmed Initial Configuration
+
+Confirmed by the restaurant owner through `restaurantData.md` on 2026-08-15:
+
+- Restaurant identity: Carnales — Mexican Grill.
+- Taxes: configurable; the default rate is 15% and menu prices include the applicable tax.
+- Service locations: Tables 1 through 15, plus a Dispatch Window. Only the Dispatch Window permits multiple active orders.
+- Payment methods: Cash, DeUna, and JEP Fast. DeUna and JEP Fast are the configured labels for the two initial bank-transfer methods.
+- Business hours: 11:00–22:00.
+- Kitchen thresholds: warning at 5 minutes; critical at 7 minutes.
+- Delivery thresholds: warning at 6 minutes; critical at 8 minutes.
+- Inventory policy: stock must never become negative.
+
+This checkpoint records approved operating decisions only; configuration will be entered by later administration and seed tasks.
