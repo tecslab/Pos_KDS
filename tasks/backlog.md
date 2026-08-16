@@ -20,7 +20,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-016 Create shared domain error and result conventions
 - [ ] T-017 Implement centralized permission evaluation
 - [ ] T-018 Implement the immutable audit-event application service
-- [ ] T-019 Define domain-event and transaction boundary interfaces
+- [x] T-019 Define domain-event and transaction boundary interfaces
 - [ ] T-020 Implement the Supabase Realtime event adapter
 - [ ] T-021 Define the printer service port and safe no-op adapter
 - [ ] T-022 Integrate Supabase Authentication and session lifecycle

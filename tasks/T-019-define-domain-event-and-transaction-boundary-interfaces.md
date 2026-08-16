@@ -1,7 +1,7 @@
 ---
 id: T-019
 title: "Define domain-event and transaction boundary interfaces"
-status: todo
+status: done
 priority: high
 size: small
 type: domain
