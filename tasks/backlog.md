@@ -6,7 +6,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-002 Establish code quality and automated test tooling
 - [x] T-003 Confirm initial restaurant operating configuration
 - [x] T-004 Provision the Supabase development project and credentials
-- [ ] T-005 Implement typed environment configuration and startup validation
+- [x] T-005 Implement typed environment configuration and startup validation
 - [ ] T-006 Add Prisma database foundation and migration workflow
 - [ ] T-007 Model RBAC, employee profiles, and immutable audit records
 - [ ] T-008 Model restaurant configuration and service locations

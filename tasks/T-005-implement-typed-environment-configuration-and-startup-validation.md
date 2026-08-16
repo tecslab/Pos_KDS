@@ -1,7 +1,7 @@
 ---
 id: T-005
 title: "Implement typed environment configuration and startup validation"
-status: todo
+status: done
 priority: critical
 size: small
 type: infrastructure
