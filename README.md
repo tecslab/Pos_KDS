@@ -30,9 +30,9 @@ The individual commands are available when iterating on a specific concern:
 - `npm run format` validates formatting with Prettier; `npm run format:write`
   applies it.
 - `npm run typecheck` performs TypeScript checking without emitting files.
-- `npm run test` executes unit tests with Vitest. The initial application
-  skeleton has no unit tests yet, so this command succeeds while reporting no
-  test files; future domain-layer business rules should add their tests there.
+- `npm run test` executes unit tests with Vitest. Domain contracts and
+  framework-facing helpers have focused suites alongside their source files;
+  future business rules should follow the same pattern.
 
 Continuous integration runs the quality gate and production build for pushes
 to `main` and pull requests.
@@ -69,3 +69,13 @@ modules own their future application and domain behavior. Cross-module access
 must use an intentional public entry point (for example, a module `index.ts`);
 deep imports into another module are not allowed. These rules keep business
 logic testable and independent of Next.js and external integrations.
+
+### Error and result convention
+
+Expected business failures are returned as `Result<T, BusinessError>` values;
+they are not thrown. The shared business-error union covers invalid state
+transitions, insufficient inventory, invalid payment amounts, and unauthorized
+operations. Technical failures continue to throw and are handled at transport
+catch boundaries. Route handlers can use `mapErrorToHttp` to translate either
+kind of failure into a framework-neutral descriptor with a fixed, safe public
+message, then construct the framework response at the route boundary.

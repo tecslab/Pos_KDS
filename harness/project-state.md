@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-004
-last_completed_task: T-002
-last_commit: b038e9901dde8098abde2e0b0e8b0fbc9ac6382a
-completed_tasks: 2
+next_suggested_task: T-019
+last_completed_task: T-016
+last_commit: 97cda3831ff0c5b8a2cc399070ab28e705b8bfaf
+completed_tasks: 3
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -26,7 +26,9 @@ M1 — Foundation and Domain Infrastructure
 
 T-001 — Initialize the Next.js modular-monolith workspace (`b038e99`).
 
-T-002 — Establish code quality and automated test tooling (commit pending; the commit cannot self-reference in this tracked state file).
+T-002 — Establish code quality and automated test tooling (`97cda38`).
+
+T-016 — Create shared domain error and result conventions (commit pending; the task commit cannot self-reference in this tracked state file).
 
 ## Current Task
 
@@ -34,7 +36,7 @@ None.
 
 ## Next Suggested Task
 
-T-004 — Provision the Supabase development project and credentials (human checkpoint).
+T-019 — Define domain-event and transaction boundary interfaces.
 
 ## Human Checkpoints
 

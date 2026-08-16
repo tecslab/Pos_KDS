@@ -1,7 +1,7 @@
 ---
 id: T-016
 title: "Create shared domain error and result conventions"
-status: todo
+status: done
 priority: high
 size: small
 type: domain
