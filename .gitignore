@@ -36,6 +36,7 @@ vitest.config.*.timestamp-*
 
 # environment files and deployment metadata
 .env*
+!.env.example
 .vercel
 
 # temporary AI harness packets and transcripts

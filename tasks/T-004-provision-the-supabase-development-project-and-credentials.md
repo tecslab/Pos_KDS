@@ -20,7 +20,7 @@ definition_of_done: harness/definition-of-done.md
 ## Expected Outcome
 
 - Create the development Supabase project
-- provide the project URL, publishable key, database connection details, and approved server-only credentials through the project’s secret-management process.
+- provide the project URL and publishable key; if privileged server operations require it, approve a modern server-only secret key through the project’s secret-management process. Remote database migrations use the connected Supabase MCP under ADR-001 rather than a direct database connection string.
 
 ## Not Included
 
