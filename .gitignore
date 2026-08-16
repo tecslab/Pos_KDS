@@ -11,6 +11,9 @@
 # testing
 /coverage
 
+# code quality tooling
+/.eslintcache
+
 # Next.js
 /.next/
 /out/
@@ -29,6 +32,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+vitest.config.*.timestamp-*
 
 # environment files and deployment metadata
 .env*

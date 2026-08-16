@@ -16,6 +16,27 @@ Use `npm run build` for a production build and `npm start` to serve it. The
 production build uses Next.js's supported webpack compiler for compatibility
 with restricted build environments.
 
+## Quality checks
+
+Run the complete local quality gate with:
+
+```bash
+npm run check
+```
+
+The individual commands are available when iterating on a specific concern:
+
+- `npm run lint` checks the TypeScript and Next.js code with ESLint.
+- `npm run format` validates formatting with Prettier; `npm run format:write`
+  applies it.
+- `npm run typecheck` performs TypeScript checking without emitting files.
+- `npm run test` executes unit tests with Vitest. The initial application
+  skeleton has no unit tests yet, so this command succeeds while reporting no
+  test files; future domain-layer business rules should add their tests there.
+
+Continuous integration runs the quality gate and production build for pushes
+to `main` and pull requests.
+
 ## Architecture
 
 All application code lives under `src/`:

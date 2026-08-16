@@ -1,0 +1,16 @@
+.next/
+build/
+coverage/
+next-env.d.ts
+node_modules/
+out/
+
+# Product references, planning records, and static mockups are maintained
+# separately from application source formatting.
+harness/
+mockups/
+PRD/
+products.md
+restaurantData.md
+styleguide.md
+tasks/

@@ -1,7 +1,7 @@
 ---
 id: T-002
 title: "Establish code quality and automated test tooling"
-status: todo
+status: done
 priority: high
 size: small
 type: infrastructure
