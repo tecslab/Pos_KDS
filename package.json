@@ -4,16 +4,21 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "npm run db:generate && next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "check": "npm run lint && npm run format && npm run typecheck && npm run test"
+    "db:schema:format": "prisma format",
+    "db:schema:validate": "prisma validate",
+    "db:generate": "prisma generate",
+    "db:migration:diff": "prisma migrate diff",
+    "check": "npm run lint && npm run format && npm run typecheck && npm run db:schema:validate && npm run test"
   },
   "dependencies": {
+    "@prisma/client": "^7.9.1",
     "next": "16.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8"
@@ -26,6 +31,7 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.1",
     "prettier": "^3.9.6",
+    "prisma": "^7.9.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.10"

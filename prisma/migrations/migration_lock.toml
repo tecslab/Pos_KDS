@@ -1,0 +1,2 @@
+# This file is maintained by Prisma. It records the provider used by migration artifacts.
+provider = "postgresql"

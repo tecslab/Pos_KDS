@@ -16,6 +16,45 @@ Use `npm run build` for a production build and `npm start` to serve it. The
 production build uses Next.js's supported webpack compiler for compatibility
 with restricted build environments.
 
+## Database schema and migrations
+
+Prisma is the repository source for the PostgreSQL schema, generated client,
+and reviewable SQL migration artifacts. It does not connect to or deploy to
+Supabase from this project. The generated client is written to
+`src/generated/prisma/` and is intentionally ignored; `npm run build` runs
+`npm run db:generate` first to ensure it is current.
+
+```bash
+npm run db:schema:format
+npm run db:schema:validate
+npm run db:generate
+```
+
+Remote Supabase migrations are governed by ADR-001 and must use the connected
+Supabase MCP, never a database connection string or a Prisma remote command.
+For each future schema change:
+
+1. Inspect the affected remote schema and Supabase migration history through
+   MCP.
+2. Update `prisma/schema.prisma`, then generate reviewable SQL by diffing the
+   committed prior schema (or `--from-empty` for the first model-bearing
+   migration) to the proposed schema:
+
+   ```bash
+   npm run db:migration:diff -- --from-schema <before.prisma> --to-schema prisma/schema.prisma --script --output prisma/migrations/<timestamp>_<mcp-name>/migration.sql
+   ```
+
+3. Review the schema and exact SQL together. The migration directory suffix
+   and named MCP migration must match.
+4. Apply that reviewed SQL through MCP, then verify the resulting schema and
+   MCP migration history through MCP.
+5. Run schema validation and client generation locally.
+
+Supabase MCP history is authoritative because Prisma never applies remote
+migrations; repository `prisma/migrations/**/migration.sql` files are the
+versioned artifacts. Do not use `prisma migrate dev`, `prisma migrate deploy`,
+`prisma db push`, or `prisma db execute` against the Supabase project.
+
 ## Quality checks
 
 Run the complete local quality gate with:

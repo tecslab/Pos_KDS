@@ -1,7 +1,7 @@
 ---
 id: T-006
 title: "Add Prisma database foundation and migration workflow"
-status: todo
+status: done
 priority: critical
 size: small
 type: infrastructure

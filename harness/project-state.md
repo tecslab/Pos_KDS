@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-006
-last_completed_task: T-005
-last_commit: 38966ff876af31cc2b10089062b1c5752d448c30
-completed_tasks: 7
+next_suggested_task: T-007
+last_completed_task: T-006
+last_commit: Pending task commit
+completed_tasks: 8
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -36,13 +36,15 @@ T-004 — Provision the Supabase development project and credentials (`38966ff`)
 
 T-005 — Implement typed environment configuration and startup validation (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-006 — Add Prisma database foundation and migration workflow (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-006 — Add Prisma database foundation and migration workflow.
+T-007 — Model RBAC, employee profiles, and immutable audit records.
 
 ## Human Checkpoints
 
