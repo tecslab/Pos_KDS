@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-009
-last_completed_task: T-008
+next_suggested_task: T-010
+last_completed_task: T-009
 last_commit: Pending task commit
-completed_tasks: 10
+completed_tasks: 11
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -40,13 +40,17 @@ T-006 — Add Prisma database foundation and migration workflow (commit pending;
 
 T-007 — Model RBAC, employee profiles, and immutable audit records (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-008 — Model restaurant configuration and service locations (commit pending; the task commit cannot self-reference in this tracked state file).
+
+T-009 — Model the versioned product catalog and configurable modifications (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-009 — Model the versioned product catalog and configurable modifications.
+T-010 — Model orders, baskets, lines, and lifecycle timestamps.
 
 ## Human Checkpoints
 

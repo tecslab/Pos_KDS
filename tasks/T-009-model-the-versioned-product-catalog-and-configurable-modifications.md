@@ -1,7 +1,7 @@
 ---
 id: T-009
 title: "Model the versioned product catalog and configurable modifications"
-status: todo
+status: done
 priority: critical
 size: medium
 type: database
