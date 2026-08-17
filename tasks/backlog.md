@@ -12,7 +12,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-008 Model restaurant configuration and service locations
 - [x] T-009 Model the versioned product catalog and configurable modifications
 - [x] T-010 Model orders, baskets, lines, and lifecycle timestamps
-- [ ] T-011 Model payments and immutable payment history
+- [x] T-011 Model payments and immutable payment history
 - [ ] T-012 Model inventory ledger, balances, and alerts
 - [ ] T-013 Model recipes, production batches, and operating expenses
 - [ ] T-014 Enforce database-level integrity and historical-record protections

@@ -1,7 +1,7 @@
 ---
 id: T-011
 title: "Model payments and immutable payment history"
-status: todo
+status: done
 priority: critical
 size: small
 type: database
