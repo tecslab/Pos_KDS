@@ -84,3 +84,96 @@ model AuditEvent {
   @@index([entityType, entityId, occurredAt])
   @@map("audit_events")
 }
+
+model Restaurant {
+  id               String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String
+  isActive         Boolean                  @map("is_active")
+  createdAt        DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt        DateTime?                @map("deleted_at") @db.Timestamptz(6)
+  configuration    RestaurantConfiguration?
+  serviceLocations ServiceLocation[]
+  paymentMethods   PaymentMethod[]
+  taxRates         RestaurantTaxRate[]
+
+  @@map("restaurants")
+}
+
+model RestaurantConfiguration {
+  restaurantId                        String     @id @map("restaurant_id") @db.Uuid
+  address                             String?
+  taxId                               String?    @map("tax_id")
+  contactInformation                  Json?      @map("contact_information") @db.JsonB
+  logoUrl                             String?    @map("logo_url")
+  receiptHeader                       String?    @map("receipt_header")
+  receiptFooter                       String?    @map("receipt_footer")
+  thermalPrinterConfiguration         Json?      @map("thermal_printer_configuration") @db.JsonB
+  serviceChargeRate                   Decimal    @map("service_charge_rate") @db.Decimal(7, 6)
+  preparationWarningThresholdMinutes  Int        @map("preparation_warning_threshold_minutes")
+  preparationCriticalThresholdMinutes Int        @map("preparation_critical_threshold_minutes")
+  deliveryWarningThresholdMinutes     Int        @map("delivery_warning_threshold_minutes")
+  deliveryCriticalThresholdMinutes    Int        @map("delivery_critical_threshold_minutes")
+  inventoryPolicy                     Json       @map("inventory_policy") @db.JsonB
+  printingBehavior                    Json       @map("printing_behavior") @db.JsonB
+  businessHours                       Json       @map("business_hours") @db.JsonB
+  createdAt                           DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                           DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  restaurant                          Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@map("restaurant_configurations")
+}
+
+model ServiceLocation {
+  id                         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId               String     @map("restaurant_id") @db.Uuid
+  name                       String
+  type                       String
+  displayOrder               Int        @map("display_order")
+  isActive                   Boolean    @map("is_active")
+  allowsMultipleActiveOrders Boolean    @map("allows_multiple_active_orders")
+  createdAt                  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                  DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt                  DateTime?  @map("deleted_at") @db.Timestamptz(6)
+  restaurant                 Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([restaurantId, name])
+  @@index([restaurantId, isActive, displayOrder])
+  @@map("service_locations")
+}
+
+model PaymentMethod {
+  id                       String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId             String     @map("restaurant_id") @db.Uuid
+  code                     String
+  name                     String
+  displayOrder             Int        @map("display_order")
+  isActive                 Boolean    @map("is_active")
+  bankAccountConfiguration Json?      @map("bank_account_configuration") @db.JsonB
+  receiptConfiguration     Json?      @map("receipt_configuration") @db.JsonB
+  createdAt                DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt                DateTime?  @map("deleted_at") @db.Timestamptz(6)
+  restaurant               Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([restaurantId, code])
+  @@index([restaurantId, isActive, displayOrder])
+  @@map("payment_methods")
+}
+
+model RestaurantTaxRate {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String     @map("restaurant_id") @db.Uuid
+  code         String
+  name         String
+  rate         Decimal    @db.Decimal(7, 6)
+  isActive     Boolean    @map("is_active")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime?  @map("deleted_at") @db.Timestamptz(6)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([restaurantId, code])
+  @@index([restaurantId, isActive])
+  @@map("restaurant_tax_rates")
+}

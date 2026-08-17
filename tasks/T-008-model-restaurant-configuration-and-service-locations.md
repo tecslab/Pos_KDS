@@ -1,7 +1,7 @@
 ---
 id: T-008
 title: "Model restaurant configuration and service locations"
-status: todo
+status: done
 priority: high
 size: medium
 type: database

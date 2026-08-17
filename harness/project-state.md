@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-008
-last_completed_task: T-007
+next_suggested_task: T-009
+last_completed_task: T-008
 last_commit: Pending task commit
-completed_tasks: 9
+completed_tasks: 10
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -46,7 +46,7 @@ None.
 
 ## Next Suggested Task
 
-T-008 — Model restaurant configuration and service locations.
+T-009 — Model the versioned product catalog and configurable modifications.
 
 ## Human Checkpoints
 
