@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-010
-last_completed_task: T-009
-last_commit: Pending task commit
-completed_tasks: 11
+next_suggested_task: T-011
+last_completed_task: T-010
+last_commit: a067599
+completed_tasks: 12
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-010 — Model orders, baskets, lines, and lifecycle timestamps.
+T-011 — Model payments and immutable payment history.
 
 ## Human Checkpoints
 

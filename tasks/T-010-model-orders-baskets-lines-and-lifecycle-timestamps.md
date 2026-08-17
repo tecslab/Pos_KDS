@@ -1,7 +1,7 @@
 ---
 id: T-010
 title: "Model orders, baskets, lines, and lifecycle timestamps"
-status: todo
+status: done
 priority: critical
 size: medium
 type: database

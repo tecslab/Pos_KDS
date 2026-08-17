@@ -8,13 +8,15 @@ datasource db {
 }
 
 model ApplicationUser {
-  id          String               @id @db.Uuid
-  displayName String               @map("display_name")
-  isActive    Boolean              @default(true) @map("is_active")
-  createdAt   DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
-  roles       UserRoleAssignment[]
-  auditEvents AuditEvent[]
+  id                 String               @id @db.Uuid
+  displayName        String               @map("display_name")
+  isActive           Boolean              @default(true) @map("is_active")
+  createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  roles              UserRoleAssignment[]
+  auditEvents        AuditEvent[]
+  assignedOrders     Order[]              @relation("AssignedWaiter")
+  orderCancellations OrderCancellation[]
 
   @@map("application_users")
 }
@@ -99,6 +101,7 @@ model Restaurant {
   productCatalog    ProductCatalog?
   productCategories ProductCategory[]
   products          Product[]
+  orders            Order[]
 
   @@map("restaurants")
 }
@@ -139,8 +142,10 @@ model ServiceLocation {
   updatedAt                  DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt                  DateTime?  @map("deleted_at") @db.Timestamptz(6)
   restaurant                 Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  orders                     Order[]
 
   @@unique([restaurantId, name])
+  @@unique([restaurantId, id])
   @@index([restaurantId, isActive, displayOrder])
   @@map("service_locations")
 }
@@ -252,6 +257,7 @@ model ProductVersion {
   tax                  RestaurantTaxRate            @relation(fields: [restaurantId, taxRateId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict)
   options              ProductOption[]
   removableIngredients ProductRemovableIngredient[]
+  orderLineSnapshots   OrderLineSaleSnapshot[]
 
   @@unique([restaurantId, productId, versionNumber])
   @@unique([restaurantId, id])
@@ -288,4 +294,126 @@ model ProductRemovableIngredient {
   @@unique([restaurantId, productVersionId, name], map: "product_removable_ingredients_version_name_key")
   @@index([restaurantId, productVersionId, displayOrder], map: "product_removable_ingredients_version_display_order_idx")
   @@map("product_removable_ingredients")
+}
+
+enum OrderStatus {
+  PENDING
+  READY
+  ON_THE_WAY
+  DELIVERED
+  PAID
+  CANCELLED
+
+  @@map("order_status")
+}
+
+enum CustomerBasketStatus {
+  PENDING
+  PAID
+
+  @@map("customer_basket_status")
+}
+
+model Order {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId      String             @map("restaurant_id") @db.Uuid
+  serviceLocationId String             @map("service_location_id") @db.Uuid
+  assignedWaiterId  String             @map("assigned_waiter_id") @db.Uuid
+  orderNumber       String             @unique @map("order_number")
+  status            OrderStatus
+  notes             String?
+  totalAmount       Decimal            @map("total_amount") @db.Decimal(12, 2)
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  readyAt           DateTime?          @map("ready_at") @db.Timestamptz(6)
+  onTheWayAt        DateTime?          @map("on_the_way_at") @db.Timestamptz(6)
+  deliveredAt       DateTime?          @map("delivered_at") @db.Timestamptz(6)
+  paidAt            DateTime?          @map("paid_at") @db.Timestamptz(6)
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  restaurant        Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  serviceLocation   ServiceLocation    @relation(fields: [restaurantId, serviceLocationId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "orders_service_location_fkey")
+  assignedWaiter    ApplicationUser    @relation("AssignedWaiter", fields: [assignedWaiterId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  baskets           CustomerBasket[]
+  cancellation      OrderCancellation?
+
+  @@unique([restaurantId, id])
+  @@index([restaurantId, status, createdAt])
+  @@index([restaurantId, serviceLocationId, status])
+  @@index([assignedWaiterId, status])
+  @@map("orders")
+}
+
+model CustomerBasket {
+  id           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String               @map("restaurant_id") @db.Uuid
+  orderId      String               @map("order_id") @db.Uuid
+  status       CustomerBasketStatus
+  totalAmount  Decimal              @map("total_amount") @db.Decimal(12, 2)
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  paidAt       DateTime?            @map("paid_at") @db.Timestamptz(6)
+  order        Order                @relation(fields: [restaurantId, orderId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "customer_baskets_order_fkey")
+  lines        OrderLine[]
+
+  @@unique([restaurantId, id])
+  @@index([restaurantId, orderId, status])
+  @@map("customer_baskets")
+}
+
+model OrderLine {
+  id                String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId      String                  @map("restaurant_id") @db.Uuid
+  basketId          String                  @map("basket_id") @db.Uuid
+  currentSnapshotId String                  @unique @map("current_snapshot_id") @db.Uuid
+  createdAt         DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  basket            CustomerBasket          @relation(fields: [restaurantId, basketId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_lines_basket_fkey")
+  snapshots         OrderLineSaleSnapshot[] @relation("LineSnapshots")
+  currentSnapshot   OrderLineSaleSnapshot   @relation("CurrentLineSnapshot", fields: [restaurantId, id, currentSnapshotId], references: [restaurantId, orderLineId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_lines_current_snapshot_fkey")
+
+  @@unique([restaurantId, id])
+  @@unique([restaurantId, id, currentSnapshotId], map: "order_lines_current_snapshot_owner_key")
+  @@index([restaurantId, basketId])
+  @@map("order_lines")
+}
+
+model OrderLineSaleSnapshot {
+  id                 String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId       String         @map("restaurant_id") @db.Uuid
+  orderLineId        String         @map("order_line_id") @db.Uuid
+  revisionNumber     Int            @map("revision_number")
+  productVersionId   String         @map("product_version_id") @db.Uuid
+  productName        String         @map("product_name")
+  quantity           Int
+  baseUnitPrice      Decimal        @map("base_unit_price") @db.Decimal(12, 2)
+  finalUnitPrice     Decimal        @map("final_unit_price") @db.Decimal(12, 2)
+  lineTotal          Decimal        @map("line_total") @db.Decimal(12, 2)
+  taxCode            String         @map("tax_code")
+  taxName            String         @map("tax_name")
+  taxRate            Decimal        @map("tax_rate") @db.Decimal(7, 6)
+  priceIncludesTax   Boolean        @map("price_includes_tax")
+  selectedOptions    Json           @map("selected_options") @db.JsonB
+  removedIngredients Json           @map("removed_ingredients") @db.JsonB
+  observations       String?
+  createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  orderLine          OrderLine      @relation("LineSnapshots", fields: [restaurantId, orderLineId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_line_snapshots_line_fkey")
+  currentForLine     OrderLine?     @relation("CurrentLineSnapshot")
+  productVersion     ProductVersion @relation(fields: [restaurantId, productVersionId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_line_snapshots_product_version_fkey")
+
+  @@unique([restaurantId, orderLineId, revisionNumber], map: "order_line_snapshots_line_revision_key")
+  @@unique([restaurantId, orderLineId, id], map: "order_line_snapshots_current_key")
+  @@index([restaurantId, productVersionId], map: "order_line_snapshots_product_version_idx")
+  @@map("order_line_sale_snapshots")
+}
+
+model OrderCancellation {
+  orderId        String          @id @map("order_id") @db.Uuid
+  restaurantId   String          @map("restaurant_id") @db.Uuid
+  cancelledById  String          @map("cancelled_by_id") @db.Uuid
+  previousStatus OrderStatus     @map("previous_status")
+  reason         String
+  cancelledAt    DateTime        @default(now()) @map("cancelled_at") @db.Timestamptz(6)
+  order          Order           @relation(fields: [restaurantId, orderId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_cancellations_order_fkey")
+  cancelledBy    ApplicationUser @relation(fields: [cancelledById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([restaurantId, orderId])
+  @@index([cancelledById, cancelledAt])
+  @@map("order_cancellations")
 }
