@@ -1,7 +1,7 @@
 ---
 id: T-012
 title: "Model inventory ledger, balances, and alerts"
-status: todo
+status: done
 priority: critical
 size: medium
 type: database

@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -19,6 +20,7 @@ model ApplicationUser {
   orderCancellations OrderCancellation[]
   recordedPayments   Payment[]            @relation("PaymentRecorder")
   authorizedOverages Payment[]            @relation("PaymentOverageAuthorizer")
+  inventoryMovements InventoryMovement[]
 
   @@map("application_users")
 }
@@ -104,6 +106,7 @@ model Restaurant {
   productCategories ProductCategory[]
   products          Product[]
   orders            Order[]
+  inventoryItems    InventoryItem[]
 
   @@map("restaurants")
 }
@@ -449,4 +452,115 @@ model Payment {
   @@index([recordedById, recordedAt])
   @@index([overageAuthorizedById])
   @@map("payments")
+}
+
+enum InventoryItemType {
+  RAW_INGREDIENT
+  PRODUCED_ITEM
+  RESALE_ITEM
+
+  @@map("inventory_item_type")
+}
+
+enum InventoryMovementType {
+  PURCHASE
+  PRODUCTION_CONSUMPTION
+  PRODUCTION_OUTPUT
+  SALE
+  ADJUSTMENT
+  WASTE
+  ROLLBACK
+
+  @@map("inventory_movement_type")
+}
+
+enum InventoryBusinessOriginType {
+  PURCHASE
+  PRODUCTION
+  SALE
+  ADJUSTMENT
+  WASTE
+  ROLLBACK
+
+  @@map("inventory_business_origin_type")
+}
+
+enum InventoryAlertStatus {
+  ACTIVE
+  RESOLVED
+
+  @@map("inventory_alert_status")
+}
+
+model InventoryItem {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId      String              @map("restaurant_id") @db.Uuid
+  name              String
+  type              InventoryItemType
+  unitOfMeasure     String              @map("unit_of_measure")
+  minimumStockLevel Decimal             @map("minimum_stock_level") @db.Decimal(14, 3)
+  isActive          Boolean             @map("is_active")
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt         DateTime?           @map("deleted_at") @db.Timestamptz(6)
+  restaurant        Restaurant          @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  movements         InventoryMovement[]
+  alerts            InventoryAlert[]
+
+  @@unique([restaurantId, name])
+  @@unique([restaurantId, id])
+  @@index([restaurantId, type, isActive])
+  @@map("inventory_items")
+}
+
+model InventoryMovement {
+  id                 String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId       String                      @map("restaurant_id") @db.Uuid
+  inventoryItemId    String                      @map("inventory_item_id") @db.Uuid
+  type               InventoryMovementType
+  quantityDelta      Decimal                     @map("quantity_delta") @db.Decimal(14, 3)
+  unitOfMeasure      String                      @map("unit_of_measure")
+  recordedById       String                      @map("recorded_by_id") @db.Uuid
+  recordedAt         DateTime                    @default(now()) @map("recorded_at") @db.Timestamptz(6)
+  businessOriginType InventoryBusinessOriginType @map("business_origin_type")
+  businessOriginId   String                      @map("business_origin_id") @db.Uuid
+  comments           String?
+  reversedMovementId String?                     @map("reversed_movement_id") @db.Uuid
+  inventoryItem      InventoryItem               @relation(fields: [restaurantId, inventoryItemId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "inventory_movements_item_fkey")
+  recordedBy         ApplicationUser             @relation(fields: [recordedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  reversedMovement   InventoryMovement?          @relation("InventoryMovementReversal", fields: [restaurantId, inventoryItemId, reversedMovementId], references: [restaurantId, inventoryItemId, id], onDelete: Restrict, onUpdate: Restrict, map: "inventory_movements_reversed_fkey")
+  reversalMovements  InventoryMovement[]         @relation("InventoryMovementReversal")
+
+  @@unique([restaurantId, inventoryItemId, id], map: "inventory_movements_item_id_key")
+  @@index([restaurantId, inventoryItemId, recordedAt])
+  @@index([restaurantId, businessOriginType, businessOriginId], map: "inventory_movements_origin_idx")
+  @@index([recordedById, recordedAt])
+  @@index([reversedMovementId])
+  @@map("inventory_movements")
+}
+
+model InventoryAlert {
+  id              String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId    String               @map("restaurant_id") @db.Uuid
+  inventoryItemId String               @map("inventory_item_id") @db.Uuid
+  status          InventoryAlertStatus
+  threshold       Decimal              @db.Decimal(14, 3)
+  observedBalance Decimal              @map("observed_balance") @db.Decimal(14, 3)
+  openedAt        DateTime             @default(now()) @map("opened_at") @db.Timestamptz(6)
+  resolvedAt      DateTime?            @map("resolved_at") @db.Timestamptz(6)
+  inventoryItem   InventoryItem        @relation(fields: [restaurantId, inventoryItemId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "inventory_alerts_item_fkey")
+
+  @@unique([restaurantId, id])
+  @@index([restaurantId, inventoryItemId, status, openedAt])
+  @@map("inventory_alerts")
+}
+
+view InventoryBalance {
+  restaurantId    String  @map("restaurant_id") @db.Uuid
+  inventoryItemId String  @map("inventory_item_id") @db.Uuid
+  unitOfMeasure   String  @map("unit_of_measure")
+  currentBalance  Decimal @map("current_balance") @db.Decimal(14, 3)
+
+  @@unique([restaurantId, inventoryItemId])
+  @@map("inventory_balances")
 }

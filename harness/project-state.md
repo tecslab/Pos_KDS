@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-012
-last_completed_task: T-011
-last_commit: 576f154
-completed_tasks: 13
+next_suggested_task: T-013
+last_completed_task: T-012
+last_commit: f885817
+completed_tasks: 14
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-012 — Model inventory ledger, balances, and alerts.
+T-013 — Model recipes, production batches, and operating expenses.
 
 ## Human Checkpoints
 

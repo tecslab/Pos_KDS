@@ -51,7 +51,6 @@ describe("versioned product catalog schema", () => {
     expect(schema).toContain(
       "@@index([restaurantId, categoryId, isActive, displayOrder])",
     );
-    expect(schema).not.toMatch(/model\s+(Ingredient|Recipe|InventoryItem)\b/);
   });
 
   it("uses composite foreign keys to prohibit cross-restaurant catalog references", async () => {
