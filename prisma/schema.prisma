@@ -21,6 +21,10 @@ model ApplicationUser {
   recordedPayments   Payment[]            @relation("PaymentRecorder")
   authorizedOverages Payment[]            @relation("PaymentOverageAuthorizer")
   inventoryMovements InventoryMovement[]
+  recipeVersions     RecipeVersion[]      @relation("RecipeVersionCreator")
+  createdBatches     ProductionBatch[]    @relation("ProductionBatchCreator")
+  completedBatches   ProductionBatch[]    @relation("ProductionBatchCompleter")
+  operatingExpenses  OperatingExpense[]
 
   @@map("application_users")
 }
@@ -107,6 +111,8 @@ model Restaurant {
   products          Product[]
   orders            Order[]
   inventoryItems    InventoryItem[]
+  recipes           Recipe[]
+  expenseCategories ExpenseCategory[]
 
   @@map("restaurants")
 }
@@ -240,6 +246,7 @@ model Product {
   restaurant   Restaurant       @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   category     ProductCategory  @relation(fields: [restaurantId, categoryId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict)
   versions     ProductVersion[]
+  recipes      Recipe[]
 
   @@unique([restaurantId, id])
   @@index([restaurantId, categoryId, isActive, displayOrder])
@@ -506,6 +513,8 @@ model InventoryItem {
   restaurant        Restaurant          @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   movements         InventoryMovement[]
   alerts            InventoryAlert[]
+  outputRecipes     Recipe[]            @relation("RecipeOutputItem")
+  recipeIngredients RecipeIngredient[]  @relation("RecipeIngredientItem")
 
   @@unique([restaurantId, name])
   @@unique([restaurantId, id])
@@ -563,4 +572,145 @@ view InventoryBalance {
 
   @@unique([restaurantId, inventoryItemId])
   @@map("inventory_balances")
+}
+
+enum ProductionBatchStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+
+  @@map("production_batch_status")
+}
+
+enum ExpenseOriginType {
+  MANUAL
+  PURCHASE
+
+  @@map("expense_origin_type")
+}
+
+model Recipe {
+  id                    String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId          String          @map("restaurant_id") @db.Uuid
+  productId             String          @map("product_id") @db.Uuid
+  outputInventoryItemId String          @map("output_inventory_item_id") @db.Uuid
+  name                  String
+  isActive              Boolean         @map("is_active")
+  createdAt             DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt             DateTime?       @map("deleted_at") @db.Timestamptz(6)
+  restaurant            Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  product               Product         @relation(fields: [restaurantId, productId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "recipes_product_fkey")
+  outputInventoryItem   InventoryItem   @relation("RecipeOutputItem", fields: [restaurantId, outputInventoryItemId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "recipes_output_item_fkey")
+  versions              RecipeVersion[]
+
+  @@unique([restaurantId, name])
+  @@unique([restaurantId, id])
+  @@index([restaurantId, productId, isActive])
+  @@index([restaurantId, outputInventoryItemId])
+  @@map("recipes")
+}
+
+model RecipeVersion {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId      String             @map("restaurant_id") @db.Uuid
+  recipeId          String             @map("recipe_id") @db.Uuid
+  versionNumber     Int                @map("version_number")
+  producedQuantity  Decimal            @map("produced_quantity") @db.Decimal(14, 3)
+  producedUnit      String             @map("produced_unit")
+  createdById       String             @map("created_by_id") @db.Uuid
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  recipe            Recipe             @relation(fields: [restaurantId, recipeId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "recipe_versions_recipe_fkey")
+  createdBy         ApplicationUser    @relation("RecipeVersionCreator", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  ingredients       RecipeIngredient[]
+  productionBatches ProductionBatch[]
+
+  @@unique([restaurantId, recipeId, versionNumber], map: "recipe_versions_recipe_number_key")
+  @@unique([restaurantId, id])
+  @@index([createdById, createdAt])
+  @@map("recipe_versions")
+}
+
+model RecipeIngredient {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId     String        @map("restaurant_id") @db.Uuid
+  recipeVersionId  String        @map("recipe_version_id") @db.Uuid
+  inventoryItemId  String        @map("inventory_item_id") @db.Uuid
+  requiredQuantity Decimal       @map("required_quantity") @db.Decimal(14, 3)
+  unitOfMeasure    String        @map("unit_of_measure")
+  recipeVersion    RecipeVersion @relation(fields: [restaurantId, recipeVersionId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "recipe_ingredients_version_fkey")
+  inventoryItem    InventoryItem @relation("RecipeIngredientItem", fields: [restaurantId, inventoryItemId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "recipe_ingredients_item_fkey")
+
+  @@unique([restaurantId, recipeVersionId, inventoryItemId], map: "recipe_ingredients_version_item_key")
+  @@index([restaurantId, inventoryItemId])
+  @@map("recipe_ingredients")
+}
+
+model ProductionBatch {
+  id               String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId     String                @map("restaurant_id") @db.Uuid
+  recipeVersionId  String                @map("recipe_version_id") @db.Uuid
+  status           ProductionBatchStatus
+  plannedQuantity  Decimal               @map("planned_quantity") @db.Decimal(14, 3)
+  producedQuantity Decimal?              @map("produced_quantity") @db.Decimal(14, 3)
+  unitOfMeasure    String                @map("unit_of_measure")
+  createdById      String                @map("created_by_id") @db.Uuid
+  completedById    String?               @map("completed_by_id") @db.Uuid
+  createdAt        DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  startedAt        DateTime?             @map("started_at") @db.Timestamptz(6)
+  completedAt      DateTime?             @map("completed_at") @db.Timestamptz(6)
+  notes            String?
+  recipeVersion    RecipeVersion         @relation(fields: [restaurantId, recipeVersionId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "production_batches_recipe_version_fkey")
+  createdBy        ApplicationUser       @relation("ProductionBatchCreator", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  completedBy      ApplicationUser?      @relation("ProductionBatchCompleter", fields: [completedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([restaurantId, id])
+  @@index([restaurantId, status, createdAt])
+  @@index([restaurantId, recipeVersionId, createdAt], map: "production_batches_recipe_created_idx")
+  @@index([createdById, createdAt])
+  @@index([completedById, completedAt])
+  @@map("production_batches")
+}
+
+model ExpenseCategory {
+  id           String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String             @map("restaurant_id") @db.Uuid
+  code         String
+  name         String
+  isActive     Boolean            @map("is_active")
+  createdAt    DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime?          @map("deleted_at") @db.Timestamptz(6)
+  restaurant   Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  expenses     OperatingExpense[]
+
+  @@unique([restaurantId, code])
+  @@unique([restaurantId, id])
+  @@index([restaurantId, isActive, name])
+  @@map("expense_categories")
+}
+
+model OperatingExpense {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId        String            @map("restaurant_id") @db.Uuid
+  expenseCategoryId   String            @map("expense_category_id") @db.Uuid
+  amount              Decimal           @db.Decimal(12, 2)
+  description         String
+  incurredAt          DateTime          @map("incurred_at") @db.Timestamptz(6)
+  recordedAt          DateTime          @default(now()) @map("recorded_at") @db.Timestamptz(6)
+  recordedById        String            @map("recorded_by_id") @db.Uuid
+  referenceNumber     String?           @map("reference_number")
+  comments            String?
+  expenseCategoryCode String            @map("expense_category_code")
+  expenseCategoryName String            @map("expense_category_name")
+  originType          ExpenseOriginType @map("origin_type")
+  originId            String?           @map("origin_id") @db.Uuid
+  expenseCategory     ExpenseCategory   @relation(fields: [restaurantId, expenseCategoryId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "operating_expenses_category_fkey")
+  recordedBy          ApplicationUser   @relation(fields: [recordedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([restaurantId, id])
+  @@index([restaurantId, expenseCategoryId, incurredAt], map: "operating_expenses_category_incurred_idx")
+  @@index([restaurantId, originType, originId])
+  @@index([recordedById, recordedAt])
+  @@map("operating_expenses")
 }
