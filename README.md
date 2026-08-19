@@ -55,6 +55,15 @@ migrations; repository `prisma/migrations/**/migration.sql` files are the
 versioned artifacts. Do not use `prisma migrate dev`, `prisma migrate deploy`,
 `prisma db push`, or `prisma db execute` against the Supabase project.
 
+### Development reference seed
+
+After the schema migrations, apply the reviewed
+`prisma/seeds/development.sql` artifact to a development database through the
+connected Supabase MCP. The seed is transaction-scoped and repeatable: it
+upserts reference records by stable keys and reconciles the three initial roles
+to the approved permission matrix. It does not create authentication or
+application user accounts, and it must not be treated as production data.
+
 ## Quality checks
 
 Run the complete local quality gate with:

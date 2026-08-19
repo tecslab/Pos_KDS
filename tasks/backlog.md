@@ -16,7 +16,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-012 Model inventory ledger, balances, and alerts
 - [x] T-013 Model recipes, production batches, and operating expenses
 - [x] T-014 Enforce database-level integrity and historical-record protections
-- [ ] T-015 Seed the initial roles, permissions, and development reference data
+- [x] T-015 Seed the initial roles, permissions, and development reference data
 - [x] T-016 Create shared domain error and result conventions
 - [ ] T-017 Implement centralized permission evaluation
 - [ ] T-018 Implement the immutable audit-event application service

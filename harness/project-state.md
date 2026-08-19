@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-015
-last_completed_task: T-014
-last_commit: 42642f6
-completed_tasks: 16
+next_suggested_task: T-017
+last_completed_task: T-015
+last_commit: 8f612e8
+completed_tasks: 17
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-015 — Seed the initial roles, permissions, and development reference data.
+T-017 — Implement centralized permission evaluation.
 
 ## Human Checkpoints
 
