@@ -1,7 +1,7 @@
 ---
 id: T-017
 title: "Implement centralized permission evaluation"
-status: todo
+status: done
 priority: critical
 size: small
 type: domain

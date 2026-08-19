@@ -5,6 +5,12 @@ export {
   isBusinessError,
   unauthorizedError,
 } from "./business-error";
+export { evaluatePermission } from "./authorization";
+export type {
+  PermissionCode,
+  PermissionSubject,
+  RolePermissionGrant,
+} from "./authorization";
 export type {
   BusinessError,
   BusinessErrorCode,
