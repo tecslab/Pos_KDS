@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-014
-last_completed_task: T-013
-last_commit: 047186a
-completed_tasks: 15
+next_suggested_task: T-015
+last_completed_task: T-014
+last_commit: 42642f6
+completed_tasks: 16
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-014 — Enforce database-level integrity and historical-record protections.
+T-015 — Seed the initial roles, permissions, and development reference data.
 
 ## Human Checkpoints
 

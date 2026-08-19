@@ -1,7 +1,7 @@
 ---
 id: T-014
 title: "Enforce database-level integrity and historical-record protections"
-status: todo
+status: done
 priority: critical
 size: medium
 type: database
