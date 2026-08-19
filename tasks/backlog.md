@@ -22,7 +22,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-018 Implement the immutable audit-event application service
 - [x] T-019 Define domain-event and transaction boundary interfaces
 - [x] T-020 Implement the Supabase Realtime event adapter
-- [ ] T-021 Define the printer service port and safe no-op adapter
+- [x] T-021 Define the printer service port and safe no-op adapter
 - [ ] T-022 Integrate Supabase Authentication and session lifecycle
 - [ ] T-023 Enforce authenticated and authorized server routes
 - [ ] T-024 Build the role-aware authenticated application shell

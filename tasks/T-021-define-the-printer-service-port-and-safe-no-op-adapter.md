@@ -1,7 +1,7 @@
 ---
 id: T-021
 title: "Define the printer service port and safe no-op adapter"
-status: todo
+status: done
 priority: medium
 size: small
 type: infrastructure

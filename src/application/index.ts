@@ -13,6 +13,25 @@ export {
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
 export {
+  PrintingFacade,
+  type PrintDocument,
+  type PrintDocumentType,
+  type PrintErrorReporter,
+  type PrintFailureReport,
+  type PrintLine,
+  type PrintLineAlignment,
+  type PrintOutcome,
+  type PrintRequest,
+  type PrintRetryAdvisor,
+  type PrintRetryDecision,
+  type PrinterDestination,
+  type PrinterExecutionOutcome,
+  type PrinterSelectionOutcome,
+  type PrinterSelector,
+  type PrinterService,
+  type SanitizedPrintFailure,
+} from "./printing";
+export {
   mapDomainEventToRealtime,
   parseRealtimeMessage,
   realtimeEventNames,
