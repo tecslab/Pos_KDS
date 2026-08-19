@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-018
-last_completed_task: T-017
-last_commit: 5f36eb1
-completed_tasks: 18
+next_suggested_task: T-020
+last_completed_task: T-018
+last_commit: 0cf0e89
+completed_tasks: 19
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-018 — Implement the immutable audit-event application service.
+T-020 — Implement the Supabase Realtime event adapter.
 
 ## Human Checkpoints
 

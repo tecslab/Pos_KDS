@@ -1,7 +1,7 @@
 ---
 id: T-018
 title: "Implement the immutable audit-event application service"
-status: todo
+status: done
 priority: critical
 size: small
 type: domain
