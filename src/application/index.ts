@@ -12,6 +12,29 @@ export {
 } from "./audit";
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
+export {
+  mapDomainEventToRealtime,
+  parseRealtimeMessage,
+  realtimeEventNames,
+  realtimeTopicName,
+  realtimeTopics,
+  type InvalidRealtimeEventError,
+  type RealtimeData,
+  type RealtimeDomainEvent,
+  type RealtimeDomainEventPayload,
+  type RealtimeEnvelopeV1,
+  type RealtimeEventName,
+  type RealtimeMessage,
+  type RealtimeMessageHandler,
+  type RealtimePrimitive,
+  type RealtimePublication,
+  type RealtimeSubscriber,
+  type RealtimeSubscription,
+  type RealtimeSubscriptionFailure,
+  type RealtimeSubscriptionRequest,
+  type RealtimeTopic,
+  type RealtimeValue,
+} from "./realtime";
 export type { TransactionBoundary } from "./transaction-boundary";
 export {
   TransactionalOperationRunner,

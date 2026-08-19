@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-020
-last_completed_task: T-018
-last_commit: 0cf0e89
-completed_tasks: 19
+next_suggested_task: T-021
+last_completed_task: T-020
+last_commit: 49aa871
+completed_tasks: 20
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-020 — Implement the Supabase Realtime event adapter.
+T-021 — Define printer service port and safe no-op adapter.
 
 ## Human Checkpoints
 

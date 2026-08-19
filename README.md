@@ -64,6 +64,44 @@ upserts reference records by stable keys and reconciles the three initial roles
 to the approved permission matrix. It does not create authentication or
 application user accounts, and it must not be treated as production data.
 
+## Realtime contract
+
+Realtime traffic uses private Supabase Broadcast topics with the stable form
+`restaurant:{restaurantId}:{area}`. The supported areas are `orders`,
+`kitchen`, `delivery`, `payments`, and `inventory`. Version 1 messages use the
+following provider-neutral payload; `data` contains only the minimal JSON-safe
+fields needed to refresh the affected read model:
+
+```json
+{
+  "version": 1,
+  "occurredAt": "2026-08-18T19:00:00.000Z",
+  "restaurantId": "00000000-0000-0000-0000-000000000000",
+  "entityId": "entity identifier",
+  "entityType": "order",
+  "data": {}
+}
+```
+
+Broadcast event names and their ordered topic fan-out are:
+
+| Event name                | Topics                          |
+| ------------------------- | ------------------------------- |
+| `order.created`           | `orders`, `kitchen`             |
+| `order.modified`          | `orders`, `kitchen`             |
+| `order.cancelled`         | `orders`, `kitchen`, `delivery` |
+| `kitchen.status.updated`  | `kitchen`, `orders`, `delivery` |
+| `delivery.status.updated` | `delivery`, `orders`            |
+| `payment.completed`       | `payments`, `orders`            |
+| `inventory.alert`         | `inventory`                     |
+
+Publishing is sequential and acknowledged. Subscriptions become usable only
+after provider readiness, reject malformed or cross-restaurant messages, share
+one provider channel per topic, and preserve registrations across one immediate
+channel replacement. A failed replacement is reported through the
+provider-neutral terminal-failure callback; no polling, backoff, or outbox is
+part of this contract.
+
 ## Quality checks
 
 Run the complete local quality gate with:

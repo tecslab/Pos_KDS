@@ -1,7 +1,7 @@
 ---
 id: T-020
 title: "Implement the Supabase Realtime event adapter"
-status: todo
+status: done
 priority: high
 size: medium
 type: infrastructure
