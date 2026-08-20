@@ -10,6 +10,12 @@ export {
   type JsonValue,
   type RecordAuditEventInput,
 } from "./audit";
+export {
+  AuthorizationService,
+  type AuthorizationProfile,
+  type AuthorizationProfileReader,
+  type AuthorizedEmployeeContext,
+} from "./authorization";
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
 export {

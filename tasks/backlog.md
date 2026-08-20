@@ -24,7 +24,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-020 Implement the Supabase Realtime event adapter
 - [x] T-021 Define the printer service port and safe no-op adapter
 - [x] T-022 Integrate Supabase Authentication and session lifecycle
-- [ ] T-023 Enforce authenticated and authorized server routes
+- [x] T-023 Enforce authenticated and authorized server routes
 - [ ] T-024 Build the role-aware authenticated application shell
 - [ ] T-025 Build administrator user invitation and activation management
 - [ ] T-026 Build role assignment and permission inspection administration

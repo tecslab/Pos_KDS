@@ -1,7 +1,7 @@
 ---
 id: T-023
 title: "Enforce authenticated and authorized server routes"
-status: todo
+status: done
 priority: critical
 size: small
 type: security
