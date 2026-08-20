@@ -1,7 +1,7 @@
 ---
 id: T-022
 title: "Integrate Supabase Authentication and session lifecycle"
-status: todo
+status: done
 priority: critical
 size: medium
 type: feature

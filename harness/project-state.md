@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-022
-last_completed_task: T-021
-last_commit: de1ae0e
-completed_tasks: 21
+next_suggested_task: T-023
+last_completed_task: T-022
+last_commit: afb4378
+completed_tasks: 22
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-022 — Integrate Supabase Authentication and session lifecycle.
+T-023 — Enforce authenticated and authorized server routes.
 
 ## Human Checkpoints
 
