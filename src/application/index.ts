@@ -19,6 +19,12 @@ export {
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
 export {
+  buildNavigation,
+  roleLabel,
+  type NavigationIcon,
+  type NavigationItem,
+} from "./navigation";
+export {
   PrintingFacade,
   type PrintDocument,
   type PrintDocumentType,

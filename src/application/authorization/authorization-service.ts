@@ -21,49 +21,70 @@ export class AuthorizationService {
     authenticatedUserId: string,
     requiredPermission: string,
   ): Promise<Result<AuthorizedEmployeeContext, UnauthorizedError>> {
+    if (!isCanonicalCode(requiredPermission)) {
+      return denied();
+    }
+
+    const profile = await this.readProfile(authenticatedUserId);
+
+    if (profile === null) {
+      return denied();
+    }
+
+    const permissionResult = evaluatePermission(profile, requiredPermission);
+
+    return permissionResult.ok ? ok(toContext(profile)) : denied();
+  }
+
+  async readContext(
+    authenticatedUserId: string,
+  ): Promise<Result<AuthorizedEmployeeContext, UnauthorizedError>> {
+    const profile = await this.readProfile(authenticatedUserId);
+
     if (
-      !isUuid(authenticatedUserId) ||
-      !isNonblank(requiredPermission) ||
-      requiredPermission !== requiredPermission.trim()
+      profile === null ||
+      !profile.isActive ||
+      profile.roleGrants.length === 0
     ) {
       return denied();
     }
 
-    let persistedProfile: AuthorizationProfile | null;
+    return ok(toContext(profile));
+  }
 
-    try {
-      persistedProfile =
-        await this.profiles.findByAuthenticatedUserId(authenticatedUserId);
-    } catch {
-      return denied();
+  private async readProfile(
+    authenticatedUserId: string,
+  ): Promise<AuthorizationProfile | null> {
+    if (!isUuid(authenticatedUserId)) {
+      return null;
     }
 
     try {
-      const profile = normalizeProfile(persistedProfile, authenticatedUserId);
-
-      if (profile === null) {
-        return denied();
-      }
-
-      const permissionResult = evaluatePermission(profile, requiredPermission);
-
-      if (!permissionResult.ok) {
-        return denied();
-      }
-
-      return ok(
-        Object.freeze({
-          userId: profile.userId,
-          displayName: profile.displayName,
-          roleCodes: Object.freeze(
-            profile.roleGrants.map((grant) => grant.roleCode),
-          ),
-        }),
+      return normalizeProfile(
+        await this.profiles.findByAuthenticatedUserId(authenticatedUserId),
+        authenticatedUserId,
       );
     } catch {
-      return denied();
+      return null;
     }
   }
+}
+
+function toContext(profile: AuthorizationProfile): AuthorizedEmployeeContext {
+  const permissionCodes = new Set<string>();
+
+  for (const grant of profile.roleGrants) {
+    for (const permissionCode of grant.permissionCodes) {
+      permissionCodes.add(permissionCode);
+    }
+  }
+
+  return Object.freeze({
+    userId: profile.userId,
+    displayName: profile.displayName,
+    roleCodes: Object.freeze(profile.roleGrants.map((grant) => grant.roleCode)),
+    permissionCodes: Object.freeze([...permissionCodes]),
+  });
 }
 
 function normalizeProfile(

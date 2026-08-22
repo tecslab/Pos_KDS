@@ -48,11 +48,31 @@ describe("AuthorizationService", () => {
         userId,
         displayName: "Ana",
         roleCodes: ["waiter", "cashier"],
+        permissionCodes: ["orders.view", "payments.record"],
       },
     });
     expect(profiles.findByAuthenticatedUserId).toHaveBeenCalledWith(userId);
     expect(result.ok && Object.isFrozen(result.value)).toBe(true);
     expect(result.ok && Object.isFrozen(result.value.roleCodes)).toBe(true);
+    expect(result.ok && Object.isFrozen(result.value.permissionCodes)).toBe(
+      true,
+    );
+  });
+
+  it("loads an active persisted context without treating navigation as authorization", async () => {
+    const result = await new AuthorizationService(
+      reader(profile()),
+    ).readContext(userId);
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        userId,
+        displayName: "Ana",
+        roleCodes: ["waiter", "cashier"],
+        permissionCodes: ["orders.view", "payments.record"],
+      },
+    });
   });
 
   it.each([

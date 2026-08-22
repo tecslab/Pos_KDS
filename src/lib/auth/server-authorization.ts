@@ -22,6 +22,30 @@ export async function requireServerPermission(
   requiredPermission: string,
   returnTo: string = "/",
 ): Promise<AuthorizedEmployeeContext> {
+  const { service, userId } = await createAuthorizationRequest(returnTo);
+  const authorization = await service.authorize(userId, requiredPermission);
+
+  if (!authorization.ok) {
+    throw unauthorizedError();
+  }
+
+  return authorization.value;
+}
+
+export async function requireServerAuthorizationContext(
+  returnTo: string = "/",
+): Promise<AuthorizedEmployeeContext> {
+  const { service, userId } = await createAuthorizationRequest(returnTo);
+  const authorization = await service.readContext(userId);
+
+  if (!authorization.ok) {
+    throw unauthorizedError();
+  }
+
+  return authorization.value;
+}
+
+async function createAuthorizationRequest(returnTo: string) {
   let session = null;
 
   try {
@@ -44,14 +68,8 @@ export async function requireServerPermission(
     throw unauthorizedError();
   }
 
-  const authorization = await new AuthorizationService(profileReader).authorize(
-    session.userId,
-    requiredPermission,
-  );
-
-  if (!authorization.ok) {
-    throw unauthorizedError();
-  }
-
-  return authorization.value;
+  return Object.freeze({
+    service: new AuthorizationService(profileReader),
+    userId: session.userId,
+  });
 }

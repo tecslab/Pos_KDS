@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Carnales Restaurant System",
-  description: "Restaurant operations management",
+  title: "Carnales — Sistema de restaurante",
+  description: "Gestión de operaciones del restaurante Carnales",
 };
 
 type RootLayoutProps = Readonly<{
@@ -14,7 +14,7 @@ type RootLayoutProps = Readonly<{
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body>{children}</body>
     </html>
   );

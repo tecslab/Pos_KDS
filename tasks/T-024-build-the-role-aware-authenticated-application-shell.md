@@ -1,7 +1,7 @@
 ---
 id: T-024
 title: "Build the role-aware authenticated application shell"
-status: todo
+status: done
 priority: high
 size: medium
 type: ui

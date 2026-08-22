@@ -17,4 +17,5 @@ export type AuthorizedEmployeeContext = Readonly<{
   userId: string;
   displayName: string;
   roleCodes: readonly string[];
+  permissionCodes: readonly string[];
 }>;

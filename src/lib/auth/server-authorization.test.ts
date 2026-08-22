@@ -28,7 +28,10 @@ vi.mock("../../infrastructure/auth", () => ({
   },
 }));
 
-import { requireServerPermission } from "./server-authorization";
+import {
+  requireServerAuthorizationContext,
+  requireServerPermission,
+} from "./server-authorization";
 
 const userId = "10000000-0000-4000-8000-000000000001";
 
@@ -68,9 +71,31 @@ describe("requireServerPermission", () => {
       userId,
       displayName: "Ana",
       roleCodes: ["waiter"],
+      permissionCodes: ["orders.view"],
     });
     expect(Object.isFrozen(result)).toBe(true);
     expect(dependencies.findByAuthenticatedUserId).toHaveBeenCalledWith(userId);
+  });
+
+  it("loads the active persisted context for server-rendered navigation", async () => {
+    dependencies.findByAuthenticatedUserId.mockResolvedValue({
+      userId,
+      displayName: "Ana",
+      isActive: true,
+      roleGrants: [
+        {
+          roleCode: "waiter",
+          permissionCodes: ["orders.create", "orders.view"],
+        },
+      ],
+    });
+
+    await expect(requireServerAuthorizationContext("/")).resolves.toEqual({
+      userId,
+      displayName: "Ana",
+      roleCodes: ["waiter"],
+      permissionCodes: ["orders.create", "orders.view"],
+    });
   });
 
   it("redirects an unverifiable session before persistence is read", async () => {

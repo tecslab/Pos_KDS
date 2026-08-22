@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-024
-last_completed_task: T-023
-last_commit: e520369
-completed_tasks: 23
+next_suggested_task: T-025
+last_completed_task: T-024
+last_commit: 769f41a
+completed_tasks: 24
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-024 — Build the role-aware authenticated application shell.
+T-025 — Build administrator user invitation and activation management.
 
 ## Human Checkpoints
 

@@ -1,0 +1,74 @@
+import { describe, expect, it } from "vitest";
+
+import { buildNavigation, roleLabel } from "./navigation";
+
+function ids(permissionCodes: readonly string[]) {
+  return buildNavigation(permissionCodes).map((item) => item.id);
+}
+
+describe("buildNavigation", () => {
+  it("shows a waiter's operational modules from persisted permission grants", () => {
+    expect(
+      ids([
+        "orders.create",
+        "orders.edit",
+        "orders.view",
+        "delivery.panel.view",
+        "payments.register",
+      ]),
+    ).toEqual(["home", "orders", "delivery", "payments"]);
+  });
+
+  it("keeps kitchen navigation minimal and excludes financial/admin modules", () => {
+    expect(
+      ids(["orders.view", "kitchen.queue.view", "kitchen.ready.mark"]),
+    ).toEqual(["home", "kitchen"]);
+  });
+
+  it("combines permissions across roles without consulting role names", () => {
+    expect(
+      ids([
+        "inventory.view",
+        "production.batch.create",
+        "reports.view",
+        "administration.products.manage",
+        "audit.log.view",
+      ]),
+    ).toEqual([
+      "home",
+      "inventory",
+      "production",
+      "reports",
+      "administration",
+      "audit",
+    ]);
+  });
+
+  it("supports future roles through permission data and ignores malformed grants", () => {
+    expect(
+      ids(["payments.view", " future.invalid", "unknown.permission"]),
+    ).toEqual(["home", "payments"]);
+  });
+
+  it("returns detached immutable presentation data and no premature module links", () => {
+    const navigation = buildNavigation(["orders.create", "reports.view"]);
+
+    expect(Object.isFrozen(navigation)).toBe(true);
+    expect(navigation.every(Object.isFrozen)).toBe(true);
+    expect(
+      navigation.filter((item) => item.available).map((item) => item.id),
+    ).toEqual(["home"]);
+  });
+});
+
+describe("roleLabel", () => {
+  it.each([
+    ["administrator", "Administrador"],
+    ["waiter", "Mesero"],
+    ["kitchen_personnel", "Personal de cocina"],
+    ["branch_manager", "Rol adicional"],
+    ["", "Rol asignado"],
+  ])("localizes %s as %s", (roleCode, expected) => {
+    expect(roleLabel(roleCode)).toBe(expected);
+  });
+});
