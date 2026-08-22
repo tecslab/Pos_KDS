@@ -48,16 +48,22 @@ const navigationDefinitions: readonly NavigationDefinition[] = Object.freeze([
     "reports.view",
     "reports.export",
   ]),
-  definition("administration", "Administración", "/administration", [
-    "administration.users.manage",
-    "administration.roles.manage",
-    "administration.products.manage",
-    "administration.categories.manage",
-    "administration.locations.manage",
-    "administration.restaurant.configure",
-    "administration.payment_methods.configure",
-    "administration.printers.configure",
-  ]),
+  definition(
+    "administration",
+    "Administración",
+    "/administration/users",
+    [
+      "administration.users.manage",
+      "administration.roles.manage",
+      "administration.products.manage",
+      "administration.categories.manage",
+      "administration.locations.manage",
+      "administration.restaurant.configure",
+      "administration.payment_methods.configure",
+      "administration.printers.configure",
+    ],
+    true,
+  ),
   definition("audit", "Auditoría", "/audit", ["audit.log.view"]),
 ]);
 
@@ -85,7 +91,10 @@ export function buildNavigation(
           label: item.label,
           href: item.href,
           icon: item.icon,
-          available: item.available,
+          available:
+            item.available &&
+            (item.id !== "administration" ||
+              grants.has("administration.users.manage")),
         }),
       ),
   );

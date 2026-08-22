@@ -68,6 +68,14 @@ export {
 } from "./realtime";
 export type { TransactionBoundary } from "./transaction-boundary";
 export {
+  UserAdministrationService,
+  type InvitedUser,
+  type ManagedUser,
+  type ManagedUserState,
+  type UserAdministrationError,
+  type UserAdministrationGateway,
+} from "./user-administration";
+export {
   TransactionalOperationRunner,
   type TransactionalOperation,
 } from "./transactional-operation-runner";

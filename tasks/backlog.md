@@ -26,7 +26,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-022 Integrate Supabase Authentication and session lifecycle
 - [x] T-023 Enforce authenticated and authorized server routes
 - [x] T-024 Build the role-aware authenticated application shell
-- [ ] T-025 Build administrator user invitation and activation management
+- [x] T-025 Build administrator user invitation and activation management
 - [ ] T-026 Build role assignment and permission inspection administration
 - [ ] T-027 Build restaurant and operational-settings administration
 - [ ] T-028 Build service-location administration

@@ -59,6 +59,21 @@ describe("buildNavigation", () => {
       navigation.filter((item) => item.available).map((item) => item.id),
     ).toEqual(["home"]);
   });
+
+  it("enables the user administration link only for its exact permission", () => {
+    const unrelatedAdministration = buildNavigation([
+      "administration.products.manage",
+    ]).find((item) => item.id === "administration");
+    const userAdministration = buildNavigation([
+      "administration.users.manage",
+    ]).find((item) => item.id === "administration");
+
+    expect(unrelatedAdministration).toMatchObject({ available: false });
+    expect(userAdministration).toMatchObject({
+      available: true,
+      href: "/administration/users",
+    });
+  });
 });
 
 describe("roleLabel", () => {

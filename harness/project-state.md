@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-025
-last_completed_task: T-024
-last_commit: 769f41a
-completed_tasks: 24
+next_suggested_task: T-026
+last_completed_task: T-025
+last_commit: 5e35456
+completed_tasks: 25
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-025 — Build administrator user invitation and activation management.
+T-026 — Build role assignment and permission inspection administration.
 
 ## Human Checkpoints
 

@@ -1,7 +1,7 @@
 ---
 id: T-025
 title: "Build administrator user invitation and activation management"
-status: todo
+status: done
 priority: high
 size: medium
 type: feature
