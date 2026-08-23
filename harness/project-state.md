@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-026
-last_completed_task: T-025
-last_commit: 5e35456
-completed_tasks: 25
+next_suggested_task: T-027
+last_completed_task: T-026
+last_commit: 3b58702
+completed_tasks: 26
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-026 — Build role assignment and permission inspection administration.
+T-027 — Build restaurant and operational-settings administration.
 
 ## Human Checkpoints
 

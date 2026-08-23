@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { requireServerPermission } from "@/lib/auth/server-authorization";
 import { createUserAdministrationService } from "@/lib/user-administration/server";
 
@@ -32,15 +34,23 @@ export default async function UserAdministrationPage({
 
   return (
     <div>
-      <header>
-        <p className="text-sm font-semibold text-[var(--brand-green)]">
-          Administración
-        </p>
-        <h1 className="mt-2 text-3xl font-bold">Usuarios y acceso</h1>
-        <p className="mt-2 text-[var(--color-text-muted)]">
-          Invita empleados y administra su acceso. Las funciones y permisos se
-          asignan por separado.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-[var(--brand-green)]">
+            Administración
+          </p>
+          <h1 className="mt-2 text-3xl font-bold">Usuarios y acceso</h1>
+          <p className="mt-2 text-[var(--color-text-muted)]">
+            Invita empleados y administra su acceso. Las funciones y permisos se
+            asignan por separado.
+          </p>
+        </div>
+        <Link
+          href="/administration/roles"
+          className="inline-flex min-h-12 items-center rounded-md border border-[var(--color-border-strong)] px-4 font-semibold"
+        >
+          Funciones y permisos
+        </Link>
       </header>
 
       {status && feedback[status] ? (

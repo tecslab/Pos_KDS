@@ -7,3 +7,7 @@ export {
   SupabaseUserAdministrationGateway,
   UserAdministrationInfrastructureError,
 } from "./supabase-user-administration-gateway";
+export {
+  RoleAdministrationInfrastructureError,
+  SupabaseRoleAdministrationGateway,
+} from "./supabase-role-administration-gateway";

@@ -66,6 +66,16 @@ export {
   type RealtimeTopic,
   type RealtimeValue,
 } from "./realtime";
+export {
+  RoleAdministrationService,
+  type AssignableRole,
+  type InspectablePermission,
+  type RoleAdministrationError,
+  type RoleAdministrationGateway,
+  type RoleAdministrationView,
+  type RoleAssignmentChange,
+  type RoleAssignmentEmployee,
+} from "./role-administration";
 export type { TransactionBoundary } from "./transaction-boundary";
 export {
   UserAdministrationService,

@@ -1,7 +1,7 @@
 ---
 id: T-026
 title: "Build role assignment and permission inspection administration"
-status: todo
+status: done
 priority: high
 size: medium
 type: feature
