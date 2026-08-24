@@ -83,6 +83,13 @@ export {
   type RoleAssignmentChange,
   type RoleAssignmentEmployee,
 } from "./role-administration";
+export {
+  ServiceLocationAdministrationService,
+  type SaveServiceLocationInput,
+  type ServiceLocation,
+  type ServiceLocationAdministrationError,
+  type ServiceLocationAdministrationGateway,
+} from "./service-location-administration";
 export type { TransactionBoundary } from "./transaction-boundary";
 export {
   UserAdministrationService,

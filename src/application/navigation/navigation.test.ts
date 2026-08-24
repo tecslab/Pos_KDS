@@ -82,6 +82,14 @@ describe("buildNavigation", () => {
       ),
     ).toMatchObject({ href: "/administration/settings", available: true });
   });
+
+  it("routes location administrators to service-location administration", () => {
+    expect(
+      buildNavigation(["administration.locations.manage"]).find(
+        (item) => item.id === "administration",
+      ),
+    ).toMatchObject({ href: "/administration/locations", available: true });
+  });
 });
 
 describe("roleLabel", () => {

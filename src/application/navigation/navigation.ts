@@ -92,15 +92,19 @@ export function buildNavigation(
           href:
             item.id === "administration" &&
             !grants.has("administration.users.manage") &&
-            grants.has("administration.restaurant.configure")
-              ? "/administration/settings"
+            (grants.has("administration.restaurant.configure") ||
+              grants.has("administration.locations.manage"))
+              ? grants.has("administration.restaurant.configure")
+                ? "/administration/settings"
+                : "/administration/locations"
               : item.href,
           icon: item.icon,
           available:
             item.available &&
             (item.id !== "administration" ||
               grants.has("administration.users.manage") ||
-              grants.has("administration.restaurant.configure")),
+              grants.has("administration.restaurant.configure") ||
+              grants.has("administration.locations.manage")),
         }),
       ),
   );

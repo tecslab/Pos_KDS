@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-028
-last_completed_task: T-027
-last_commit: ab7cd9f
-completed_tasks: 27
+next_suggested_task: T-029
+last_completed_task: T-028
+last_commit: 3216ea0
+completed_tasks: 28
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,7 +50,7 @@ None.
 
 ## Next Suggested Task
 
-T-028 — Build service-location administration.
+T-029 — Build payment-method and receipt-settings administration.
 
 ## Human Checkpoints
 

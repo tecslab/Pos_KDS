@@ -1,7 +1,7 @@
 ---
 id: T-028
 title: "Build service-location administration"
-status: todo
+status: done
 priority: high
 size: small
 type: feature
