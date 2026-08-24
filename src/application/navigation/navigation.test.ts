@@ -74,6 +74,14 @@ describe("buildNavigation", () => {
       href: "/administration/users",
     });
   });
+
+  it("routes restaurant configurators to the settings screen", () => {
+    expect(
+      buildNavigation(["administration.restaurant.configure"]).find(
+        (item) => item.id === "administration",
+      ),
+    ).toMatchObject({ href: "/administration/settings", available: true });
+  });
 });
 
 describe("roleLabel", () => {

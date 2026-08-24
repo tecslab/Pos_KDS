@@ -1,7 +1,7 @@
 ---
 id: T-027
 title: "Build restaurant and operational-settings administration"
-status: todo
+status: done
 priority: high
 size: medium
 type: feature

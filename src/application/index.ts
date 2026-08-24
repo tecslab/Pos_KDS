@@ -25,6 +25,13 @@ export {
   type NavigationItem,
 } from "./navigation";
 export {
+  OperatingSettingsService,
+  type OperatingSettings,
+  type OperatingSettingsError,
+  type OperatingSettingsGateway,
+  type UpdateOperatingSettingsInput,
+} from "./operating-settings";
+export {
   PrintingFacade,
   type PrintDocument,
   type PrintDocumentType,

@@ -89,12 +89,18 @@ export function buildNavigation(
         Object.freeze({
           id: item.id,
           label: item.label,
-          href: item.href,
+          href:
+            item.id === "administration" &&
+            !grants.has("administration.users.manage") &&
+            grants.has("administration.restaurant.configure")
+              ? "/administration/settings"
+              : item.href,
           icon: item.icon,
           available:
             item.available &&
             (item.id !== "administration" ||
-              grants.has("administration.users.manage")),
+              grants.has("administration.users.manage") ||
+              grants.has("administration.restaurant.configure")),
         }),
       ),
   );
