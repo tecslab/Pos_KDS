@@ -1,7 +1,7 @@
 ---
 id: T-030
 title: "Build product-category administration"
-status: todo
+status: done
 priority: high
 size: small
 type: feature

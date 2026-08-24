@@ -101,6 +101,27 @@ describe("buildNavigation", () => {
       available: true,
     });
   });
+
+  it("routes category-only administrators to product-category administration", () => {
+    expect(
+      buildNavigation(["administration.categories.manage"]).find(
+        (item) => item.id === "administration",
+      ),
+    ).toMatchObject({
+      href: "/administration/categories",
+      available: true,
+    });
+  });
+
+  it("preserves established administration-route priority when category access is combined", () => {
+    expect(
+      buildNavigation([
+        "administration.locations.manage",
+        "administration.payment_methods.configure",
+        "administration.categories.manage",
+      ]).find((item) => item.id === "administration"),
+    ).toMatchObject({ href: "/administration/locations", available: true });
+  });
 });
 
 describe("roleLabel", () => {

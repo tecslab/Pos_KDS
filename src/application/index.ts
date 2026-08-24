@@ -39,6 +39,15 @@ export {
   type SavePaymentMethodInput,
 } from "./payment-method-administration";
 export {
+  ProductCategoryAdministrationService,
+  type ProductCategory,
+  type ProductCategoryAdministrationError,
+  type ProductCategoryAdministrationGateway,
+  type ProductCategoryAdministrationView,
+  type ProductCategoryRestaurant,
+  type SaveProductCategoryInput,
+} from "./product-category-administration";
+export {
   PrintingFacade,
   type PrintDocument,
   type PrintDocumentType,

@@ -31,7 +31,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-027 Build restaurant and operational-settings administration
 - [x] T-028 Build service-location administration
 - [x] T-029 Build payment-method and receipt-settings administration
-- [ ] T-030 Build product-category administration
+- [x] T-030 Build product-category administration
 - [ ] T-031 Build product catalog and modification administration
 - [ ] T-032 Build inventory-item administration
 - [ ] T-033 Build versioned recipe administration

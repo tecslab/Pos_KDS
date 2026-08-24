@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-030
-last_completed_task: T-029
-last_commit: 3216ea0
-completed_tasks: 29
+next_suggested_task: T-031
+last_completed_task: T-030
+last_commit: efdaa2e
+completed_tasks: 30
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -44,13 +44,15 @@ T-008 — Model restaurant configuration and service locations (commit pending; 
 
 T-009 — Model the versioned product catalog and configurable modifications (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-030 — Build product-category administration (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-029 — Build payment-method and receipt-settings administration.
+T-031 — Build product catalog and modification administration.
 
 ## Human Checkpoints
 

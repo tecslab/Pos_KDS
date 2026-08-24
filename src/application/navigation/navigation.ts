@@ -94,12 +94,15 @@ export function buildNavigation(
             !grants.has("administration.users.manage") &&
             (grants.has("administration.restaurant.configure") ||
               grants.has("administration.locations.manage") ||
-              grants.has("administration.payment_methods.configure"))
+              grants.has("administration.payment_methods.configure") ||
+              grants.has("administration.categories.manage"))
               ? grants.has("administration.restaurant.configure")
                 ? "/administration/settings"
                 : grants.has("administration.locations.manage")
                   ? "/administration/locations"
-                  : "/administration/payment-methods"
+                  : grants.has("administration.payment_methods.configure")
+                    ? "/administration/payment-methods"
+                    : "/administration/categories"
               : item.href,
           icon: item.icon,
           available:
@@ -108,7 +111,8 @@ export function buildNavigation(
               grants.has("administration.users.manage") ||
               grants.has("administration.restaurant.configure") ||
               grants.has("administration.locations.manage") ||
-              grants.has("administration.payment_methods.configure")),
+              grants.has("administration.payment_methods.configure") ||
+              grants.has("administration.categories.manage")),
         }),
       ),
   );
