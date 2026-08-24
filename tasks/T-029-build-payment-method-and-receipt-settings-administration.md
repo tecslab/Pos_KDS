@@ -1,7 +1,7 @@
 ---
 id: T-029
 title: "Build payment-method and receipt-settings administration"
-status: todo
+status: done
 priority: medium
 size: small
 type: feature

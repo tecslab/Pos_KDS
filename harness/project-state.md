@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-029
-last_completed_task: T-028
+next_suggested_task: T-030
+last_completed_task: T-029
 last_commit: 3216ea0
-completed_tasks: 28
+completed_tasks: 29
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:

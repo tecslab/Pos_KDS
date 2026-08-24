@@ -55,7 +55,8 @@ SET
   description = EXCLUDED.description,
   updated_at = CURRENT_TIMESTAMP;
 
--- Reconcile the three initial roles to exactly the grants in PRD 10.3. The
+-- Reconcile the three initial roles to the grants in PRD 10.3 plus the
+-- explicitly approved T-029 Administrator-only payment-method grant. The
 -- different wording in the matrix (for example, "Register Payments") maps to
 -- the canonical permission from PRD 10.2 ("Register Payment") by stable code.
 CREATE TEMPORARY TABLE seed_desired_role_permissions (
@@ -86,6 +87,7 @@ VALUES
   ('administrator', 'reports.export'),
   ('administrator', 'administration.products.manage'),
   ('administrator', 'administration.users.manage'),
+  ('administrator', 'administration.payment_methods.configure'),
   ('administrator', 'audit.log.view'),
   ('waiter', 'orders.create'),
   ('waiter', 'orders.edit'),

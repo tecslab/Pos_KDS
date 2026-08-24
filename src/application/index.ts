@@ -32,6 +32,13 @@ export {
   type UpdateOperatingSettingsInput,
 } from "./operating-settings";
 export {
+  PaymentMethodAdministrationService,
+  type PaymentMethod,
+  type PaymentMethodAdministrationError,
+  type PaymentMethodAdministrationGateway,
+  type SavePaymentMethodInput,
+} from "./payment-method-administration";
+export {
   PrintingFacade,
   type PrintDocument,
   type PrintDocumentType,

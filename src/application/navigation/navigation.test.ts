@@ -90,6 +90,17 @@ describe("buildNavigation", () => {
       ),
     ).toMatchObject({ href: "/administration/locations", available: true });
   });
+
+  it("routes payment configurators to payment-method administration", () => {
+    expect(
+      buildNavigation(["administration.payment_methods.configure"]).find(
+        (item) => item.id === "administration",
+      ),
+    ).toMatchObject({
+      href: "/administration/payment-methods",
+      available: true,
+    });
+  });
 });
 
 describe("roleLabel", () => {

@@ -24,6 +24,7 @@ const initialRoleMatrix = [
   ["administrator", "reports.export"],
   ["administrator", "administration.products.manage"],
   ["administrator", "administration.users.manage"],
+  ["administrator", "administration.payment_methods.configure"],
   ["administrator", "audit.log.view"],
   ["waiter", "orders.create"],
   ["waiter", "orders.edit"],
@@ -46,7 +47,7 @@ function tuplesBetween(seed: string, start: string, end: string) {
 }
 
 describe("development seed", () => {
-  it("seeds the initial roles and exact PRD role-permission matrix", async () => {
+  it("seeds the PRD matrix plus only the approved T-029 Administrator grant", async () => {
     const seed = await readFile(seedPath, "utf8");
 
     for (const role of ["Administrator", "Waiter", "Kitchen Personnel"]) {
@@ -61,12 +62,19 @@ describe("development seed", () => {
 
     expect(matrix).toEqual(initialRoleMatrix);
     expect(matrix.filter(([role]) => role === "administrator")).toHaveLength(
-      21,
+      22,
     );
     expect(matrix.filter(([role]) => role === "waiter")).toHaveLength(7);
     expect(
       matrix.filter(([role]) => role === "kitchen_personnel"),
     ).toHaveLength(3);
+    expect(
+      matrix.filter(
+        ([role, permission]) =>
+          permission === "administration.payment_methods.configure" &&
+          role !== "administrator",
+      ),
+    ).toEqual([]);
   });
 
   it("seeds the complete PRD permission catalog without granting future refunds", async () => {
