@@ -17,6 +17,7 @@ describe("auth return paths", () => {
     "/\\attacker.example/path",
     "javascript:alert(1)",
     "/login?next=/orders",
+    "/access-denied",
     "",
     null,
   ])("rejects unsafe return path %s", (value) => {

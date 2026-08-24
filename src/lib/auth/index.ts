@@ -5,6 +5,7 @@ export type {
   SignOutService,
 } from "./auth-actions";
 export {
+  ACCESS_DENIED_PATH,
   DEFAULT_AUTHENTICATED_PATH,
   LOGIN_PATH,
   loginPath,

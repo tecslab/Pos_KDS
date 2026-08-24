@@ -1,4 +1,5 @@
 export const LOGIN_PATH = "/login";
+export const ACCESS_DENIED_PATH = "/access-denied";
 export const DEFAULT_AUTHENTICATED_PATH = "/";
 
 const LOCAL_ORIGIN = "https://carnales.local";
@@ -22,7 +23,9 @@ export function safeLocalPath(value: unknown): string {
   try {
     const url = new URL(candidate, LOCAL_ORIGIN);
 
-    return url.origin === LOCAL_ORIGIN && url.pathname !== LOGIN_PATH
+    return url.origin === LOCAL_ORIGIN &&
+      url.pathname !== LOGIN_PATH &&
+      url.pathname !== ACCESS_DENIED_PATH
       ? `${url.pathname}${url.search}${url.hash}`
       : DEFAULT_AUTHENTICATED_PATH;
   } catch {

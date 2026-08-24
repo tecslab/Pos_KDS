@@ -61,6 +61,16 @@ describe("Supabase auth proxy", () => {
     expect(response.headers.get("location")).toBeNull();
   });
 
+  it("keeps the access-denied explanation public while failing closed", async () => {
+    const response = await routeAuthenticatedRequest(
+      new NextRequest("https://carnales.example/access-denied"),
+      factory(false),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
   it("redirects an authenticated login request to a safe local destination", async () => {
     const response = await routeAuthenticatedRequest(
       new NextRequest(

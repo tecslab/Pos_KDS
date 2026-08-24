@@ -1,8 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { loginPath, LOGIN_PATH, safeLocalPath } from "../auth";
+import {
+  ACCESS_DENIED_PATH,
+  loginPath,
+  LOGIN_PATH,
+  safeLocalPath,
+} from "../auth";
 import { parsePublicEnvironment } from "../config/environment";
+import { assertTlsVerificationEnabled } from "../config/tls-security";
 
 type CookieToSet = Readonly<{
   name: string;
@@ -28,6 +34,7 @@ export async function routeAuthenticatedRequest(
   request: NextRequest,
   clientFactory: ProxyAuthClientFactory = createProxyClient,
 ): Promise<NextResponse> {
+  assertTlsVerificationEnabled(process.env.NODE_TLS_REJECT_UNAUTHORIZED);
   let response = NextResponse.next({ request });
 
   const cookieBridge: ProxyCookieBridge = {
@@ -55,8 +62,10 @@ export async function routeAuthenticatedRequest(
   }
 
   const isLogin = request.nextUrl.pathname === LOGIN_PATH;
+  const isPublicAuthRoute =
+    isLogin || request.nextUrl.pathname === ACCESS_DENIED_PATH;
 
-  if (!authenticated && !isLogin) {
+  if (!authenticated && !isPublicAuthRoute) {
     return redirectWithCookies(
       request,
       loginPath(`${request.nextUrl.pathname}${request.nextUrl.search}`),

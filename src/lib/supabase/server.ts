@@ -4,8 +4,10 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 import { publicEnvironment } from "../config/runtime";
+import { assertTlsVerificationEnabled } from "../config/tls-security";
 
 export async function createServerSupabaseClient() {
+  assertTlsVerificationEnabled(process.env.NODE_TLS_REJECT_UNAUTHORIZED);
   const cookieStore = await cookies();
 
   return createServerClient(
