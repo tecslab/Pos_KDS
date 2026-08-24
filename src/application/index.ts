@@ -48,6 +48,20 @@ export {
   type SaveProductCategoryInput,
 } from "./product-category-administration";
 export {
+  ProductAdministrationService,
+  type Product,
+  type ProductAdministrationCategory,
+  type ProductAdministrationError,
+  type ProductAdministrationGateway,
+  type ProductAdministrationRecipe,
+  type ProductAdministrationResaleItem,
+  type ProductAdministrationRestaurant,
+  type ProductAdministrationTaxRate,
+  type ProductAdministrationView,
+  type ProductModification,
+  type SaveProductInput,
+} from "./product-administration";
+export {
   PrintingFacade,
   type PrintDocument,
   type PrintDocumentType,

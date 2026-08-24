@@ -60,7 +60,7 @@ describe("buildNavigation", () => {
     ).toEqual(["home"]);
   });
 
-  it("enables the user administration link only for its exact permission", () => {
+  it("enables administration for each implemented exact permission", () => {
     const unrelatedAdministration = buildNavigation([
       "administration.products.manage",
     ]).find((item) => item.id === "administration");
@@ -68,7 +68,10 @@ describe("buildNavigation", () => {
       "administration.users.manage",
     ]).find((item) => item.id === "administration");
 
-    expect(unrelatedAdministration).toMatchObject({ available: false });
+    expect(unrelatedAdministration).toMatchObject({
+      available: true,
+      href: "/administration/products",
+    });
     expect(userAdministration).toMatchObject({
       available: true,
       href: "/administration/users",
@@ -113,12 +116,24 @@ describe("buildNavigation", () => {
     });
   });
 
+  it("routes product-only administrators to product administration", () => {
+    expect(
+      buildNavigation(["administration.products.manage"]).find(
+        (item) => item.id === "administration",
+      ),
+    ).toMatchObject({
+      href: "/administration/products",
+      available: true,
+    });
+  });
+
   it("preserves established administration-route priority when category access is combined", () => {
     expect(
       buildNavigation([
         "administration.locations.manage",
         "administration.payment_methods.configure",
         "administration.categories.manage",
+        "administration.products.manage",
       ]).find((item) => item.id === "administration"),
     ).toMatchObject({ href: "/administration/locations", available: true });
   });

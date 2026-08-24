@@ -1,7 +1,7 @@
 ---
 id: T-031
 title: "Build product catalog and modification administration"
-status: todo
+status: done
 priority: critical
 size: medium
 type: feature

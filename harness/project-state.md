@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-031
-last_completed_task: T-030
-last_commit: efdaa2e
-completed_tasks: 30
+next_suggested_task: T-032
+last_completed_task: T-031
+last_commit: pending
+completed_tasks: 31
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -46,13 +46,15 @@ T-009 — Model the versioned product catalog and configurable modifications (co
 
 T-030 — Build product-category administration (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-031 — Build product catalog and modification administration (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-031 — Build product catalog and modification administration.
+T-032 — Build inventory-item administration.
 
 ## Human Checkpoints
 

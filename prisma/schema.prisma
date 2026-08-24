@@ -254,29 +254,35 @@ model Product {
 }
 
 model ProductVersion {
-  id                   String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  restaurantId         String                       @map("restaurant_id") @db.Uuid
-  productId            String                       @map("product_id") @db.Uuid
-  versionNumber        Int                          @map("version_number")
-  name                 String
-  unitPrice            Decimal                      @map("unit_price") @db.Decimal(12, 2)
-  printerAlias         String                       @map("printer_alias")
-  taxRateId            String                       @map("tax_rate_id") @db.Uuid
-  taxCode              String                       @map("tax_code")
-  taxName              String                       @map("tax_name")
-  taxRate              Decimal                      @map("tax_rate") @db.Decimal(7, 6)
-  priceIncludesTax     Boolean                      @map("price_includes_tax")
-  createdAt            DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
-  product              Product                      @relation(fields: [restaurantId, productId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict)
-  tax                  RestaurantTaxRate            @relation(fields: [restaurantId, taxRateId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict)
-  options              ProductOption[]
-  removableIngredients ProductRemovableIngredient[]
-  orderLineSnapshots   OrderLineSaleSnapshot[]
+  id                    String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId          String                       @map("restaurant_id") @db.Uuid
+  productId             String                       @map("product_id") @db.Uuid
+  versionNumber         Int                          @map("version_number")
+  name                  String
+  unitPrice             Decimal                      @map("unit_price") @db.Decimal(12, 2)
+  printerAlias          String                       @map("printer_alias")
+  taxRateId             String                       @map("tax_rate_id") @db.Uuid
+  taxCode               String                       @map("tax_code")
+  taxName               String                       @map("tax_name")
+  taxRate               Decimal                      @map("tax_rate") @db.Decimal(7, 6)
+  priceIncludesTax      Boolean                      @map("price_includes_tax")
+  recipeId              String?                      @map("recipe_id") @db.Uuid
+  resaleInventoryItemId String?                      @map("resale_inventory_item_id") @db.Uuid
+  createdAt             DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
+  product               Product                      @relation(fields: [restaurantId, productId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict)
+  tax                   RestaurantTaxRate            @relation(fields: [restaurantId, taxRateId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict)
+  recipe                Recipe?                      @relation("ProductVersionRecipe", fields: [restaurantId, recipeId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict)
+  resaleInventoryItem   InventoryItem?               @relation("ProductVersionResaleItem", fields: [restaurantId, resaleInventoryItemId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict)
+  options               ProductOption[]
+  removableIngredients  ProductRemovableIngredient[]
+  orderLineSnapshots    OrderLineSaleSnapshot[]
 
   @@unique([restaurantId, productId, versionNumber])
   @@unique([restaurantId, id])
   @@index([restaurantId, productId, versionNumber])
   @@index([restaurantId, taxRateId])
+  @@index([restaurantId, recipeId])
+  @@index([restaurantId, resaleInventoryItemId])
   @@map("product_versions")
 }
 
@@ -500,21 +506,22 @@ enum InventoryAlertStatus {
 }
 
 model InventoryItem {
-  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  restaurantId      String              @map("restaurant_id") @db.Uuid
-  name              String
-  type              InventoryItemType
-  unitOfMeasure     String              @map("unit_of_measure")
-  minimumStockLevel Decimal             @map("minimum_stock_level") @db.Decimal(14, 3)
-  isActive          Boolean             @map("is_active")
-  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
-  deletedAt         DateTime?           @map("deleted_at") @db.Timestamptz(6)
-  restaurant        Restaurant          @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  movements         InventoryMovement[]
-  alerts            InventoryAlert[]
-  outputRecipes     Recipe[]            @relation("RecipeOutputItem")
-  recipeIngredients RecipeIngredient[]  @relation("RecipeIngredientItem")
+  id                    String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId          String              @map("restaurant_id") @db.Uuid
+  name                  String
+  type                  InventoryItemType
+  unitOfMeasure         String              @map("unit_of_measure")
+  minimumStockLevel     Decimal             @map("minimum_stock_level") @db.Decimal(14, 3)
+  isActive              Boolean             @map("is_active")
+  createdAt             DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt             DateTime?           @map("deleted_at") @db.Timestamptz(6)
+  restaurant            Restaurant          @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  movements             InventoryMovement[]
+  alerts                InventoryAlert[]
+  outputRecipes         Recipe[]            @relation("RecipeOutputItem")
+  recipeIngredients     RecipeIngredient[]  @relation("RecipeIngredientItem")
+  resaleProductVersions ProductVersion[]    @relation("ProductVersionResaleItem")
 
   @@unique([restaurantId, name])
   @@unique([restaurantId, id])
@@ -590,19 +597,20 @@ enum ExpenseOriginType {
 }
 
 model Recipe {
-  id                    String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  restaurantId          String          @map("restaurant_id") @db.Uuid
-  productId             String          @map("product_id") @db.Uuid
-  outputInventoryItemId String          @map("output_inventory_item_id") @db.Uuid
+  id                    String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId          String           @map("restaurant_id") @db.Uuid
+  productId             String           @map("product_id") @db.Uuid
+  outputInventoryItemId String           @map("output_inventory_item_id") @db.Uuid
   name                  String
-  isActive              Boolean         @map("is_active")
-  createdAt             DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt             DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
-  deletedAt             DateTime?       @map("deleted_at") @db.Timestamptz(6)
-  restaurant            Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  product               Product         @relation(fields: [restaurantId, productId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "recipes_product_fkey")
-  outputInventoryItem   InventoryItem   @relation("RecipeOutputItem", fields: [restaurantId, outputInventoryItemId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "recipes_output_item_fkey")
+  isActive              Boolean          @map("is_active")
+  createdAt             DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt             DateTime?        @map("deleted_at") @db.Timestamptz(6)
+  restaurant            Restaurant       @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  product               Product          @relation(fields: [restaurantId, productId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "recipes_product_fkey")
+  outputInventoryItem   InventoryItem    @relation("RecipeOutputItem", fields: [restaurantId, outputInventoryItemId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "recipes_output_item_fkey")
   versions              RecipeVersion[]
+  productVersions       ProductVersion[] @relation("ProductVersionRecipe")
 
   @@unique([restaurantId, name])
   @@unique([restaurantId, id])
