@@ -34,7 +34,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-030 Build product-category administration
 - [x] T-031 Build product catalog and modification administration
 - [x] T-032 Build inventory-item administration
-- [ ] T-033 Build versioned recipe administration
+- [x] T-033 Build versioned recipe administration
 - [ ] T-034 Build the read-only audit-log view
 - [ ] T-035 Expose active menu and service-location data for PoS
 - [ ] T-036 Build the client-only PoS order draft composer

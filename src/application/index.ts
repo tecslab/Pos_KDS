@@ -72,6 +72,19 @@ export {
   type SaveProductInput,
 } from "./product-administration";
 export {
+  RecipeAdministrationService,
+  type Recipe,
+  type RecipeAdministrationError,
+  type RecipeAdministrationGateway,
+  type RecipeAdministrationInventoryItem,
+  type RecipeAdministrationProduct,
+  type RecipeAdministrationRestaurant,
+  type RecipeAdministrationView,
+  type RecipeIngredient,
+  type SaveRecipeIngredientInput,
+  type SaveRecipeInput,
+} from "./recipe-administration";
+export {
   PrintingFacade,
   type PrintDocument,
   type PrintDocumentType,

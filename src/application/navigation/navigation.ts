@@ -39,11 +39,17 @@ const navigationDefinitions: readonly NavigationDefinition[] = Object.freeze([
     "inventory.adjustments.register",
     "inventory.waste.register",
   ]),
-  definition("production", "Producción", "/production", [
-    "production.batch.create",
-    "production.recipes.edit",
-    "production.history.view",
-  ]),
+  definition(
+    "production",
+    "Producción",
+    "/production",
+    [
+      "production.batch.create",
+      "production.recipes.edit",
+      "production.history.view",
+    ],
+    true,
+  ),
   definition("reports", "Reportes", "/reports", [
     "reports.view",
     "reports.export",
@@ -114,6 +120,8 @@ export function buildNavigation(
           icon: item.icon,
           available:
             item.available &&
+            (item.id !== "production" ||
+              grants.has("production.recipes.edit")) &&
             (item.id !== "administration" ||
               grants.has("administration.users.manage") ||
               grants.has("administration.restaurant.configure") ||

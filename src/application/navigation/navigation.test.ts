@@ -86,6 +86,23 @@ describe("buildNavigation", () => {
     ).toMatchObject({ href: "/administration/settings", available: true });
   });
 
+  it("makes implemented recipe administration available to authorized users", () => {
+    expect(
+      buildNavigation(["production.recipes.edit"]).find(
+        (item) => item.id === "production",
+      ),
+    ).toMatchObject({ href: "/production", available: true });
+  });
+
+  it.each(["production.batch.create", "production.history.view"])(
+    "keeps production visible but unavailable with only %s",
+    (permission) => {
+      expect(
+        buildNavigation([permission]).find((item) => item.id === "production"),
+      ).toMatchObject({ href: "/production", available: false });
+    },
+  );
+
   it("routes location administrators to service-location administration", () => {
     expect(
       buildNavigation(["administration.locations.manage"]).find(
