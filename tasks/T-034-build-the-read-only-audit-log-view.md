@@ -1,7 +1,7 @@
 ---
 id: T-034
 title: "Build the read-only audit-log view"
-status: todo
+status: done
 priority: medium
 size: small
 type: feature

@@ -94,6 +94,15 @@ describe("buildNavigation", () => {
     ).toMatchObject({ href: "/production", available: true });
   });
 
+  it("makes the audit log reachable only with its exact persisted permission", () => {
+    expect(
+      buildNavigation(["audit.log.view"]).find((item) => item.id === "audit"),
+    ).toMatchObject({ href: "/audit", available: true });
+    expect(
+      buildNavigation(["reports.view"]).find((item) => item.id === "audit"),
+    ).toBeUndefined();
+  });
+
   it.each(["production.batch.create", "production.history.view"])(
     "keeps production visible but unavailable with only %s",
     (permission) => {

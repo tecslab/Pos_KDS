@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-034
-last_completed_task: T-033
+next_suggested_task: T-035
+last_completed_task: T-034
 last_commit: pending
-completed_tasks: 33
+completed_tasks: 34
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -50,13 +50,15 @@ T-031 — Build product catalog and modification administration (commit pending;
 
 T-032 — Build inventory-item administration (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-034 — Build the read-only audit-log view (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-034 — Build the read-only audit-log view.
+T-035 — Expose active menu and service-location data for PoS.
 
 ## Human Checkpoints
 

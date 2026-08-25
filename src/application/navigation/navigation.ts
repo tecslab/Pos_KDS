@@ -71,7 +71,7 @@ const navigationDefinitions: readonly NavigationDefinition[] = Object.freeze([
     ],
     true,
   ),
-  definition("audit", "Auditoría", "/audit", ["audit.log.view"]),
+  definition("audit", "Auditoría", "/audit", ["audit.log.view"], true),
 ]);
 
 export function buildNavigation(
