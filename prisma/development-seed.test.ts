@@ -15,6 +15,7 @@ const initialRoleMatrix = [
   ["administrator", "delivery.delivered.mark"],
   ["administrator", "payments.register"],
   ["administrator", "inventory.view"],
+  ["administrator", "administration.inventory.manage"],
   ["administrator", "inventory.purchases.register"],
   ["administrator", "inventory.waste.register"],
   ["administrator", "inventory.adjustments.register"],
@@ -47,7 +48,7 @@ function tuplesBetween(seed: string, start: string, end: string) {
 }
 
 describe("development seed", () => {
-  it("seeds the PRD matrix plus only the approved T-029 Administrator grant", async () => {
+  it("seeds the PRD matrix plus approved Administrator-only administration grants", async () => {
     const seed = await readFile(seedPath, "utf8");
 
     for (const role of ["Administrator", "Waiter", "Kitchen Personnel"]) {
@@ -62,7 +63,7 @@ describe("development seed", () => {
 
     expect(matrix).toEqual(initialRoleMatrix);
     expect(matrix.filter(([role]) => role === "administrator")).toHaveLength(
-      22,
+      23,
     );
     expect(matrix.filter(([role]) => role === "waiter")).toHaveLength(7);
     expect(
@@ -85,12 +86,12 @@ describe("development seed", () => {
     );
     const permissionCodes = [
       ...permissionSection.matchAll(
-        /\('20000000-[^']+', '([^']+)', '[^']+', NULL\)/g,
+        /\('20000000-[^']+', '([^']+)', '[^']+', (?:NULL|'[^']*')\)/g,
       ),
     ].map(([, code]) => code);
 
-    expect(permissionCodes).toHaveLength(31);
-    expect(new Set(permissionCodes).size).toBe(31);
+    expect(permissionCodes).toHaveLength(32);
+    expect(new Set(permissionCodes).size).toBe(32);
     expect(permissionCodes).toContain("payments.refund");
     expect(initialRoleMatrix.flat()).not.toContain("payments.refund");
   });

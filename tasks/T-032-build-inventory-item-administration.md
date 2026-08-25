@@ -1,7 +1,7 @@
 ---
 id: T-032
 title: "Build inventory-item administration"
-status: todo
+status: done
 priority: high
 size: medium
 type: feature

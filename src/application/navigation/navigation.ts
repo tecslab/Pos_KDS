@@ -56,6 +56,7 @@ const navigationDefinitions: readonly NavigationDefinition[] = Object.freeze([
       "administration.users.manage",
       "administration.roles.manage",
       "administration.products.manage",
+      "administration.inventory.manage",
       "administration.categories.manage",
       "administration.locations.manage",
       "administration.restaurant.configure",
@@ -96,7 +97,8 @@ export function buildNavigation(
               grants.has("administration.locations.manage") ||
               grants.has("administration.payment_methods.configure") ||
               grants.has("administration.categories.manage") ||
-              grants.has("administration.products.manage"))
+              grants.has("administration.products.manage") ||
+              grants.has("administration.inventory.manage"))
               ? grants.has("administration.restaurant.configure")
                 ? "/administration/settings"
                 : grants.has("administration.locations.manage")
@@ -105,7 +107,9 @@ export function buildNavigation(
                     ? "/administration/payment-methods"
                     : grants.has("administration.categories.manage")
                       ? "/administration/categories"
-                      : "/administration/products"
+                      : grants.has("administration.products.manage")
+                        ? "/administration/products"
+                        : "/administration/inventory-items"
               : item.href,
           icon: item.icon,
           available:
@@ -116,7 +120,8 @@ export function buildNavigation(
               grants.has("administration.locations.manage") ||
               grants.has("administration.payment_methods.configure") ||
               grants.has("administration.categories.manage") ||
-              grants.has("administration.products.manage")),
+              grants.has("administration.products.manage") ||
+              grants.has("administration.inventory.manage")),
         }),
       ),
   );

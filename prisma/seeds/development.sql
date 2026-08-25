@@ -48,7 +48,8 @@ VALUES
   ('20000000-0000-4000-8000-000000000028', 'administration.restaurant.configure', 'Configure Restaurant', NULL),
   ('20000000-0000-4000-8000-000000000029', 'administration.payment_methods.configure', 'Configure Payment Methods', NULL),
   ('20000000-0000-4000-8000-000000000030', 'administration.printers.configure', 'Configure Printers', NULL),
-  ('20000000-0000-4000-8000-000000000031', 'audit.log.view', 'View Audit Log', NULL)
+  ('20000000-0000-4000-8000-000000000031', 'audit.log.view', 'View Audit Log', NULL),
+  ('20000000-0000-4000-8000-000000000032', 'administration.inventory.manage', 'Manage Inventory Items', 'Create, edit, activate, and deactivate inventory item definitions.')
 ON CONFLICT (code) DO UPDATE
 SET
   name = EXCLUDED.name,
@@ -56,7 +57,7 @@ SET
   updated_at = CURRENT_TIMESTAMP;
 
 -- Reconcile the three initial roles to the grants in PRD 10.3 plus the
--- explicitly approved T-029 Administrator-only payment-method grant. The
+-- explicitly approved Administrator-only administration grants. The
 -- different wording in the matrix (for example, "Register Payments") maps to
 -- the canonical permission from PRD 10.2 ("Register Payment") by stable code.
 CREATE TEMPORARY TABLE seed_desired_role_permissions (
@@ -78,6 +79,7 @@ VALUES
   ('administrator', 'delivery.delivered.mark'),
   ('administrator', 'payments.register'),
   ('administrator', 'inventory.view'),
+  ('administrator', 'administration.inventory.manage'),
   ('administrator', 'inventory.purchases.register'),
   ('administrator', 'inventory.waste.register'),
   ('administrator', 'inventory.adjustments.register'),

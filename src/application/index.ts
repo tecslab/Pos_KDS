@@ -25,6 +25,16 @@ export {
   type NavigationItem,
 } from "./navigation";
 export {
+  InventoryItemAdministrationService,
+  type InventoryItem,
+  type InventoryItemAdministrationError,
+  type InventoryItemAdministrationGateway,
+  type InventoryItemAdministrationRestaurant,
+  type InventoryItemAdministrationView,
+  type InventoryItemType,
+  type SaveInventoryItemInput,
+} from "./inventory-item-administration";
+export {
   OperatingSettingsService,
   type OperatingSettings,
   type OperatingSettingsError,

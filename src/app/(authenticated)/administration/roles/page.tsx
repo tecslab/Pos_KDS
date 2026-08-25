@@ -182,6 +182,7 @@ function permissionLabel(code: string) {
     "payments.receipt.print": "Imprimir comprobantes",
     "payments.refund": "Reembolsar pagos (futuro)",
     "inventory.view": "Ver inventario",
+    "administration.inventory.manage": "Administrar artículos de inventario",
     "inventory.purchases.register": "Registrar compras",
     "inventory.adjustments.register": "Registrar ajustes",
     "inventory.waste.register": "Registrar desperdicio",
