@@ -102,6 +102,23 @@ channel replacement. A failed replacement is reported through the
 provider-neutral terminal-failure callback; no polling, backoff, or outbox is
 part of this contract.
 
+## PoS ordering-context API
+
+`GET /api/v1/pos/ordering-context` returns the active service locations and
+menu data used to compose a client-only order draft. It requires an
+authenticated employee with the persisted `orders.create` permission. The
+response groups locations and active catalog categories by restaurant; each
+active product includes its latest version identifier, price, captured tax
+details, and only the options and removable ingredients configured for that
+version.
+
+The endpoint accepts no filters or request body. An authorized installation
+with no configured data receives `{ "restaurants": [] }`. Authentication and
+authorization failures use JSON error envelopes with status 401 and 403;
+sanitized read failures use status 500. This read model is advisory draft input:
+it does not persist drafts or replace server-side order-confirmation validation
+and pricing.
+
 ## Quality checks
 
 Run the complete local quality gate with:

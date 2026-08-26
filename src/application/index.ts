@@ -60,6 +60,18 @@ export {
   type SavePaymentMethodInput,
 } from "./payment-method-administration";
 export {
+  PosOrderingContextService,
+  type PosOrderingContext,
+  type PosOrderingContextCategory,
+  type PosOrderingContextError,
+  type PosOrderingContextModification,
+  type PosOrderingContextProduct,
+  type PosOrderingContextReader,
+  type PosOrderingContextRestaurant,
+  type PosOrderingContextServiceLocation,
+  type PosOrderingContextTax,
+} from "./pos-ordering-context";
+export {
   ProductCategoryAdministrationService,
   type ProductCategory,
   type ProductCategoryAdministrationError,

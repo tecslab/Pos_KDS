@@ -1,7 +1,7 @@
 ---
 id: T-035
 title: "Expose active menu and service-location data for PoS"
-status: todo
+status: done
 priority: critical
 size: small
 type: api

@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-035
-last_completed_task: T-034
+next_suggested_task: T-036
+last_completed_task: T-035
 last_commit: pending
-completed_tasks: 34
+completed_tasks: 35
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -52,13 +52,15 @@ T-032 — Build inventory-item administration (commit pending; the task commit c
 
 T-034 — Build the read-only audit-log view (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-035 — Expose active menu and service-location data for PoS (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-035 — Expose active menu and service-location data for PoS.
+T-036 — Build the client-only PoS order draft composer.
 
 ## Human Checkpoints
 
