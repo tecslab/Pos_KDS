@@ -37,7 +37,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-033 Build versioned recipe administration
 - [x] T-034 Build the read-only audit-log view
 - [x] T-035 Expose active menu and service-location data for PoS
-- [ ] T-036 Build the client-only PoS order draft composer
+- [x] T-036 Build the client-only PoS order draft composer
 - [ ] T-037 Implement the order confirmation domain use case
 - [ ] T-038 Add resale-item consumption to order confirmation
 - [ ] T-039 Expose the transactional order-confirmation API

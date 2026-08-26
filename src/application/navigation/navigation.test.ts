@@ -50,14 +50,23 @@ describe("buildNavigation", () => {
     ).toEqual(["home", "payments"]);
   });
 
-  it("returns detached immutable presentation data and no premature module links", () => {
+  it("returns detached immutable presentation data and makes the implemented PoS reachable", () => {
     const navigation = buildNavigation(["orders.create", "reports.view"]);
 
     expect(Object.isFrozen(navigation)).toBe(true);
     expect(navigation.every(Object.isFrozen)).toBe(true);
     expect(
       navigation.filter((item) => item.available).map((item) => item.id),
-    ).toEqual(["home"]);
+    ).toEqual(["home", "orders"]);
+  });
+
+  it("makes the PoS reachable only with orders.create, matching its page boundary", () => {
+    expect(
+      buildNavigation(["orders.create"]).find((item) => item.id === "orders"),
+    ).toMatchObject({ href: "/orders", available: true });
+    expect(
+      buildNavigation(["orders.edit"]).find((item) => item.id === "orders"),
+    ).toBeUndefined();
   });
 
   it("enables administration for each implemented exact permission", () => {

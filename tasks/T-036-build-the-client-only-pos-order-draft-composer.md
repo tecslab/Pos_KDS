@@ -1,7 +1,7 @@
 ---
 id: T-036
 title: "Build the client-only PoS order draft composer"
-status: todo
+status: done
 priority: critical
 size: medium
 type: ui

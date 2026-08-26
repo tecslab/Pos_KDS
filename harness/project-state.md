@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-036
-last_completed_task: T-035
+next_suggested_task: T-037
+last_completed_task: T-036
 last_commit: pending
-completed_tasks: 35
+completed_tasks: 36
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -54,13 +54,15 @@ T-034 — Build the read-only audit-log view (commit pending; the task commit ca
 
 T-035 — Expose active menu and service-location data for PoS (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-036 — Build the client-only PoS order draft composer (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-036 — Build the client-only PoS order draft composer.
+T-037 — Implement the order confirmation domain use case.
 
 ## Human Checkpoints
 
