@@ -50,6 +50,9 @@ function mapPersistenceFailure(error: unknown) {
     if (error.message.includes("ORDER_CONFIRMATION_STALE_CONFIGURATION")) {
       return orderConfirmationFailure("STALE_CONFIGURATION");
     }
+    if (error.message.includes("ORDER_CONFIRMATION_INSUFFICIENT_INVENTORY")) {
+      return orderConfirmationFailure("INSUFFICIENT_INVENTORY");
+    }
   }
   return orderConfirmationFailure("OPERATION_FAILED");
 }

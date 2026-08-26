@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-038
-last_completed_task: T-037
+next_suggested_task: T-039
+last_completed_task: T-038
 last_commit: pending
-completed_tasks: 37
+completed_tasks: 38
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -58,13 +58,15 @@ T-036 — Build the client-only PoS order draft composer (commit pending; the ta
 
 T-037 — Implement the order confirmation domain use case (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-038 — Add resale-item consumption to order confirmation (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-038 — Add resale-item consumption to order confirmation.
+T-039 — Expose the transactional order-confirmation API.
 
 ## Human Checkpoints
 

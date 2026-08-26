@@ -1,7 +1,7 @@
 ---
 id: T-038
 title: "Add resale-item consumption to order confirmation"
-status: todo
+status: done
 priority: critical
 size: medium
 type: domain

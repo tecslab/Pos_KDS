@@ -143,6 +143,11 @@ describe("SupabaseOrderConfirmationGateway", () => {
       "LOCATION_UNAVAILABLE",
     ],
     ["P0001", "ORDER_CONFIRMATION_STALE_CONFIGURATION", "STALE_CONFIGURATION"],
+    [
+      "P0001",
+      "ORDER_CONFIRMATION_INSUFFICIENT_INVENTORY",
+      "INSUFFICIENT_INVENTORY",
+    ],
     ["23514", "constraint failed", "OPERATION_FAILED"],
   ])("maps safe RPC failure %s to %s", async (code, message, expectedCode) => {
     const gateway = new SupabaseOrderConfirmationGateway({

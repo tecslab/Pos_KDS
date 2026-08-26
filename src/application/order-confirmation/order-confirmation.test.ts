@@ -310,6 +310,27 @@ describe("OrderConfirmationService", () => {
     expect(published).toEqual([]);
   });
 
+  it("returns insufficient inventory without publishing a confirmation", async () => {
+    const { activity, published, service } = setup(
+      err({
+        kind: "order-confirmation-error",
+        code: "INSUFFICIENT_INVENTORY",
+      }),
+    );
+    await expect(service.confirm(actorId, draft())).resolves.toEqual(
+      err({
+        kind: "order-confirmation-error",
+        code: "INSUFFICIENT_INVENTORY",
+      }),
+    );
+    expect(activity).toEqual([
+      "transaction:start",
+      "rpc",
+      "transaction:rollback",
+    ]);
+    expect(published).toEqual([]);
+  });
+
   it("propagates a publisher failure after the RPC has committed", async () => {
     const publisherFailure = new Error("realtime unavailable");
     const activity: string[] = [];

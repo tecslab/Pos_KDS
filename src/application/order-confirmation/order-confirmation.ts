@@ -105,6 +105,7 @@ export type OrderConfirmationError = Readonly<{
     | "INVALID_DRAFT"
     | "LOCATION_UNAVAILABLE"
     | "STALE_CONFIGURATION"
+    | "INSUFFICIENT_INVENTORY"
     | "OPERATION_FAILED";
 }>;
 
