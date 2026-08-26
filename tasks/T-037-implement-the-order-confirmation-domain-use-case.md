@@ -1,7 +1,7 @@
 ---
 id: T-037
 title: "Implement the order confirmation domain use case"
-status: todo
+status: done
 priority: critical
 size: medium
 type: domain

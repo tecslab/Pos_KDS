@@ -20,5 +20,6 @@ export type {
   UnauthorizedError,
 } from "./business-error";
 export type { DomainEvent } from "./domain-event";
+export type { OrderConfirmed, OrderConfirmedPayload } from "./order-confirmed";
 export { err, ok } from "./result";
 export type { Err, Ok, Result } from "./result";

@@ -30,6 +30,23 @@ export {
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
 export {
+  OrderConfirmationService,
+  confirmedOrderResult,
+  orderConfirmationFailure,
+  type ConfirmedOrder,
+  type ConfirmedOrderBasket,
+  type ConfirmedOrderLine,
+  type ConfirmedOrderModification,
+  type ConfirmOrderBasketInput,
+  type ConfirmOrderInput,
+  type ConfirmOrderLineInput,
+  type OrderConfirmationCommand,
+  type OrderConfirmationCommandBasket,
+  type OrderConfirmationCommandLine,
+  type OrderConfirmationError,
+  type OrderConfirmationGateway,
+} from "./order-confirmation";
+export {
   buildNavigation,
   roleLabel,
   type NavigationIcon,
