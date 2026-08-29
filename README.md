@@ -119,6 +119,24 @@ sanitized read failures use status 500. This read model is advisory draft input:
 it does not persist drafts or replace server-side order-confirmation validation
 and pricing.
 
+## Order-confirmation API
+
+`POST /api/v1/pos/orders` confirms a client order draft transactionally. It
+requires an authenticated employee with the persisted `orders.create`
+permission and accepts `serviceLocationId`, optional `notes`, and baskets whose
+lines identify product versions, quantities, selected options, removable
+ingredients, and observations. Prices, totals, status, waiter identity,
+timestamps, order identifiers, audit source IPs, and other authoritative fields
+are always derived or validated on the server.
+
+A successful request returns the canonical confirmed order with status 201.
+The committed order is then published as an `order.created` realtime event to
+the `orders` and `kitchen` topics; the endpoint does not retry confirmation if
+post-commit publication fails. Authentication and permission failures return
+401 and 403, invalid JSON returns 400, invalid drafts return 422, business
+conflicts return 409, and technical failures return a sanitized 500 JSON error
+envelope.
+
 ## Quality checks
 
 Run the complete local quality gate with:

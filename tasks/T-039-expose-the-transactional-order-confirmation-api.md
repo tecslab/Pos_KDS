@@ -1,7 +1,7 @@
 ---
 id: T-039
 title: "Expose the transactional order-confirmation API"
-status: todo
+status: done
 priority: critical
 size: small
 type: api

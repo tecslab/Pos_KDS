@@ -18,6 +18,7 @@ export {
   type RealtimeTopic,
   type RealtimeValue,
 } from "./realtime-event";
+export { OrderConfirmedRealtimePublisher } from "./order-confirmed-realtime-publisher";
 export type {
   RealtimeMessageHandler,
   RealtimeSubscriber,

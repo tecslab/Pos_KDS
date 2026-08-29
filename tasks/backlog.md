@@ -40,7 +40,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-036 Build the client-only PoS order draft composer
 - [x] T-037 Implement the order confirmation domain use case
 - [x] T-038 Add resale-item consumption to order confirmation
-- [ ] T-039 Expose the transactional order-confirmation API
+- [x] T-039 Expose the transactional order-confirmation API
 - [ ] T-040 Connect PoS draft confirmation and recovery feedback
 - [ ] T-041 Expose active-order queries for authorized operations
 - [ ] T-042 Implement pending-order modification domain rules

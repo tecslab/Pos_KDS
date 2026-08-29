@@ -145,6 +145,7 @@ export {
 } from "./printing";
 export {
   mapDomainEventToRealtime,
+  OrderConfirmedRealtimePublisher,
   parseRealtimeMessage,
   realtimeEventNames,
   realtimeTopicName,
