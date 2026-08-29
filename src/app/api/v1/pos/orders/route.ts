@@ -6,6 +6,7 @@ import type {
 import { authorizeApiPermission } from "../../../../../lib/auth/api-authorization";
 import { mapOrderConfirmationErrorToHttp } from "../../../../../lib/http";
 import { createOrderConfirmationService } from "../../../../../lib/order-confirmation/server";
+import { requestKitchenTicketAfterPersistence } from "../../../../../lib/printing/server";
 
 const authenticationRequired = Object.freeze({
   status: 401,
@@ -75,6 +76,12 @@ export async function POST(request: Request) {
     if (!result.ok) {
       const response = mapOrderConfirmationErrorToHttp(result.error);
       return Response.json(response.body, { status: response.status });
+    }
+
+    try {
+      requestKitchenTicketAfterPersistence(result.value);
+    } catch {
+      // Printing is best effort and cannot change persisted confirmation.
     }
 
     return Response.json(result.value, { status: 201 });

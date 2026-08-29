@@ -17,6 +17,12 @@ import {
   initialDraftState,
   lineTotal,
 } from "./draft-state";
+import {
+  confirmationActionState,
+  DraftConfirmationWorkflow,
+  toConfirmationInput,
+} from "./draft-confirmation";
+import type { ConfirmationState } from "./draft-confirmation";
 
 type ContextState =
   | Readonly<{ status: "loading" }>
@@ -50,8 +56,12 @@ export function OrderDraftComposer() {
   const [observation, setObservation] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [basketName, setBasketName] = useState("");
+  const [confirmationState, setConfirmationState] = useState<ConfirmationState>(
+    { status: "idle" },
+  );
   const nextLineId = useRef(1);
   const nextBasketId = useRef(1);
+  const confirmationWorkflow = useRef<DraftConfirmationWorkflow | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -141,6 +151,30 @@ export function OrderDraftComposer() {
     });
     resetProductConfiguration();
   }
+
+  if (confirmationWorkflow.current === null) {
+    confirmationWorkflow.current = new DraftConfirmationWorkflow(
+      async (input) =>
+        fetch("/api/v1/pos/orders", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(input),
+        }),
+      setConfirmationState,
+      () => {
+        dispatch({ type: "clear" });
+        setSelectedCategoryId(null);
+        setBasketName("");
+        resetProductConfiguration();
+      },
+    );
+  }
+
+  const confirmationInput = toConfirmationInput(draft);
+  const confirmationAction = confirmationActionState(
+    confirmationState,
+    confirmationInput,
+  );
 
   return (
     <div>
@@ -401,15 +435,62 @@ export function OrderDraftComposer() {
             <button
               type="button"
               onClick={() => dispatch({ type: "clear" })}
-              disabled={draft.lines.length === 0 && !draft.locationId}
+              disabled={
+                confirmationState.status === "pending" ||
+                (draft.lines.length === 0 && !draft.locationId)
+              }
               className="mt-5 min-h-12 w-full rounded-md border border-[var(--brand-red)] px-3 font-semibold text-[var(--brand-red)] hover:bg-[var(--status-critical-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancelar borrador
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                void confirmationWorkflow.current?.submit(confirmationInput);
+              }}
+              disabled={confirmationAction.disabled}
+              aria-describedby="confirmation-feedback"
+              className="mt-3 min-h-12 w-full rounded-md bg-[var(--brand-green)] px-4 font-bold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {confirmationAction.label}
+            </button>
+            <ConfirmationFeedback state={confirmationState} />
           </aside>
         </div>
       )}
     </div>
+  );
+}
+
+function ConfirmationFeedback({
+  state,
+}: Readonly<{ state: ConfirmationState }>) {
+  if (state.status === "idle" || state.status === "pending") {
+    return <p id="confirmation-feedback" className="sr-only" />;
+  }
+
+  if (state.status === "success") {
+    return (
+      <p
+        id="confirmation-feedback"
+        role="status"
+        className="mt-3 rounded-md border border-[var(--status-new)] bg-[var(--status-new-bg)] p-3 text-sm font-semibold text-[var(--status-new)]"
+      >
+        {state.orderNumber === null
+          ? "La orden se confirmó. Se solicitó el envío a cocina."
+          : `La orden ${state.orderNumber} se confirmó. Se solicitó el envío a cocina.`}
+      </p>
+    );
+  }
+
+  return (
+    <p
+      id="confirmation-feedback"
+      role="alert"
+      className="mt-3 rounded-md border border-[var(--status-critical)] bg-[var(--status-critical-bg)] p-3 text-sm font-semibold text-[var(--status-critical)]"
+    >
+      {state.message}
+    </p>
   );
 }
 

@@ -4,6 +4,7 @@ const dependencies = vi.hoisted(() => ({
   authorizeApiPermission: vi.fn(),
   createOrderConfirmationService: vi.fn(),
   confirm: vi.fn(),
+  requestKitchenTicketAfterPersistence: vi.fn(),
 }));
 
 vi.mock("../../../../../lib/auth/api-authorization", () => ({
@@ -11,6 +12,10 @@ vi.mock("../../../../../lib/auth/api-authorization", () => ({
 }));
 vi.mock("../../../../../lib/order-confirmation/server", () => ({
   createOrderConfirmationService: dependencies.createOrderConfirmationService,
+}));
+vi.mock("../../../../../lib/printing/server", () => ({
+  requestKitchenTicketAfterPersistence:
+    dependencies.requestKitchenTicketAfterPersistence,
 }));
 
 import { POST } from "./route";
@@ -86,6 +91,7 @@ beforeEach(() => {
   dependencies.authorizeApiPermission.mockReset();
   dependencies.createOrderConfirmationService.mockReset();
   dependencies.confirm.mockReset();
+  dependencies.requestKitchenTicketAfterPersistence.mockReset();
   dependencies.authorizeApiPermission.mockResolvedValue({
     ok: true,
     value: { userId: actorId },
@@ -131,6 +137,9 @@ describe("POST /api/v1/pos/orders", () => {
         },
       ],
     });
+    expect(
+      dependencies.requestKitchenTicketAfterPersistence,
+    ).toHaveBeenCalledWith(confirmedOrder);
   });
 
   it.each([
@@ -164,6 +173,9 @@ describe("POST /api/v1/pos/orders", () => {
         dependencies.createOrderConfirmationService,
       ).not.toHaveBeenCalled();
       expect(dependencies.confirm).not.toHaveBeenCalled();
+      expect(
+        dependencies.requestKitchenTicketAfterPersistence,
+      ).not.toHaveBeenCalled();
     },
   );
 
@@ -183,6 +195,9 @@ describe("POST /api/v1/pos/orders", () => {
     });
     expect(dependencies.createOrderConfirmationService).not.toHaveBeenCalled();
     expect(dependencies.confirm).not.toHaveBeenCalled();
+    expect(
+      dependencies.requestKitchenTicketAfterPersistence,
+    ).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -215,6 +230,9 @@ describe("POST /api/v1/pos/orders", () => {
         error: { code, message },
       });
       expect(dependencies.confirm).toHaveBeenCalledOnce();
+      expect(
+        dependencies.requestKitchenTicketAfterPersistence,
+      ).not.toHaveBeenCalled();
     },
   );
 
@@ -266,5 +284,19 @@ describe("POST /api/v1/pos/orders", () => {
     expect(JSON.stringify(body)).not.toContain("private");
     expect(JSON.stringify(body)).not.toContain("secret-value");
     expect(dependencies.confirm.mock.calls.length).toBeLessThanOrEqual(1);
+  });
+
+  it("keeps persisted confirmation successful when ticket initiation throws", async () => {
+    dependencies.requestKitchenTicketAfterPersistence.mockImplementation(() => {
+      throw new Error("printer unavailable");
+    });
+
+    const response = await POST(jsonRequest(draft()));
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toEqual(confirmedOrder);
+    expect(
+      dependencies.requestKitchenTicketAfterPersistence,
+    ).toHaveBeenCalledWith(confirmedOrder);
   });
 });

@@ -26,7 +26,7 @@ describe("PoS draft composer UI", () => {
     expect(markup).toContain("Cargando ubicaciones y menú activo");
   });
 
-  it("uses accessible, tablet-sized controls and labels for draft-only interactions", async () => {
+  it("uses accessible, tablet-sized controls and labels for draft confirmation", async () => {
     const source = await readFile(
       new URL("./order-draft-composer.tsx", import.meta.url),
       "utf8",
@@ -37,20 +37,26 @@ describe("PoS draft composer UI", () => {
     expect(source).toContain('aria-label="Total de la orden"');
     expect(source).toContain('aria-label="Disminuir cantidad"');
     expect(source).toContain('aria-label="Aumentar cantidad"');
+    expect(source).toContain('aria-describedby="confirmation-feedback"');
+    expect(source).toContain('role="alert"');
+    expect(source).toContain('role="status"');
     expect(source).toContain("min-h-12");
     expect(source).toContain("aria-pressed");
   });
 
-  it("fetches only the authorized ordering context and contains no persistence or confirmation boundary", async () => {
+  it("uses the protected confirmation endpoint with pending-state duplicate protection", async () => {
     const source = await readFile(
       new URL("./order-draft-composer.tsx", import.meta.url),
       "utf8",
     );
 
     expect(source).toContain('fetch("/api/v1/pos/ordering-context"');
+    expect(source).toContain('fetch("/api/v1/pos/orders"');
+    expect(source).toContain('method: "POST"');
+    expect(source).toContain("DraftConfirmationWorkflow");
+    expect(source).toContain("confirmationAction.disabled");
+    expect(source).toContain('dispatch({ type: "clear" })');
     expect(source).not.toMatch(/localStorage|sessionStorage|"use server"/);
-    expect(source).not.toMatch(/method:\s*["'](?:POST|PUT|PATCH|DELETE)["']/);
-    expect(source).not.toContain("Confirmar orden");
     expect(source).not.toMatch(/action=|\.insert\(|\.update\(|\.delete\(/);
   });
 });

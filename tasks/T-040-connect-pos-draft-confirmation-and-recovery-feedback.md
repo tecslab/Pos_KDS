@@ -1,7 +1,7 @@
 ---
 id: T-040
 title: "Connect PoS draft confirmation and recovery feedback"
-status: todo
+status: done
 priority: critical
 size: small
 type: ui
