@@ -9,6 +9,8 @@ const restaurantId = "30000000-0000-4000-8000-000000000001";
 const basketId = "42000000-0000-4000-8000-000000000001";
 const lineId = "43000000-0000-4000-8000-000000000001";
 const snapshotId = "44000000-0000-4000-8000-000000000001";
+const inventoryItemId = "45000000-0000-4000-8000-000000000001";
+const movementId = "46000000-0000-4000-8000-000000000001";
 
 const command: OrderModificationCommand = Object.freeze({
   actorId,
@@ -31,6 +33,16 @@ function row() {
     status: "PENDING",
     total_amount: "10.00",
     updated_at: "2026-08-28T10:00:00+00:00",
+    inventory_movements: [
+      {
+        inventory_movement_id: movementId,
+        inventory_item_id: inventoryItemId,
+        type: "SALE",
+        quantity_delta: "-2.000",
+        unit_of_measure: "unit",
+        reversed_movement_id: null as string | null,
+      },
+    ],
     baskets: [
       {
         id: basketId,
@@ -71,9 +83,21 @@ describe("SupabaseOrderModificationGateway", () => {
     ).resolves.toMatchObject({
       ok: true,
       value: {
-        orderId,
-        totalAmount: "10.00",
-        updatedAt: "2026-08-28T10:00:00.000Z",
+        order: {
+          orderId,
+          totalAmount: "10.00",
+          updatedAt: "2026-08-28T10:00:00.000Z",
+        },
+        inventoryMovements: [
+          {
+            inventoryMovementId: movementId,
+            inventoryItemId,
+            type: "SALE",
+            quantityDelta: "-2.000",
+            unitOfMeasure: "unit",
+            reversedMovementId: null,
+          },
+        ],
       },
     });
     expect(rpc).toHaveBeenCalledWith("modify_pending_order", {
@@ -93,6 +117,11 @@ describe("SupabaseOrderModificationGateway", () => {
     ["P0001", "ORDER_MODIFICATION_NOT_PENDING", "ORDER_NOT_PENDING"],
     ["P0001", "ORDER_MODIFICATION_STALE_ORDER", "STALE_ORDER"],
     ["P0001", "ORDER_MODIFICATION_STALE_CONFIGURATION", "STALE_CONFIGURATION"],
+    [
+      "P0001",
+      "ORDER_MODIFICATION_INSUFFICIENT_INVENTORY",
+      "INSUFFICIENT_INVENTORY",
+    ],
   ])(
     "maps %s persistence errors without leaking details",
     async (code, message, expected) => {
@@ -110,6 +139,33 @@ describe("SupabaseOrderModificationGateway", () => {
   it("fails closed for a cross-restaurant or inconsistent returned aggregate", async () => {
     const invalid = row();
     invalid.baskets[0]!.restaurantId = "30000000-0000-4000-8000-000000000099";
+    const rpc = vi.fn().mockResolvedValue({ data: [invalid], error: null });
+    await expect(
+      new SupabaseOrderModificationGateway({
+        rpc,
+      } as unknown as SupabaseClient).modify(command),
+    ).resolves.toMatchObject({
+      ok: false,
+      error: { code: "OPERATION_FAILED" },
+    });
+  });
+
+  it.each([
+    [{ type: "SALE", quantity_delta: "2.000", reversed_movement_id: null }],
+    [{ type: "ROLLBACK", quantity_delta: "1.000", reversed_movement_id: null }],
+    [
+      {
+        type: "ROLLBACK",
+        quantity_delta: "-1.000",
+        reversed_movement_id: movementId,
+      },
+    ],
+  ])("fails closed for malformed movement summaries", async (changes) => {
+    const invalid = row();
+    invalid.inventory_movements[0] = {
+      ...invalid.inventory_movements[0]!,
+      ...changes,
+    };
     const rpc = vi.fn().mockResolvedValue({ data: [invalid], error: null });
     await expect(
       new SupabaseOrderModificationGateway({

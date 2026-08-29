@@ -50,6 +50,7 @@ export {
   OrderModificationService,
   modifiedOrderResult,
   orderModificationFailure,
+  persistedOrderModificationResult,
   type AddOrderLineOperationInput,
   type ModifiedOrder,
   type ModifiedOrderBasket,
@@ -61,6 +62,7 @@ export {
   type OrderModificationGateway,
   type OrderModificationOperation,
   type OrderModificationOperationInput,
+  type PersistedOrderModification,
   type RemoveOrderLineOperationInput,
   type ReplaceOrderLineOperationInput,
 } from "./order-modification";

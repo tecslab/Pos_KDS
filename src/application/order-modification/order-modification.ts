@@ -1,4 +1,11 @@
-import { err, ok, type OrderUpdated, type Result } from "../../domain";
+import {
+  err,
+  ok,
+  type InventoryReconciled,
+  type InventoryReconciledMovement,
+  type OrderUpdated,
+  type Result,
+} from "../../domain";
 import type { AuditClock } from "../audit";
 import {
   AuthorizationService,
@@ -128,6 +135,11 @@ export type ModifiedOrder = Readonly<{
   baskets: readonly ModifiedOrderBasket[];
 }>;
 
+export type PersistedOrderModification = Readonly<{
+  order: ModifiedOrder;
+  inventoryMovements: readonly InventoryReconciledMovement[];
+}>;
+
 export type OrderModificationError = Readonly<{
   kind: "order-modification-error";
   code:
@@ -137,13 +149,14 @@ export type OrderModificationError = Readonly<{
     | "ORDER_NOT_PENDING"
     | "STALE_ORDER"
     | "STALE_CONFIGURATION"
+    | "INSUFFICIENT_INVENTORY"
     | "OPERATION_FAILED";
 }>;
 
 export interface OrderModificationGateway {
   modify(
     command: OrderModificationCommand,
-  ): Promise<Result<ModifiedOrder, OrderModificationError>>;
+  ): Promise<Result<PersistedOrderModification, OrderModificationError>>;
 }
 
 export class OrderModificationService {
@@ -151,7 +164,9 @@ export class OrderModificationService {
     private readonly profiles: AuthorizationProfileReader,
     private readonly gateway: OrderModificationGateway,
     private readonly clock: AuditClock,
-    private readonly operations: TransactionalOperationRunner<OrderUpdated>,
+    private readonly operations: TransactionalOperationRunner<
+      OrderUpdated | InventoryReconciled
+    >,
   ) {}
 
   async modify(
@@ -184,7 +199,7 @@ export class OrderModificationService {
         }),
       );
       if (!result.ok) return result;
-      const order = result.value;
+      const { order, inventoryMovements } = result.value;
       events.record(
         Object.freeze({
           type: "order.updated" as const,
@@ -201,7 +216,20 @@ export class OrderModificationService {
           }),
         }),
       );
-      return result;
+      if (inventoryMovements.length > 0) {
+        events.record(
+          Object.freeze({
+            type: "inventory.reconciled" as const,
+            occurredAt: order.updatedAt,
+            payload: Object.freeze({
+              orderId: order.orderId,
+              restaurantId: order.restaurantId,
+              movements: inventoryMovements,
+            }),
+          }),
+        );
+      }
+      return modifiedOrderResult(order);
     });
   }
 }
@@ -413,6 +441,12 @@ export function orderModificationFailure(
 
 export function modifiedOrderResult(order: ModifiedOrder) {
   return ok(order);
+}
+
+export function persistedOrderModificationResult(
+  result: PersistedOrderModification,
+) {
+  return ok(result);
 }
 
 function failure(code: OrderModificationError["code"]) {

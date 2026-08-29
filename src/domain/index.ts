@@ -20,6 +20,11 @@ export type {
   UnauthorizedError,
 } from "./business-error";
 export type { DomainEvent } from "./domain-event";
+export type {
+  InventoryReconciled,
+  InventoryReconciledMovement,
+  InventoryReconciledPayload,
+} from "./inventory-reconciled";
 export type { OrderConfirmed, OrderConfirmedPayload } from "./order-confirmed";
 export type { OrderUpdated, OrderUpdatedPayload } from "./order-updated";
 export { err, ok } from "./result";

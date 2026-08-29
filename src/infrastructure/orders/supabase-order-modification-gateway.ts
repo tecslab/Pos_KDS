@@ -1,8 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { InventoryReconciledMovement } from "../../domain";
 
 import {
-  modifiedOrderResult,
   orderModificationFailure,
+  persistedOrderModificationResult,
   type ModifiedOrder,
   type ModifiedOrderBasket,
   type ModifiedOrderLine,
@@ -27,10 +28,10 @@ export class SupabaseOrderModificationGateway implements OrderModificationGatewa
       if (error) return mapFailure(error);
       if (!Array.isArray(data) || data.length !== 1)
         return orderModificationFailure("OPERATION_FAILED");
-      const order = mapOrder(data[0]);
-      return order === null
+      const persisted = mapPersistedModification(data[0]);
+      return persisted === null
         ? orderModificationFailure("OPERATION_FAILED")
-        : modifiedOrderResult(order);
+        : persistedOrderModificationResult(persisted);
     } catch {
       return orderModificationFailure("OPERATION_FAILED");
     }
@@ -48,11 +49,63 @@ function mapFailure(error: unknown) {
       ["ORDER_MODIFICATION_NOT_PENDING", "ORDER_NOT_PENDING"],
       ["ORDER_MODIFICATION_STALE_ORDER", "STALE_ORDER"],
       ["ORDER_MODIFICATION_STALE_CONFIGURATION", "STALE_CONFIGURATION"],
+      ["ORDER_MODIFICATION_INSUFFICIENT_INVENTORY", "INSUFFICIENT_INVENTORY"],
     ] as const;
     for (const [marker, code] of mappings)
       if (error.message.includes(marker)) return orderModificationFailure(code);
   }
   return orderModificationFailure("OPERATION_FAILED");
+}
+
+function mapPersistedModification(value: unknown) {
+  if (!isRecord(value)) return null;
+  const order = mapOrder(value);
+  const inventoryMovements = mapInventoryMovements(value.inventory_movements);
+  if (order === null || inventoryMovements === null) return null;
+  return Object.freeze({ order, inventoryMovements });
+}
+
+function mapInventoryMovements(
+  value: unknown,
+): readonly InventoryReconciledMovement[] | null {
+  if (!Array.isArray(value) || value.length > 1_000) return null;
+  const ids = new Set<string>();
+  const movements: InventoryReconciledMovement[] = [];
+  for (const candidate of value) {
+    if (
+      !isRecord(candidate) ||
+      !isUuid(candidate.inventory_movement_id) ||
+      ids.has(candidate.inventory_movement_id) ||
+      !isUuid(candidate.inventory_item_id) ||
+      (candidate.type !== "SALE" && candidate.type !== "ROLLBACK") ||
+      !isNonblank(candidate.unit_of_measure) ||
+      (candidate.reversed_movement_id !== null &&
+        !isUuid(candidate.reversed_movement_id))
+    )
+      return null;
+    const quantityDelta = signedQuantity(candidate.quantity_delta);
+    if (
+      quantityDelta === null ||
+      Number(quantityDelta) === 0 ||
+      (candidate.type === "SALE" && Number(quantityDelta) >= 0) ||
+      (candidate.type === "ROLLBACK" && Number(quantityDelta) <= 0) ||
+      (candidate.type === "SALE" && candidate.reversed_movement_id !== null) ||
+      (candidate.type === "ROLLBACK" && candidate.reversed_movement_id === null)
+    )
+      return null;
+    ids.add(candidate.inventory_movement_id);
+    movements.push(
+      Object.freeze({
+        inventoryMovementId: candidate.inventory_movement_id,
+        inventoryItemId: candidate.inventory_item_id,
+        type: candidate.type,
+        quantityDelta,
+        unitOfMeasure: candidate.unit_of_measure,
+        reversedMovementId: candidate.reversed_movement_id,
+      }),
+    );
+  }
+  return Object.freeze(movements);
 }
 
 function mapOrder(value: unknown): ModifiedOrder | null {
@@ -216,6 +269,9 @@ function signedMoney(value: unknown) {
 function rate(value: unknown) {
   const result = decimal(value, 6, false);
   return result !== null && Number(result) <= 1 ? result : null;
+}
+function signedQuantity(value: unknown) {
+  return decimal(value, 3, true);
 }
 function decimal(value: unknown, scale: number, signed: boolean) {
   if (

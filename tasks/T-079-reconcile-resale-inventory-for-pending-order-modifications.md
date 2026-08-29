@@ -1,7 +1,7 @@
 ---
 id: T-079
 title: "Reconcile resale inventory for pending-order modifications"
-status: todo
+status: done
 priority: critical
 size: medium
 type: domain

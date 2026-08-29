@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ok, type OrderUpdated, type Result } from "../../domain";
+import {
+  err,
+  ok,
+  type InventoryReconciled,
+  type OrderUpdated,
+  type Result,
+} from "../../domain";
 import type { DomainEventPublisher } from "../domain-event-publisher";
 import type { TransactionBoundary } from "../transaction-boundary";
 import { TransactionalOperationRunner } from "../transactional-operation-runner";
@@ -20,6 +26,8 @@ const lineId = "43000000-0000-4000-8000-000000000001";
 const snapshotId = "44000000-0000-4000-8000-000000000001";
 const productVersionId = "36000000-0000-4000-8000-000000000002";
 const optionId = "37000000-0000-4000-8000-000000000001";
+const inventoryItemId = "45000000-0000-4000-8000-000000000001";
+const inventoryMovementId = "46000000-0000-4000-8000-000000000001";
 
 const modified: ModifiedOrder = Object.freeze({
   orderId,
@@ -32,6 +40,17 @@ const modified: ModifiedOrder = Object.freeze({
   updatedAt: "2026-08-28T10:00:00.000Z",
   baskets: Object.freeze([]),
 });
+
+const inventoryMovements = Object.freeze([
+  Object.freeze({
+    inventoryMovementId,
+    inventoryItemId,
+    type: "SALE" as const,
+    quantityDelta: "-2.000",
+    unitOfMeasure: "unit",
+    reversedMovementId: null,
+  }),
+]);
 
 const input = (): ModifyOrderInput => ({
   orderId,
@@ -69,16 +88,21 @@ class Boundary implements TransactionBoundary {
   }
 }
 
-function setup(permissions: readonly string[] = ["orders.edit"]) {
+function setup(
+  permissions: readonly string[] = ["orders.edit"],
+  movements = inventoryMovements,
+) {
   const activity: string[] = [];
   const gateway: OrderModificationGateway = {
     modify: vi.fn().mockImplementation(async () => {
       activity.push("rpc");
-      return ok(modified);
+      return ok(
+        Object.freeze({ order: modified, inventoryMovements: movements }),
+      );
     }),
   };
-  const published: OrderUpdated[] = [];
-  const publisher: DomainEventPublisher<OrderUpdated> = {
+  const published: (OrderUpdated | InventoryReconciled)[] = [];
+  const publisher: DomainEventPublisher<OrderUpdated | InventoryReconciled> = {
     async publish(events) {
       activity.push("publish");
       published.push(...events);
@@ -105,7 +129,7 @@ function setup(permissions: readonly string[] = ["orders.edit"]) {
 }
 
 describe("OrderModificationService", () => {
-  it("authorizes, normalizes a bounded operation set, and publishes one event after commit", async () => {
+  it("publishes the order and reconciled inventory events only after commit", async () => {
     const { activity, gateway, published, service } = setup();
     await expect(service.modify(actorId, input())).resolves.toEqual(
       ok(modified),
@@ -159,7 +183,40 @@ describe("OrderModificationService", () => {
           updatedAt: modified.updatedAt,
         },
       },
+      {
+        type: "inventory.reconciled",
+        occurredAt: modified.updatedAt,
+        payload: {
+          orderId,
+          restaurantId,
+          movements: inventoryMovements,
+        },
+      },
     ]);
+  });
+
+  it("does not record an inventory event when the committed modification has no resale delta", async () => {
+    const { published, service } = setup(["orders.edit"], Object.freeze([]));
+    await expect(service.modify(actorId, input())).resolves.toEqual(
+      ok(modified),
+    );
+    expect(published.map((event) => event.type)).toEqual(["order.updated"]);
+  });
+
+  it("records and publishes no events when inventory reconciliation fails", async () => {
+    const { activity, gateway, published, service } = setup();
+    vi.mocked(gateway.modify).mockResolvedValueOnce(
+      err({
+        kind: "order-modification-error",
+        code: "INSUFFICIENT_INVENTORY",
+      }),
+    );
+    await expect(service.modify(actorId, input())).resolves.toMatchObject({
+      ok: false,
+      error: { code: "INSUFFICIENT_INVENTORY" },
+    });
+    expect(activity).toEqual(["transaction:start", "transaction:rollback"]);
+    expect(published).toEqual([]);
   });
 
   it("fails closed before persistence without orders.edit", async () => {
