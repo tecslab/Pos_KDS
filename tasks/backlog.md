@@ -43,7 +43,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-039 Expose the transactional order-confirmation API
 - [x] T-040 Connect PoS draft confirmation and recovery feedback
 - [x] T-041 Expose active-order queries for authorized operations
-- [ ] T-042 Implement pending-order modification domain rules
+- [x] T-042 Implement pending-order modification domain rules
 - [ ] T-079 Reconcile resale inventory for pending-order modifications
 - [ ] T-043 Expose the pending-order modification API
 - [ ] T-044 Build the active-order editing experience

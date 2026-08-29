@@ -150,6 +150,27 @@ describe("active-order persistence mapping", () => {
     expect(Object.isFrozen(detail.baskets[0]?.lines[0]?.snapshots)).toBe(true);
   });
 
+  it("excludes immutably removed lines from active line counts and totals", () => {
+    const row = detailRow();
+    const basket = (row.baskets as Record<string, unknown>[])[0]!;
+    basket.lines = [
+      ...(basket.lines as Record<string, unknown>[]),
+      {
+        id: "43000000-0000-4000-8000-000000000099",
+        restaurant_id: restaurantId,
+        removal: {
+          restaurant_id: restaurantId,
+          order_line_id: "43000000-0000-4000-8000-000000000099",
+        },
+      },
+    ];
+
+    const detail = mapActiveOrderDetailRow(row);
+
+    expect(detail.baskets[0]?.lineCount).toBe(1);
+    expect(detail.baskets[0]?.lines.map(({ id }) => id)).toEqual([lineId]);
+  });
+
   it.each([
     detailRow({ status: "PAID" }),
     detailRow({

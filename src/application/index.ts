@@ -47,6 +47,24 @@ export {
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
 export {
+  OrderModificationService,
+  modifiedOrderResult,
+  orderModificationFailure,
+  type AddOrderLineOperationInput,
+  type ModifiedOrder,
+  type ModifiedOrderBasket,
+  type ModifiedOrderLine,
+  type ModifiedOrderModification,
+  type ModifyOrderInput,
+  type OrderModificationCommand,
+  type OrderModificationError,
+  type OrderModificationGateway,
+  type OrderModificationOperation,
+  type OrderModificationOperationInput,
+  type RemoveOrderLineOperationInput,
+  type ReplaceOrderLineOperationInput,
+} from "./order-modification";
+export {
   OrderConfirmationService,
   confirmedOrderResult,
   orderConfirmationFailure,
@@ -163,6 +181,7 @@ export {
 export {
   mapDomainEventToRealtime,
   OrderConfirmedRealtimePublisher,
+  OrderUpdatedRealtimePublisher,
   parseRealtimeMessage,
   realtimeEventNames,
   realtimeTopicName,

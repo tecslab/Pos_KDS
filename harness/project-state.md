@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-042
-last_completed_task: T-041
+next_suggested_task: T-079
+last_completed_task: T-042
 last_commit: pending
-completed_tasks: 41
+completed_tasks: 42
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -66,13 +66,15 @@ T-040 — Connect PoS draft confirmation and recovery feedback (commit pending; 
 
 T-041 — Expose active-order queries for authorized operations (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-042 — Implement pending-order modification domain rules (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-042 — Implement pending-order modification domain rules.
+T-079 — Reconcile resale inventory for pending-order modifications.
 
 ## Human Checkpoints
 

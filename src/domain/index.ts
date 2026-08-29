@@ -21,5 +21,6 @@ export type {
 } from "./business-error";
 export type { DomainEvent } from "./domain-event";
 export type { OrderConfirmed, OrderConfirmedPayload } from "./order-confirmed";
+export type { OrderUpdated, OrderUpdatedPayload } from "./order-updated";
 export { err, ok } from "./result";
 export type { Err, Ok, Result } from "./result";

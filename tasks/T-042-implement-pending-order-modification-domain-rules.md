@@ -1,7 +1,7 @@
 ---
 id: T-042
 title: "Implement pending-order modification domain rules"
-status: todo
+status: done
 priority: high
 size: medium
 type: domain

@@ -25,6 +25,7 @@ model ApplicationUser {
   createdBatches     ProductionBatch[]    @relation("ProductionBatchCreator")
   completedBatches   ProductionBatch[]    @relation("ProductionBatchCompleter")
   operatingExpenses  OperatingExpense[]
+  removedOrderLines  OrderLineRemoval[]
 
   @@map("application_users")
 }
@@ -388,6 +389,7 @@ model OrderLine {
   basket            CustomerBasket          @relation(fields: [restaurantId, basketId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_lines_basket_fkey")
   snapshots         OrderLineSaleSnapshot[] @relation("LineSnapshots")
   currentSnapshot   OrderLineSaleSnapshot   @relation("CurrentLineSnapshot", fields: [restaurantId, id, currentSnapshotId], references: [restaurantId, orderLineId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_lines_current_snapshot_fkey")
+  removal           OrderLineRemoval?
 
   @@unique([restaurantId, id])
   @@unique([restaurantId, id, currentSnapshotId], map: "order_lines_current_snapshot_owner_key")
@@ -396,32 +398,49 @@ model OrderLine {
 }
 
 model OrderLineSaleSnapshot {
-  id                 String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  restaurantId       String         @map("restaurant_id") @db.Uuid
-  orderLineId        String         @map("order_line_id") @db.Uuid
-  revisionNumber     Int            @map("revision_number")
-  productVersionId   String         @map("product_version_id") @db.Uuid
-  productName        String         @map("product_name")
+  id                 String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId       String            @map("restaurant_id") @db.Uuid
+  orderLineId        String            @map("order_line_id") @db.Uuid
+  revisionNumber     Int               @map("revision_number")
+  productVersionId   String            @map("product_version_id") @db.Uuid
+  productName        String            @map("product_name")
   quantity           Int
-  baseUnitPrice      Decimal        @map("base_unit_price") @db.Decimal(12, 2)
-  finalUnitPrice     Decimal        @map("final_unit_price") @db.Decimal(12, 2)
-  lineTotal          Decimal        @map("line_total") @db.Decimal(12, 2)
-  taxCode            String         @map("tax_code")
-  taxName            String         @map("tax_name")
-  taxRate            Decimal        @map("tax_rate") @db.Decimal(7, 6)
-  priceIncludesTax   Boolean        @map("price_includes_tax")
-  selectedOptions    Json           @map("selected_options") @db.JsonB
-  removedIngredients Json           @map("removed_ingredients") @db.JsonB
+  baseUnitPrice      Decimal           @map("base_unit_price") @db.Decimal(12, 2)
+  finalUnitPrice     Decimal           @map("final_unit_price") @db.Decimal(12, 2)
+  lineTotal          Decimal           @map("line_total") @db.Decimal(12, 2)
+  taxCode            String            @map("tax_code")
+  taxName            String            @map("tax_name")
+  taxRate            Decimal           @map("tax_rate") @db.Decimal(7, 6)
+  priceIncludesTax   Boolean           @map("price_includes_tax")
+  selectedOptions    Json              @map("selected_options") @db.JsonB
+  removedIngredients Json              @map("removed_ingredients") @db.JsonB
   observations       String?
-  createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
-  orderLine          OrderLine      @relation("LineSnapshots", fields: [restaurantId, orderLineId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_line_snapshots_line_fkey")
-  currentForLine     OrderLine?     @relation("CurrentLineSnapshot")
-  productVersion     ProductVersion @relation(fields: [restaurantId, productVersionId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_line_snapshots_product_version_fkey")
+  createdAt          DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  orderLine          OrderLine         @relation("LineSnapshots", fields: [restaurantId, orderLineId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_line_snapshots_line_fkey")
+  currentForLine     OrderLine?        @relation("CurrentLineSnapshot")
+  removalEvidence    OrderLineRemoval?
+  productVersion     ProductVersion    @relation(fields: [restaurantId, productVersionId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_line_snapshots_product_version_fkey")
 
   @@unique([restaurantId, orderLineId, revisionNumber], map: "order_line_snapshots_line_revision_key")
   @@unique([restaurantId, orderLineId, id], map: "order_line_snapshots_current_key")
   @@index([restaurantId, productVersionId], map: "order_line_snapshots_product_version_idx")
   @@map("order_line_sale_snapshots")
+}
+
+model OrderLineRemoval {
+  orderLineId       String                @id @map("order_line_id") @db.Uuid
+  restaurantId      String                @map("restaurant_id") @db.Uuid
+  removedSnapshotId String                @map("removed_snapshot_id") @db.Uuid
+  removedById       String                @map("removed_by_id") @db.Uuid
+  removedAt         DateTime              @map("removed_at") @db.Timestamptz(6)
+  orderLine         OrderLine             @relation(fields: [restaurantId, orderLineId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_line_removals_line_fkey")
+  removedSnapshot   OrderLineSaleSnapshot @relation(fields: [restaurantId, orderLineId, removedSnapshotId], references: [restaurantId, orderLineId, id], onDelete: Restrict, onUpdate: Restrict, map: "order_line_removals_snapshot_fkey")
+  removedBy         ApplicationUser       @relation(fields: [removedById], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "order_line_removals_actor_fkey")
+
+  @@unique([restaurantId, orderLineId], map: "order_line_removals_restaurant_line_key")
+  @@unique([restaurantId, orderLineId, removedSnapshotId], map: "order_line_removals_snapshot_owner_key")
+  @@index([removedById, removedAt], map: "order_line_removals_removed_by_at_idx")
+  @@map("order_line_removals")
 }
 
 model OrderCancellation {

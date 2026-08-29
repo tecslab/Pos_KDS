@@ -26,3 +26,4 @@ export type {
   RealtimeSubscriptionFailure,
   RealtimeSubscriptionRequest,
 } from "./realtime-subscription";
+export { OrderUpdatedRealtimePublisher } from "./order-updated-realtime-publisher";

@@ -45,7 +45,14 @@ const ORDER_SUMMARY_FIELDS = `
     created_at,
     paid_at,
     payments (restaurant_id, amount),
-    lines:order_lines (id, restaurant_id)
+    lines:order_lines (
+      id,
+      restaurant_id,
+      removal:order_line_removals!order_line_removals_line_fkey (
+        restaurant_id,
+        order_line_id
+      )
+    )
   )
 `;
 
@@ -68,6 +75,10 @@ const ORDER_DETAIL_FIELDS = `
       restaurant_id,
       current_snapshot_id,
       created_at,
+      removal:order_line_removals!order_line_removals_line_fkey (
+        restaurant_id,
+        order_line_id
+      ),
       snapshots:order_line_sale_snapshots!order_line_snapshots_line_fkey (
         id,
         restaurant_id,
@@ -252,7 +263,7 @@ function mapDetailedBasket(
     throw new ActiveOrderReadError();
   }
   const lineIds = new Set<string>();
-  const lines = value.lines.map((line) => {
+  const lines = activeLineRows(value.lines, restaurantId).map((line) => {
     const mapped = mapLine(line, restaurantId);
     if (lineIds.has(mapped.id)) throw new ActiveOrderReadError();
     lineIds.add(mapped.id);
@@ -281,8 +292,9 @@ function mapBasketBase(value: unknown, restaurantId: string) {
   }
   const totalAmount = money(value.total_amount);
   if (totalAmount === null) throw new ActiveOrderReadError();
+  const activeLines = activeLineRows(value.lines, restaurantId);
   const lineIds = new Set<string>();
-  for (const line of value.lines) {
+  for (const line of activeLines) {
     if (
       !isRecord(line) ||
       !isUuid(line.id) ||
@@ -309,10 +321,50 @@ function mapBasketBase(value: unknown, restaurantId: string) {
     totalAmount,
     paidAmount,
     outstandingBalance: subtractMoney(totalAmount, paidAmount),
-    lineCount: value.lines.length,
+    lineCount: activeLines.length,
     createdAt: timestamp(value.created_at),
     paidAt: nullableTimestamp(value.paid_at),
   } as const;
+}
+
+function activeLineRows(values: readonly unknown[], restaurantId: string) {
+  const active: Record<string, unknown>[] = [];
+  for (const value of values) {
+    if (
+      !isRecord(value) ||
+      !isUuid(value.id) ||
+      value.restaurant_id !== restaurantId
+    ) {
+      throw new ActiveOrderReadError();
+    }
+    const removal = singleOptionalRelation(value.removal);
+    if (removal !== null) {
+      if (
+        removal.restaurant_id !== restaurantId ||
+        removal.order_line_id !== value.id
+      ) {
+        throw new ActiveOrderReadError();
+      }
+      continue;
+    }
+    active.push(value);
+  }
+  return active;
+}
+
+function singleOptionalRelation(
+  value: unknown,
+): Record<string, unknown> | null {
+  if (
+    value === undefined ||
+    value === null ||
+    (Array.isArray(value) && value.length === 0)
+  )
+    return null;
+  if (isRecord(value)) return value;
+  if (Array.isArray(value) && value.length === 1 && isRecord(value[0]))
+    return value[0];
+  throw new ActiveOrderReadError();
 }
 
 function mapLine(value: unknown, restaurantId: string): ActiveOrderLine {
