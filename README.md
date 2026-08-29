@@ -119,6 +119,36 @@ sanitized read failures use status 500. This read model is advisory draft input:
 it does not persist drafts or replace server-side order-confirmation validation
 and pricing.
 
+## Active-order query API
+
+`GET /api/v1/pos/orders` and `GET /api/v1/pos/orders/:orderId` require an
+authenticated employee with the persisted `orders.view` permission. Both
+endpoints are read-only and include only operational orders in `PENDING`,
+`READY`, `ON_THE_WAY`, or `DELIVERED`; terminal `PAID` and non-operational
+`CANCELLED` orders are excluded.
+
+The list endpoint returns `{ "orders": [...] }`. Each order summary includes
+its identifiers, order number, service location, assigned waiter, status,
+notes, total, paid amount, outstanding balance, creation/update timestamps,
+and basket summaries. Basket summaries include status, total, paid amount,
+outstanding balance, line count, and lifecycle timestamps.
+
+The detail endpoint returns one order directly. In addition to the summary
+fields it includes order lifecycle timestamps and every basket line. A line
+contains its current immutable sale snapshot and the complete ordered snapshot
+revision history, including the persisted product name/version, quantities,
+prices, tax details, option/removal snapshots, observations, and snapshot
+timestamp. These values come from order persistence rather than the live
+catalog. Paid amounts are used only to derive basket and order balances;
+payment-history records and payment-method details are not exposed.
+
+Successful reads return status 200, including `{ "orders": [] }` when no
+active orders exist. Authentication and authorization failures return safe JSON
+error envelopes with status 401 and 403. Detail requests return 400 for a
+malformed order identifier and 404 when the identifier does not resolve to an
+active order. Persistence, malformed-data, and unexpected failures return a
+sanitized status 500 response.
+
 ## Order-confirmation API
 
 `POST /api/v1/pos/orders` confirms a client order draft transactionally. It

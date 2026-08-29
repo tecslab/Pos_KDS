@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-041
-last_completed_task: T-040
+next_suggested_task: T-042
+last_completed_task: T-041
 last_commit: pending
-completed_tasks: 40
+completed_tasks: 41
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -64,13 +64,15 @@ T-039 — Expose the transactional order-confirmation API (commit pending; the t
 
 T-040 — Connect PoS draft confirmation and recovery feedback (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-041 — Expose active-order queries for authorized operations (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-041 — Expose active-order queries for authorized operations.
+T-042 — Implement pending-order modification domain rules.
 
 ## Human Checkpoints
 

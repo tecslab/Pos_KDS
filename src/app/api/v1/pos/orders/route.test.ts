@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const dependencies = vi.hoisted(() => ({
   authorizeApiPermission: vi.fn(),
+  createActiveOrderQueryService: vi.fn(),
+  list: vi.fn(),
   createOrderConfirmationService: vi.fn(),
   confirm: vi.fn(),
   requestKitchenTicketAfterPersistence: vi.fn(),
@@ -9,6 +11,9 @@ const dependencies = vi.hoisted(() => ({
 
 vi.mock("../../../../../lib/auth/api-authorization", () => ({
   authorizeApiPermission: dependencies.authorizeApiPermission,
+}));
+vi.mock("../../../../../lib/active-orders/server", () => ({
+  createActiveOrderQueryService: dependencies.createActiveOrderQueryService,
 }));
 vi.mock("../../../../../lib/order-confirmation/server", () => ({
   createOrderConfirmationService: dependencies.createOrderConfirmationService,
@@ -18,7 +23,7 @@ vi.mock("../../../../../lib/printing/server", () => ({
     dependencies.requestKitchenTicketAfterPersistence,
 }));
 
-import { POST } from "./route";
+import { GET, POST } from "./route";
 
 const actorId = "10000000-0000-4000-8000-000000000001";
 const locationId = "31000000-0000-4000-8000-000000000001";
@@ -90,6 +95,8 @@ function failure(code: string) {
 beforeEach(() => {
   dependencies.authorizeApiPermission.mockReset();
   dependencies.createOrderConfirmationService.mockReset();
+  dependencies.createActiveOrderQueryService.mockReset();
+  dependencies.list.mockReset();
   dependencies.confirm.mockReset();
   dependencies.requestKitchenTicketAfterPersistence.mockReset();
   dependencies.authorizeApiPermission.mockResolvedValue({
@@ -99,9 +106,53 @@ beforeEach(() => {
   dependencies.createOrderConfirmationService.mockReturnValue({
     confirm: dependencies.confirm,
   });
+  dependencies.createActiveOrderQueryService.mockReturnValue({
+    list: dependencies.list,
+  });
+  dependencies.list.mockResolvedValue({ ok: true, value: [] });
   dependencies.confirm.mockResolvedValue({
     ok: true,
     value: confirmedOrder,
+  });
+});
+
+describe("GET /api/v1/pos/orders", () => {
+  it("authorizes orders.view before composition and returns the active list", async () => {
+    const orders = [{ id: confirmedOrder.orderId, status: "PENDING" }];
+    dependencies.list.mockResolvedValue({ ok: true, value: orders });
+
+    const response = await GET();
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ orders });
+    expect(dependencies.authorizeApiPermission).toHaveBeenCalledWith(
+      "orders.view",
+    );
+    expect(dependencies.createActiveOrderQueryService).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    ["AUTHENTICATION_REQUIRED", 401],
+    ["UNAUTHORIZED", 403],
+  ])("returns %s before privileged composition", async (code, status) => {
+    dependencies.authorizeApiPermission.mockResolvedValue({
+      ok: false,
+      error: { code },
+    });
+
+    const response = await GET();
+
+    expect(response.status).toBe(status);
+    expect(dependencies.createActiveOrderQueryService).not.toHaveBeenCalled();
+  });
+
+  it("sanitizes application failures", async () => {
+    dependencies.list.mockRejectedValue(new Error("private provider detail"));
+
+    const response = await GET();
+
+    expect(response.status).toBe(500);
+    expect(JSON.stringify(await response.json())).not.toContain("private");
   });
 });
 

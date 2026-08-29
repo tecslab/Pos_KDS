@@ -4,6 +4,7 @@ import type {
   ConfirmOrderLineInput,
 } from "../../../../../application";
 import { authorizeApiPermission } from "../../../../../lib/auth/api-authorization";
+import { createActiveOrderQueryService } from "../../../../../lib/active-orders/server";
 import { mapOrderConfirmationErrorToHttp } from "../../../../../lib/http";
 import { createOrderConfirmationService } from "../../../../../lib/order-confirmation/server";
 import { requestKitchenTicketAfterPersistence } from "../../../../../lib/printing/server";
@@ -47,6 +48,29 @@ const internalError = Object.freeze({
     }),
   }),
 });
+
+export async function GET() {
+  try {
+    const authorization = await authorizeApiPermission("orders.view");
+    if (!authorization.ok) {
+      const response =
+        authorization.error.code === "AUTHENTICATION_REQUIRED"
+          ? authenticationRequired
+          : unauthorized;
+      return Response.json(response.body, { status: response.status });
+    }
+
+    const result = await createActiveOrderQueryService().list();
+    if (!result.ok) {
+      return Response.json(internalError.body, {
+        status: internalError.status,
+      });
+    }
+    return Response.json({ orders: result.value });
+  } catch {
+    return Response.json(internalError.body, { status: internalError.status });
+  }
+}
 
 export async function POST(request: Request) {
   try {

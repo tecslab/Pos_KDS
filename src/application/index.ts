@@ -11,6 +11,23 @@ export {
   type RecordAuditEventInput,
 } from "./audit";
 export {
+  ACTIVE_ORDER_STATUSES,
+  ActiveOrderQueryService,
+  type ActiveOrderBasket,
+  type ActiveOrderBasketStatus,
+  type ActiveOrderBasketSummary,
+  type ActiveOrderDetail,
+  type ActiveOrderLine,
+  type ActiveOrderLineSnapshot,
+  type ActiveOrderListItem,
+  type ActiveOrderModificationSnapshot,
+  type ActiveOrderQueryError,
+  type ActiveOrderReader,
+  type ActiveOrderServiceLocation,
+  type ActiveOrderStatus,
+  type ActiveOrderWaiter,
+} from "./active-orders";
+export {
   AUDIT_LOG_PAGE_SIZE,
   AuditLogService,
   parseAuditLogFilters,

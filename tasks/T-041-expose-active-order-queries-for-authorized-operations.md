@@ -1,7 +1,7 @@
 ---
 id: T-041
 title: "Expose active-order queries for authorized operations"
-status: todo
+status: done
 priority: high
 size: small
 type: api
