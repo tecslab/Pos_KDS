@@ -1,9 +1,9 @@
 import { requireServerPermission } from "@/lib/auth/server-authorization";
 
-import { OrderDraftComposer } from "./order-draft-composer";
+import { OrdersWorkspace } from "./orders-workspace";
 
 export default async function OrdersPage() {
   await requireServerPermission("orders.create", "/orders");
 
-  return <OrderDraftComposer />;
+  return <OrdersWorkspace />;
 }

@@ -59,4 +59,29 @@ describe("PoS draft composer UI", () => {
     expect(source).not.toMatch(/localStorage|sessionStorage|"use server"/);
     expect(source).not.toMatch(/action=|\.insert\(|\.update\(|\.delete\(/);
   });
+
+  it("offers a separate accessible active-order editing workspace", async () => {
+    const [workspace, editor] = await Promise.all([
+      readFile(new URL("./orders-workspace.tsx", import.meta.url), "utf8"),
+      readFile(new URL("./active-order-editor.tsx", import.meta.url), "utf8"),
+    ]);
+
+    expect(workspace).toContain('aria-label="Acciones del punto de venta"');
+    expect(workspace).toContain("Editar orden activa");
+    expect(editor).toContain('fetch("/api/v1/pos/orders"');
+    expect(editor).toContain('method: "PATCH"');
+    expect(editor).toContain('status === "PENDING"');
+    expect(editor).toContain('aria-label="Edición de orden activa"');
+    expect(editor).toContain('aria-describedby="active-order-save-feedback"');
+    expect(editor).toContain("recoveryRequiresReload(saveState)");
+    expect(editor).toContain("interactionDisabled");
+    expect(editor).toContain("aria-label={`Antigüedad de la orden:");
+    expect(editor).toContain("<OrderAge createdAt={order.createdAt}");
+    expect(editor).toContain('role="alert"');
+    expect(editor).toContain('role="status"');
+    expect(editor).toContain("min-h-12");
+    expect(editor).not.toMatch(
+      /cancel|payment|\.insert\(|\.update\(|\.delete\(/i,
+    );
+  });
 });
