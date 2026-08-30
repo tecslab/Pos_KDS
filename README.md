@@ -167,6 +167,37 @@ post-commit publication fails. Authentication and permission failures return
 conflicts return 409, and technical failures return a sanitized 500 JSON error
 envelope.
 
+## Pending-order modification API
+
+`PATCH /api/v1/pos/orders/{orderId}` modifies a confirmed order while it is
+still `PENDING`. It requires an authenticated employee with the persisted
+`orders.edit` permission. The request body contains `expectedUpdatedAt` and a
+non-empty `operations` array. Supported operations are:
+
+- `add`: `basketId`, `clientCorrelationId`, `productVersionId`, `quantity`,
+  and optional `optionIds`, `removableIngredientIds`, and `observations`.
+- `replace`: `lineId`, `expectedCurrentSnapshotId`, `quantity`, and optional
+  `optionIds`, `removableIngredientIds`, and `observations`.
+- `remove`: `lineId` and `expectedCurrentSnapshotId`.
+
+`expectedUpdatedAt` protects the complete order from concurrent updates, while
+each replace/remove snapshot identifier protects the targeted line revision.
+The URL owns `orderId`, the authenticated session owns the actor identity, and
+the server owns the audit source IP. Client-supplied identifiers, actors,
+source IPs, prices, totals, statuses, revision numbers, or inventory effects
+outside the operation contract are not authoritative.
+
+A successful request atomically persists the order revisions, audit record,
+and inventory reconciliation, then returns the canonical modified order with
+status 200. After commit, an `order.modified` realtime event is published to
+the `orders` and `kitchen` topics. Authentication and permission failures
+return safe 401 and 403 envelopes, invalid JSON returns 400, a missing order
+returns 404, pending-state/concurrency/configuration/inventory conflicts return
+409, invalid modifications return 422, and unexpected failures return a
+sanitized 500 response. Realtime publication is post-commit: if publication
+fails, the endpoint returns 500 but the committed modification is not rolled
+back or automatically retried.
+
 ## Quality checks
 
 Run the complete local quality gate with:

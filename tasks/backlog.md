@@ -45,7 +45,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-041 Expose active-order queries for authorized operations
 - [x] T-042 Implement pending-order modification domain rules
 - [x] T-079 Reconcile resale inventory for pending-order modifications
-- [ ] T-043 Expose the pending-order modification API
+- [x] T-043 Expose the pending-order modification API
 - [ ] T-044 Build the active-order editing experience
 - [ ] T-045 Implement authorized order cancellation with inventory rollback
 - [ ] T-046 Expose order cancellation API and confirmation interface

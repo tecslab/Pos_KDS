@@ -7,3 +7,4 @@ export {
 export { SupabaseOrderConfirmationGateway } from "./supabase-order-confirmation-gateway";
 export { SupabaseOrderConfirmationTransactionBoundary } from "./supabase-order-confirmation-transaction-boundary";
 export { SupabaseOrderModificationGateway } from "./supabase-order-modification-gateway";
+export { SupabaseOrderModificationTransactionBoundary } from "./supabase-order-modification-transaction-boundary";

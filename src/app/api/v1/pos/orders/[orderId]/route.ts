@@ -1,5 +1,11 @@
 import { authorizeApiPermission } from "../../../../../../lib/auth/api-authorization";
 import { createActiveOrderQueryService } from "../../../../../../lib/active-orders/server";
+import type {
+  ModifyOrderInput,
+  OrderModificationOperationInput,
+} from "../../../../../../application";
+import { mapOrderModificationErrorToHttp } from "../../../../../../lib/http";
+import { createOrderModificationService } from "../../../../../../lib/order-modification/server";
 
 type RouteContext = Readonly<{ params: Promise<{ orderId: string }> }>;
 
@@ -33,6 +39,107 @@ export async function GET(_request: Request, context: RouteContext) {
   } catch {
     return internalError();
   }
+}
+
+export async function PATCH(request: Request, context: RouteContext) {
+  try {
+    const authorization = await authorizeApiPermission("orders.edit");
+    if (!authorization.ok)
+      return authorizationResponse(authorization.error.code);
+
+    const { orderId } = await context.params;
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse(
+        400,
+        "INVALID_REQUEST",
+        "The request body must be valid JSON.",
+      );
+    }
+
+    const result = await createOrderModificationService().modify(
+      authorization.value.userId,
+      toPublicModification(orderId, body),
+    );
+    if (!result.ok) {
+      const response = mapOrderModificationErrorToHttp(result.error);
+      return Response.json(response.body, { status: response.status });
+    }
+
+    return Response.json(result.value);
+  } catch {
+    return internalError();
+  }
+}
+
+function toPublicModification(
+  orderId: string,
+  value: unknown,
+): ModifyOrderInput {
+  const source = isRecord(value) ? value : {};
+  return {
+    orderId,
+    expectedUpdatedAt: source.expectedUpdatedAt as string,
+    sourceIp: null,
+    operations: (Array.isArray(source.operations)
+      ? source.operations.map(toPublicOperation)
+      : source.operations) as readonly OrderModificationOperationInput[],
+  };
+}
+
+function toPublicOperation(value: unknown): OrderModificationOperationInput {
+  const source = isRecord(value) ? value : {};
+  if (source.kind === "add") {
+    const operation: Record<string, unknown> = {
+      kind: "add",
+      basketId: source.basketId,
+      clientCorrelationId: source.clientCorrelationId,
+      productVersionId: source.productVersionId,
+      quantity: source.quantity,
+    };
+    copyConfiguration(source, operation);
+    return operation as AddOperation;
+  }
+  if (source.kind === "replace") {
+    const operation: Record<string, unknown> = {
+      kind: "replace",
+      lineId: source.lineId,
+      expectedCurrentSnapshotId: source.expectedCurrentSnapshotId,
+      quantity: source.quantity,
+    };
+    copyConfiguration(source, operation);
+    return operation as ReplaceOperation;
+  }
+  return {
+    kind: source.kind,
+    lineId: source.lineId,
+    expectedCurrentSnapshotId: source.expectedCurrentSnapshotId,
+  } as OrderModificationOperationInput;
+}
+
+type AddOperation = Extract<OrderModificationOperationInput, { kind: "add" }>;
+type ReplaceOperation = Extract<
+  OrderModificationOperationInput,
+  { kind: "replace" }
+>;
+
+function copyConfiguration(
+  source: Record<string, unknown>,
+  target: Record<string, unknown>,
+) {
+  for (const optional of [
+    "optionIds",
+    "removableIngredientIds",
+    "observations",
+  ] as const) {
+    if (Object.hasOwn(source, optional)) target[optional] = source[optional];
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function authorizationResponse(

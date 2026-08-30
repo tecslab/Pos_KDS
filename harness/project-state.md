@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-043
-last_completed_task: T-079
+next_suggested_task: T-044
+last_completed_task: T-043
 last_commit: pending
-completed_tasks: 43
+completed_tasks: 44
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -70,13 +70,15 @@ T-042 — Implement pending-order modification domain rules (commit pending; the
 
 T-079 — Reconcile resale inventory for pending-order modifications (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-043 — Expose the pending-order modification API (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-043 — Expose the pending-order modification API.
+T-044 — Build the active-order editing experience.
 
 ## Human Checkpoints
 

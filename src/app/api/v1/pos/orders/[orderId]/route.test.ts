@@ -4,6 +4,8 @@ const dependencies = vi.hoisted(() => ({
   authorizeApiPermission: vi.fn(),
   createActiveOrderQueryService: vi.fn(),
   detail: vi.fn(),
+  createOrderModificationService: vi.fn(),
+  modify: vi.fn(),
 }));
 
 vi.mock("../../../../../../lib/auth/api-authorization", () => ({
@@ -12,10 +14,18 @@ vi.mock("../../../../../../lib/auth/api-authorization", () => ({
 vi.mock("../../../../../../lib/active-orders/server", () => ({
   createActiveOrderQueryService: dependencies.createActiveOrderQueryService,
 }));
+vi.mock("../../../../../../lib/order-modification/server", () => ({
+  createOrderModificationService: dependencies.createOrderModificationService,
+}));
 
-import { GET } from "./route";
+import { GET, PATCH } from "./route";
 
+const actorId = "10000000-0000-4000-8000-000000000001";
 const orderId = "41000000-0000-4000-8000-000000000001";
+const basketId = "42000000-0000-4000-8000-000000000001";
+const lineId = "43000000-0000-4000-8000-000000000001";
+const snapshotId = "44000000-0000-4000-8000-000000000001";
+const productVersionId = "36000000-0000-4000-8000-000000000001";
 const request = new Request(`http://localhost/api/v1/pos/orders/${orderId}`);
 const context = (id = orderId) => ({
   params: Promise.resolve({ orderId: id }),
@@ -24,7 +34,7 @@ const context = (id = orderId) => ({
 beforeEach(() => {
   dependencies.authorizeApiPermission.mockReset().mockResolvedValue({
     ok: true,
-    value: { userId: "10000000-0000-4000-8000-000000000001" },
+    value: { userId: actorId },
   });
   dependencies.createActiveOrderQueryService.mockReset().mockReturnValue({
     detail: dependencies.detail,
@@ -32,6 +42,252 @@ beforeEach(() => {
   dependencies.detail.mockReset().mockResolvedValue({
     ok: true,
     value: { id: orderId, status: "PENDING", baskets: [] },
+  });
+  dependencies.createOrderModificationService.mockReset().mockReturnValue({
+    modify: dependencies.modify,
+  });
+  dependencies.modify.mockReset().mockResolvedValue({
+    ok: true,
+    value: {
+      orderId,
+      status: "PENDING",
+      totalAmount: "25.00",
+      updatedAt: "2026-08-29T12:00:01.000Z",
+      baskets: [],
+    },
+  });
+});
+
+function modificationBody() {
+  return {
+    orderId: "client-controlled-order-id",
+    actorId: "client-controlled-actor-id",
+    sourceIp: "client-controlled-source-ip",
+    expectedUpdatedAt: "2026-08-29T12:00:00.000Z",
+    operations: [
+      {
+        kind: "add",
+        basketId,
+        clientCorrelationId: "line-add-1",
+        productVersionId,
+        quantity: 2,
+        optionIds: [],
+        removableIngredientIds: [],
+        observations: "Sin cebolla",
+        finalUnitPrice: "0.01",
+      },
+      {
+        kind: "replace",
+        lineId,
+        expectedCurrentSnapshotId: snapshotId,
+        quantity: 3,
+        optionIds: [],
+        removableIngredientIds: [],
+        observations: null,
+        revisionNumber: 999,
+      },
+      {
+        kind: "remove",
+        lineId: "43000000-0000-4000-8000-000000000002",
+        expectedCurrentSnapshotId: "44000000-0000-4000-8000-000000000002",
+        inventoryRollback: false,
+      },
+    ],
+  };
+}
+
+function patchRequest(value: unknown): Request {
+  return new Request(`http://localhost/api/v1/pos/orders/${orderId}`, {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(value),
+  });
+}
+
+function modificationFailure(code: string) {
+  return {
+    ok: false,
+    error: Object.freeze({ kind: "order-modification-error", code }),
+  };
+}
+
+describe("PATCH /api/v1/pos/orders/:orderId", () => {
+  it("modifies once for the authenticated actor with path-owned and public input", async () => {
+    const response = await PATCH(patchRequest(modificationBody()), context());
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      orderId,
+      status: "PENDING",
+      totalAmount: "25.00",
+    });
+    expect(dependencies.authorizeApiPermission).toHaveBeenCalledWith(
+      "orders.edit",
+    );
+    expect(dependencies.createOrderModificationService).toHaveBeenCalledOnce();
+    expect(dependencies.modify).toHaveBeenCalledOnce();
+    expect(dependencies.modify).toHaveBeenCalledWith(actorId, {
+      orderId,
+      expectedUpdatedAt: "2026-08-29T12:00:00.000Z",
+      sourceIp: null,
+      operations: [
+        {
+          kind: "add",
+          basketId,
+          clientCorrelationId: "line-add-1",
+          productVersionId,
+          quantity: 2,
+          optionIds: [],
+          removableIngredientIds: [],
+          observations: "Sin cebolla",
+        },
+        {
+          kind: "replace",
+          lineId,
+          expectedCurrentSnapshotId: snapshotId,
+          quantity: 3,
+          optionIds: [],
+          removableIngredientIds: [],
+          observations: null,
+        },
+        {
+          kind: "remove",
+          lineId: "43000000-0000-4000-8000-000000000002",
+          expectedCurrentSnapshotId: "44000000-0000-4000-8000-000000000002",
+        },
+      ],
+    });
+  });
+
+  it.each([
+    ["AUTHENTICATION_REQUIRED", 401, "Authentication is required."],
+    ["UNAUTHORIZED", 403, "You are not authorized to perform this operation."],
+  ] as const)(
+    "returns %s before params, parsing, or privileged composition",
+    async (code, status, message) => {
+      dependencies.authorizeApiPermission.mockResolvedValue({
+        ok: false,
+        error: { code },
+      });
+      const params = { then: vi.fn() } as unknown as Promise<{
+        orderId: string;
+      }>;
+      const json = vi.fn();
+
+      const response = await PATCH({ json } as unknown as Request, { params });
+
+      expect(response.status).toBe(status);
+      await expect(response.json()).resolves.toEqual({
+        error: { code, message },
+      });
+      expect(params.then).not.toHaveBeenCalled();
+      expect(json).not.toHaveBeenCalled();
+      expect(
+        dependencies.createOrderModificationService,
+      ).not.toHaveBeenCalled();
+      expect(dependencies.modify).not.toHaveBeenCalled();
+    },
+  );
+
+  it("returns 400 for invalid JSON without composing modification", async () => {
+    const invalidRequest = {
+      json: vi.fn().mockRejectedValue(new SyntaxError("private body detail")),
+    } as unknown as Request;
+
+    const response = await PATCH(invalidRequest, context());
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: "INVALID_REQUEST",
+        message: "The request body must be valid JSON.",
+      },
+    });
+    expect(dependencies.createOrderModificationService).not.toHaveBeenCalled();
+    expect(dependencies.modify).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["UNAUTHORIZED", 403, "You are not authorized to perform this operation."],
+    ["INVALID_MODIFICATION", 422, "The order modification is invalid."],
+    ["NOT_FOUND", 404, "The order was not found."],
+    ["ORDER_NOT_PENDING", 409, "Only pending orders can be modified."],
+    ["STALE_ORDER", 409, "The order has changed since it was loaded."],
+    [
+      "STALE_CONFIGURATION",
+      409,
+      "The order uses configuration that is no longer available.",
+    ],
+    [
+      "INSUFFICIENT_INVENTORY",
+      409,
+      "There is not enough inventory to complete the requested operation.",
+    ],
+  ] as const)(
+    "returns the safe %s business failure",
+    async (code, status, message) => {
+      dependencies.modify.mockResolvedValue(modificationFailure(code));
+
+      const response = await PATCH(patchRequest(modificationBody()), context());
+
+      expect(response.status).toBe(status);
+      await expect(response.json()).resolves.toEqual({
+        error: { code, message },
+      });
+      expect(dependencies.modify).toHaveBeenCalledOnce();
+    },
+  );
+
+  it.each([
+    {
+      label: "operation failure",
+      arrange: () =>
+        dependencies.modify.mockResolvedValue(
+          modificationFailure("OPERATION_FAILED"),
+        ),
+    },
+    {
+      label: "malformed business-error lookalike",
+      arrange: () =>
+        dependencies.modify.mockResolvedValue({
+          ok: false,
+          error: {
+            kind: "order-modification-error",
+            code: "STALE_ORDER",
+            detail: "secret-value",
+          },
+        }),
+    },
+    {
+      label: "post-commit publication rejection",
+      arrange: () =>
+        dependencies.modify.mockRejectedValue(
+          new Error("private realtime provider detail"),
+        ),
+    },
+    {
+      label: "composition failure",
+      arrange: () =>
+        dependencies.createOrderModificationService.mockImplementation(() => {
+          throw new Error("private configuration detail");
+        }),
+    },
+  ])("returns a sanitized 500 for $label", async ({ arrange }) => {
+    arrange();
+
+    const response = await PATCH(patchRequest(modificationBody()), context());
+
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(body).toEqual({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "An unexpected error occurred.",
+      },
+    });
+    expect(JSON.stringify(body)).not.toContain("private");
+    expect(JSON.stringify(body)).not.toContain("secret-value");
+    expect(dependencies.modify.mock.calls.length).toBeLessThanOrEqual(1);
   });
 });
 

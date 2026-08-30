@@ -1,7 +1,7 @@
 ---
 id: T-043
 title: "Expose the pending-order modification API"
-status: todo
+status: done
 priority: high
 size: small
 type: api
