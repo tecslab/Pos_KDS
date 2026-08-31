@@ -26,6 +26,11 @@ import {
   type PendingOrderEdit,
   type SaveState,
 } from "./active-order-editing";
+import {
+  canExposeCancellation,
+  type CancellationSummary,
+} from "./active-order-cancellation";
+import { OrderCancellationPanel } from "./order-cancellation-panel";
 
 type OrdersState =
   | Readonly<{ status: "loading" }>
@@ -41,6 +46,7 @@ type DetailState =
   | Readonly<{ status: "idle" }>
   | Readonly<{ status: "loading" }>
   | Readonly<{ status: "error"; message: string }>
+  | Readonly<{ status: "cancelled"; summary: CancellationSummary }>
   | Readonly<{ status: "readonly"; order: ActiveOrderDetail }>
   | Readonly<{ status: "ready"; edit: PendingOrderEdit }>;
 
@@ -55,7 +61,9 @@ const panelClass =
 const inputClass =
   "mt-2 min-h-12 w-full rounded-md border border-[var(--color-border)] bg-white px-3 text-base focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[var(--color-surface-muted)]";
 
-export function ActiveOrderEditor() {
+export function ActiveOrderEditor({
+  canCancelOrders,
+}: Readonly<{ canCancelOrders: boolean }>) {
   const [ordersState, setOrdersState] = useState<OrdersState>({
     status: "loading",
   });
@@ -66,6 +74,9 @@ export function ActiveOrderEditor() {
     status: "idle",
   });
   const [saveState, setSaveState] = useState<SaveState>({ status: "idle" });
+  const [cancellationLocked, setCancellationLocked] = useState(false);
+  const [cancellationAccessBlocked, setCancellationAccessBlocked] =
+    useState(false);
   const [selectedBasketId, setSelectedBasketId] = useState("");
   const [selectedProductVersionId, setSelectedProductVersionId] = useState("");
   const [addQuantity, setAddQuantity] = useState(1);
@@ -98,6 +109,7 @@ export function ActiveOrderEditor() {
     detailRequest.current?.abort();
     const controller = new AbortController();
     detailRequest.current = controller;
+    setCancellationLocked(false);
     setSelectedOrderId(orderId);
     if (resetSave) {
       setDetailState({ status: "loading" });
@@ -183,16 +195,24 @@ export function ActiveOrderEditor() {
     };
   }, []);
 
-  const pendingOrders =
+  const canUseCancellation = canExposeCancellation(
+    canCancelOrders,
+    cancellationAccessBlocked,
+  );
+  const visibleOrders =
     ordersState.status === "ready"
-      ? ordersState.orders.filter(({ status }) => status === "PENDING")
+      ? ordersState.orders.filter(
+          ({ status }) =>
+            status === "PENDING" || (canUseCancellation && status === "READY"),
+        )
       : [];
   const edit = detailState.status === "ready" ? detailState.edit : null;
   const modificationInput = edit === null ? null : toModificationInput(edit);
   const changes = edit === null ? [] : modificationSummary(edit);
   const saveAction = saveActionState(saveState, modificationInput);
   const recoveryLocked = recoveryRequiresReload(saveState);
-  const interactionDisabled = saveState.status === "pending" || recoveryLocked;
+  const saveLocked = saveState.status === "pending" || recoveryLocked;
+  const interactionDisabled = saveLocked || cancellationLocked;
   const restaurant =
     contextState.status === "ready" && edit !== null
       ? (contextState.context.restaurants.find(
@@ -266,6 +286,18 @@ export function ActiveOrderEditor() {
     void saveWorkflow.current.submit(input);
   }
 
+  function showCommittedCancellation(summary: CancellationSummary) {
+    setCancellationLocked(false);
+    setSelectedOrderId(null);
+    setDetailState({ status: "cancelled", summary });
+    void loadOrders(undefined, false);
+  }
+
+  function blockCancellationAccess() {
+    setCancellationLocked(false);
+    setCancellationAccessBlocked(true);
+  }
+
   return (
     <div>
       <header>
@@ -283,7 +315,7 @@ export function ActiveOrderEditor() {
         <aside className={panelClass} aria-labelledby="active-orders-title">
           <div className="flex items-center justify-between gap-3">
             <h2 id="active-orders-title" className="text-xl font-bold">
-              Órdenes pendientes
+              Órdenes activas
             </h2>
             <button
               type="button"
@@ -302,13 +334,15 @@ export function ActiveOrderEditor() {
             <p role="alert" className={errorClass}>
               {ordersState.message}
             </p>
-          ) : pendingOrders.length === 0 ? (
+          ) : visibleOrders.length === 0 ? (
             <p role="status" className="mt-4 text-[var(--color-text-muted)]">
-              No hay órdenes pendientes disponibles para editar.
+              {canUseCancellation
+                ? "No hay órdenes pendientes o listas disponibles para editar o cancelar."
+                : "No hay órdenes pendientes disponibles para editar."}
             </p>
           ) : (
             <div className="mt-4 grid gap-3">
-              {pendingOrders.map((order) => (
+              {visibleOrders.map((order) => (
                 <article
                   key={order.id}
                   className="rounded-md border border-[var(--color-border)] bg-white p-3"
@@ -322,8 +356,10 @@ export function ActiveOrderEditor() {
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <span className="rounded-sm bg-[var(--status-new-bg)] px-2 py-1 text-xs font-bold text-[var(--status-new)]">
-                        Pendiente
+                      <span
+                        className={`rounded-sm px-2 py-1 text-xs font-bold ${order.status === "READY" ? "bg-[var(--status-paid-bg)] text-[var(--status-paid)]" : "bg-[var(--status-new-bg)] text-[var(--status-new)]"}`}
+                      >
+                        {statusLabel(order.status)}
                       </span>
                       <OrderAge createdAt={order.createdAt} />
                     </div>
@@ -369,6 +405,8 @@ export function ActiveOrderEditor() {
                 </button>
               ) : null}
             </div>
+          ) : detailState.status === "cancelled" ? (
+            <CancellationOutcome summary={detailState.summary} />
           ) : detailState.status === "readonly" ? (
             <div className={panelClass}>
               <p
@@ -383,8 +421,22 @@ export function ActiveOrderEditor() {
                 onClick={() => void loadOrders()}
                 className={`mt-4 ${touchButtonClass} ${neutralButtonClass}`}
               >
-                Volver a órdenes pendientes
+                Volver a órdenes activas
               </button>
+              {canUseCancellation && detailState.order.status === "READY" ? (
+                <OrderCancellationPanel
+                  key={detailState.order.id}
+                  order={detailState.order}
+                  disabled={false}
+                  onInteractionLockChange={setCancellationLocked}
+                  onAuthorizationBlocked={blockCancellationAccess}
+                  onCancelled={showCommittedCancellation}
+                  onReload={() => void loadDetail(detailState.order.id)}
+                />
+              ) : null}
+              {cancellationAccessBlocked ? (
+                <CancellationAccessBlockedNotice />
+              ) : null}
             </div>
           ) : (
             <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.65fr)]">
@@ -513,12 +565,77 @@ export function ActiveOrderEditor() {
                     Recargar orden
                   </button>
                 ) : null}
+                {canUseCancellation ? (
+                  <OrderCancellationPanel
+                    key={detailState.edit.order.id}
+                    order={detailState.edit.order}
+                    disabled={saveLocked}
+                    onInteractionLockChange={setCancellationLocked}
+                    onAuthorizationBlocked={blockCancellationAccess}
+                    onCancelled={showCommittedCancellation}
+                    onReload={() => void loadDetail(detailState.edit.order.id)}
+                  />
+                ) : null}
+                {cancellationAccessBlocked ? (
+                  <CancellationAccessBlockedNotice />
+                ) : null}
               </aside>
             </div>
           )}
         </section>
       </div>
     </div>
+  );
+}
+
+function CancellationAccessBlockedNotice() {
+  return (
+    <p role="alert" className={errorClass}>
+      Tu permiso para cancelar órdenes cambió. El control permanecerá oculto
+      hasta que vuelvas a cargar esta página.
+    </p>
+  );
+}
+
+function CancellationOutcome({
+  summary,
+}: Readonly<{ summary: CancellationSummary }>) {
+  return (
+    <section
+      className={`${panelClass} border-[var(--status-critical)]`}
+      aria-labelledby="cancelled-order-title"
+    >
+      <p className="text-sm font-bold text-[var(--status-critical)]">
+        Cancelada
+      </p>
+      <h2 id="cancelled-order-title" className="mt-1 text-2xl font-bold">
+        {summary.orderNumber === null
+          ? "La orden fue cancelada"
+          : `Orden ${summary.orderNumber} cancelada`}
+      </h2>
+      <p role="status" className="mt-3 font-semibold">
+        El servidor confirmó la cancelación. La orden salió de la operación y su
+        historial permanece registrado.
+      </p>
+      <dl className="mt-4 grid gap-3 rounded-md bg-[var(--color-surface-muted)] p-4 text-sm">
+        <div>
+          <dt className="font-semibold text-[var(--color-text-muted)]">
+            Motivo registrado
+          </dt>
+          <dd className="mt-1">{summary.reason}</dd>
+        </div>
+        {summary.cancelledAt === null ? null : (
+          <div>
+            <dt className="font-semibold text-[var(--color-text-muted)]">
+              Fecha de cancelación
+            </dt>
+            <dd className="mt-1 tabular-nums">
+              {formatDateTime(summary.cancelledAt)}
+            </dd>
+          </div>
+        )}
+      </dl>
+    </section>
   );
 }
 

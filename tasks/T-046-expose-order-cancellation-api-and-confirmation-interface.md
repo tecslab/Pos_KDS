@@ -1,7 +1,7 @@
 ---
 id: T-046
 title: "Expose order cancellation API and confirmation interface"
-status: todo
+status: done
 priority: high
 size: small
 type: feature

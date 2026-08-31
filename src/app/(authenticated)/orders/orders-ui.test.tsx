@@ -12,9 +12,10 @@ import OrdersPage from "./page";
 
 describe("PoS draft composer UI", () => {
   it("protects the route with orders.create before rendering the composer", async () => {
-    dependencies.authorize
-      .mockReset()
-      .mockResolvedValue({ userId: "waiter-1" });
+    dependencies.authorize.mockReset().mockResolvedValue({
+      userId: "waiter-1",
+      permissionCodes: ["orders.create"],
+    });
 
     const markup = renderToStaticMarkup(await OrdersPage());
 
@@ -80,8 +81,57 @@ describe("PoS draft composer UI", () => {
     expect(editor).toContain('role="alert"');
     expect(editor).toContain('role="status"');
     expect(editor).toContain("min-h-12");
-    expect(editor).not.toMatch(
-      /cancel|payment|\.insert\(|\.update\(|\.delete\(/i,
+    expect(editor).not.toMatch(/payment|\.insert\(|\.update\(|\.delete\(/i);
+  });
+
+  it("derives cancellation visibility from persisted permission codes", async () => {
+    dependencies.authorize.mockReset().mockResolvedValue({
+      userId: "administrator-1",
+      permissionCodes: ["orders.create", "orders.cancel"],
+    });
+
+    await OrdersPage();
+
+    const [page, workspace, editor, cancellationPanel] = await Promise.all([
+      readFile(new URL("./page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("./orders-workspace.tsx", import.meta.url), "utf8"),
+      readFile(new URL("./active-order-editor.tsx", import.meta.url), "utf8"),
+      readFile(
+        new URL("./order-cancellation-panel.tsx", import.meta.url),
+        "utf8",
+      ),
+    ]);
+
+    expect(page).toContain('context.permissionCodes.includes("orders.cancel")');
+    expect(workspace).toContain(
+      "<ActiveOrderEditor canCancelOrders={canCancelOrders}",
+    );
+    expect(editor).toContain("canUseCancellation ? (");
+    expect(editor).toContain(
+      'status === "PENDING" || (canUseCancellation && status === "READY")',
+    );
+    expect(editor).toContain("canExposeCancellation(");
+    expect(editor).toContain("cancellationAccessBlocked,");
+    expect(editor).toContain(
+      "onAuthorizationBlocked={blockCancellationAccess}",
+    );
+    expect(cancellationPanel).toContain('method: "DELETE"');
+    expect(cancellationPanel).toContain(
+      "fetch(`/api/v1/pos/orders/${orderId}`)",
+    );
+    expect(cancellationPanel).toContain("Motivo de cancelación");
+    expect(cancellationPanel).toContain(
+      "Confirmo que deseo cancelar esta orden de forma definitiva.",
+    );
+    expect(cancellationPanel).toContain("aria-describedby={feedbackId}");
+    expect(cancellationPanel).toContain('role="alert"');
+    expect(cancellationPanel).toContain('role="dialog"');
+    expect(cancellationPanel).toContain("moveCancellationFocus(true");
+    expect(cancellationPanel).toContain("moveCancellationFocus(false");
+    expect(cancellationPanel).toContain("Verificar estado");
+    expect(cancellationPanel).toContain("min-h-12");
+    expect(cancellationPanel).not.toMatch(
+      /roleCode|administrator|manager|refund|bulk|\.insert\(|\.update\(/i,
     );
   });
 });

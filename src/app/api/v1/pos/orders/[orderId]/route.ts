@@ -1,10 +1,15 @@
 import { authorizeApiPermission } from "../../../../../../lib/auth/api-authorization";
 import { createActiveOrderQueryService } from "../../../../../../lib/active-orders/server";
 import type {
+  CancelOrderInput,
   ModifyOrderInput,
   OrderModificationOperationInput,
 } from "../../../../../../application";
-import { mapOrderModificationErrorToHttp } from "../../../../../../lib/http";
+import {
+  mapOrderCancellationErrorToHttp,
+  mapOrderModificationErrorToHttp,
+} from "../../../../../../lib/http";
+import { createOrderCancellationService } from "../../../../../../lib/order-cancellation/server";
 import { createOrderModificationService } from "../../../../../../lib/order-modification/server";
 
 type RouteContext = Readonly<{ params: Promise<{ orderId: string }> }>;
@@ -72,6 +77,51 @@ export async function PATCH(request: Request, context: RouteContext) {
   } catch {
     return internalError();
   }
+}
+
+export async function DELETE(request: Request, context: RouteContext) {
+  try {
+    const authorization = await authorizeApiPermission("orders.cancel");
+    if (!authorization.ok)
+      return authorizationResponse(authorization.error.code);
+
+    const { orderId } = await context.params;
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse(
+        400,
+        "INVALID_REQUEST",
+        "The request body must be valid JSON.",
+      );
+    }
+
+    const result = await createOrderCancellationService().cancel(
+      authorization.value.userId,
+      toPublicCancellation(orderId, body),
+    );
+    if (!result.ok) {
+      const response = mapOrderCancellationErrorToHttp(result.error);
+      return Response.json(response.body, { status: response.status });
+    }
+
+    return Response.json(result.value);
+  } catch {
+    return internalError();
+  }
+}
+
+function toPublicCancellation(
+  orderId: string,
+  value: unknown,
+): CancelOrderInput {
+  const source = isRecord(value) ? value : {};
+  return {
+    orderId,
+    reason: source.reason as string,
+    sourceIp: null,
+  };
 }
 
 function toPublicModification(

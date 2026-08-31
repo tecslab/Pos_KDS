@@ -1,5 +1,10 @@
 export { mapErrorToHttp } from "./error-mapping";
 export type { HttpErrorCode, HttpErrorDescriptor } from "./error-mapping";
+export { mapOrderCancellationErrorToHttp } from "./order-cancellation-error-mapping";
+export type {
+  OrderCancellationHttpErrorCode,
+  OrderCancellationHttpErrorDescriptor,
+} from "./order-cancellation-error-mapping";
 export { mapOrderConfirmationErrorToHttp } from "./order-confirmation-error-mapping";
 export type {
   OrderConfirmationHttpErrorCode,

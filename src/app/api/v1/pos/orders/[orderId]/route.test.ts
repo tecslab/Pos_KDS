@@ -6,6 +6,8 @@ const dependencies = vi.hoisted(() => ({
   detail: vi.fn(),
   createOrderModificationService: vi.fn(),
   modify: vi.fn(),
+  createOrderCancellationService: vi.fn(),
+  cancel: vi.fn(),
 }));
 
 vi.mock("../../../../../../lib/auth/api-authorization", () => ({
@@ -17,8 +19,11 @@ vi.mock("../../../../../../lib/active-orders/server", () => ({
 vi.mock("../../../../../../lib/order-modification/server", () => ({
   createOrderModificationService: dependencies.createOrderModificationService,
 }));
+vi.mock("../../../../../../lib/order-cancellation/server", () => ({
+  createOrderCancellationService: dependencies.createOrderCancellationService,
+}));
 
-import { GET, PATCH } from "./route";
+import { DELETE, GET, PATCH } from "./route";
 
 const actorId = "10000000-0000-4000-8000-000000000001";
 const orderId = "41000000-0000-4000-8000-000000000001";
@@ -54,6 +59,21 @@ beforeEach(() => {
       totalAmount: "25.00",
       updatedAt: "2026-08-29T12:00:01.000Z",
       baskets: [],
+    },
+  });
+  dependencies.createOrderCancellationService.mockReset().mockReturnValue({
+    cancel: dependencies.cancel,
+  });
+  dependencies.cancel.mockReset().mockResolvedValue({
+    ok: true,
+    value: {
+      orderId,
+      orderNumber: "ORD-42",
+      previousStatus: "READY",
+      status: "CANCELLED",
+      reason: "Customer requested cancellation",
+      cancelledById: actorId,
+      cancelledAt: "2026-08-30T10:00:00.000Z",
     },
   });
 });
@@ -104,12 +124,211 @@ function patchRequest(value: unknown): Request {
   });
 }
 
+function deleteRequest(value: unknown): Request {
+  return new Request(`http://localhost/api/v1/pos/orders/${orderId}`, {
+    method: "DELETE",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(value),
+  });
+}
+
 function modificationFailure(code: string) {
   return {
     ok: false,
     error: Object.freeze({ kind: "order-modification-error", code }),
   };
 }
+
+function cancellationFailure(code: string) {
+  return {
+    ok: false,
+    error: Object.freeze({ kind: "order-cancellation-error", code }),
+  };
+}
+
+describe("DELETE /api/v1/pos/orders/:orderId", () => {
+  it("cancels once for the authenticated actor with path-owned and public input", async () => {
+    const response = await DELETE(
+      deleteRequest({
+        orderId: "client-controlled-order-id",
+        actorId: "client-controlled-actor-id",
+        reason: "Customer requested cancellation",
+        sourceIp: "client-controlled-source-ip",
+        refundPayment: true,
+      }),
+      context(),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      orderId,
+      status: "CANCELLED",
+      reason: "Customer requested cancellation",
+    });
+    expect(dependencies.authorizeApiPermission).toHaveBeenCalledWith(
+      "orders.cancel",
+    );
+    expect(dependencies.createOrderCancellationService).toHaveBeenCalledOnce();
+    expect(dependencies.cancel).toHaveBeenCalledOnce();
+    expect(dependencies.cancel).toHaveBeenCalledWith(actorId, {
+      orderId,
+      reason: "Customer requested cancellation",
+      sourceIp: null,
+    });
+  });
+
+  it.each([
+    ["AUTHENTICATION_REQUIRED", 401, "Authentication is required."],
+    ["UNAUTHORIZED", 403, "You are not authorized to perform this operation."],
+  ] as const)(
+    "returns %s before params, parsing, or privileged composition",
+    async (code, status, message) => {
+      dependencies.authorizeApiPermission.mockResolvedValue({
+        ok: false,
+        error: { code },
+      });
+      const params = { then: vi.fn() } as unknown as Promise<{
+        orderId: string;
+      }>;
+      const json = vi.fn();
+
+      const response = await DELETE({ json } as unknown as Request, { params });
+
+      expect(response.status).toBe(status);
+      await expect(response.json()).resolves.toEqual({
+        error: { code, message },
+      });
+      expect(params.then).not.toHaveBeenCalled();
+      expect(json).not.toHaveBeenCalled();
+      expect(
+        dependencies.createOrderCancellationService,
+      ).not.toHaveBeenCalled();
+      expect(dependencies.cancel).not.toHaveBeenCalled();
+    },
+  );
+
+  it("returns 400 for invalid JSON without composing cancellation", async () => {
+    const invalidRequest = {
+      json: vi.fn().mockRejectedValue(new SyntaxError("private body detail")),
+    } as unknown as Request;
+
+    const response = await DELETE(invalidRequest, context());
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: "INVALID_REQUEST",
+        message: "The request body must be valid JSON.",
+      },
+    });
+    expect(dependencies.createOrderCancellationService).not.toHaveBeenCalled();
+    expect(dependencies.cancel).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["missing", {}, undefined],
+    ["non-string", { reason: 42 }, 42],
+    ["non-object", [], undefined],
+  ])(
+    "delegates a %s reason for domain validation",
+    async (_label, body, reason) => {
+      dependencies.cancel.mockResolvedValue(
+        cancellationFailure("INVALID_CANCELLATION"),
+      );
+
+      const response = await DELETE(deleteRequest(body), context());
+
+      expect(response.status).toBe(422);
+      expect(dependencies.cancel).toHaveBeenCalledWith(actorId, {
+        orderId,
+        reason,
+        sourceIp: null,
+      });
+    },
+  );
+
+  it.each([
+    ["UNAUTHORIZED", 403, "You are not authorized to perform this operation."],
+    ["INVALID_CANCELLATION", 422, "The order cancellation is invalid."],
+    ["NOT_FOUND", 404, "The order was not found."],
+    [
+      "ORDER_NOT_CANCELLABLE",
+      409,
+      "Only pending or ready orders can be cancelled.",
+    ],
+  ] as const)(
+    "returns the safe %s business failure",
+    async (code, status, message) => {
+      dependencies.cancel.mockResolvedValue(cancellationFailure(code));
+
+      const response = await DELETE(
+        deleteRequest({ reason: "Customer request" }),
+        context(),
+      );
+
+      expect(response.status).toBe(status);
+      await expect(response.json()).resolves.toEqual({
+        error: { code, message },
+      });
+      expect(dependencies.cancel).toHaveBeenCalledOnce();
+    },
+  );
+
+  it.each([
+    {
+      label: "operation failure",
+      arrange: () =>
+        dependencies.cancel.mockResolvedValue(
+          cancellationFailure("OPERATION_FAILED"),
+        ),
+    },
+    {
+      label: "malformed business-error lookalike",
+      arrange: () =>
+        dependencies.cancel.mockResolvedValue({
+          ok: false,
+          error: {
+            kind: "order-cancellation-error",
+            code: "ORDER_NOT_CANCELLABLE",
+            detail: "secret-value",
+          },
+        }),
+    },
+    {
+      label: "post-commit publication rejection",
+      arrange: () =>
+        dependencies.cancel.mockRejectedValue(
+          new Error("private realtime provider detail"),
+        ),
+    },
+    {
+      label: "composition failure",
+      arrange: () =>
+        dependencies.createOrderCancellationService.mockImplementation(() => {
+          throw new Error("private configuration detail");
+        }),
+    },
+  ])("returns a sanitized 500 for $label", async ({ arrange }) => {
+    arrange();
+
+    const response = await DELETE(
+      deleteRequest({ reason: "Customer request" }),
+      context(),
+    );
+
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(body).toEqual({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "An unexpected error occurred.",
+      },
+    });
+    expect(JSON.stringify(body)).not.toContain("private");
+    expect(JSON.stringify(body)).not.toContain("secret-value");
+    expect(dependencies.cancel.mock.calls.length).toBeLessThanOrEqual(1);
+  });
+});
 
 describe("PATCH /api/v1/pos/orders/:orderId", () => {
   it("modifies once for the authenticated actor with path-owned and public input", async () => {

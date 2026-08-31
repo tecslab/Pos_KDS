@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-046
-last_completed_task: T-045
+next_suggested_task: T-047
+last_completed_task: T-046
 last_commit: pending
-completed_tasks: 46
+completed_tasks: 47
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -76,13 +76,15 @@ T-044 — Build the active-order editing experience (commit pending; the task co
 
 T-045 — Implement authorized order cancellation with inventory rollback (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-046 — Expose order cancellation API and confirmation interface (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-046 — Expose order cancellation API and confirmation interface.
+T-047 — Expose the kitchen pending-order queue.
 
 ## Human Checkpoints
 

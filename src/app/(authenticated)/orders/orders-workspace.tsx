@@ -7,7 +7,9 @@ import { OrderDraftComposer } from "./order-draft-composer";
 
 type WorkspaceMode = "create" | "edit";
 
-export function OrdersWorkspace() {
+export function OrdersWorkspace({
+  canCancelOrders,
+}: Readonly<{ canCancelOrders: boolean }>) {
   const [mode, setMode] = useState<WorkspaceMode>("create");
 
   return (
@@ -29,7 +31,11 @@ export function OrdersWorkspace() {
           Editar orden activa
         </WorkspaceButton>
       </nav>
-      {mode === "create" ? <OrderDraftComposer /> : <ActiveOrderEditor />}
+      {mode === "create" ? (
+        <OrderDraftComposer />
+      ) : (
+        <ActiveOrderEditor canCancelOrders={canCancelOrders} />
+      )}
     </div>
   );
 }

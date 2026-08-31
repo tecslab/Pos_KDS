@@ -48,7 +48,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-043 Expose the pending-order modification API
 - [x] T-044 Build the active-order editing experience
 - [x] T-045 Implement authorized order cancellation with inventory rollback
-- [ ] T-046 Expose order cancellation API and confirmation interface
+- [x] T-046 Expose order cancellation API and confirmation interface
 - [ ] T-047 Expose the kitchen pending-order queue
 - [ ] T-048 Build the live Kitchen Display System queue
 - [ ] T-049 Implement and expose the Kitchen Ready transition
