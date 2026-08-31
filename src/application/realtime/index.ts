@@ -19,6 +19,7 @@ export {
   type RealtimeValue,
 } from "./realtime-event";
 export { OrderConfirmedRealtimePublisher } from "./order-confirmed-realtime-publisher";
+export { OrderCancelledRealtimePublisher } from "./order-cancelled-realtime-publisher";
 export type {
   RealtimeMessageHandler,
   RealtimeSubscriber,

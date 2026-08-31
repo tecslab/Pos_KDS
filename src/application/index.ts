@@ -47,6 +47,16 @@ export {
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
 export {
+  OrderCancellationService,
+  cancelledOrderResult,
+  orderCancellationFailure,
+  type CancelledOrder,
+  type CancelOrderInput,
+  type OrderCancellationCommand,
+  type OrderCancellationError,
+  type OrderCancellationGateway,
+} from "./order-cancellation";
+export {
   OrderModificationService,
   modifiedOrderResult,
   orderModificationFailure,
@@ -183,6 +193,7 @@ export {
 export {
   mapDomainEventToRealtime,
   OrderConfirmedRealtimePublisher,
+  OrderCancelledRealtimePublisher,
   OrderUpdatedRealtimePublisher,
   parseRealtimeMessage,
   realtimeEventNames,

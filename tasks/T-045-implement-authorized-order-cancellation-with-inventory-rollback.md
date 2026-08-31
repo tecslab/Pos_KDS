@@ -1,7 +1,7 @@
 ---
 id: T-045
 title: "Implement authorized order cancellation with inventory rollback"
-status: todo
+status: done
 priority: critical
 size: medium
 type: domain
