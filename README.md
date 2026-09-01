@@ -149,6 +149,22 @@ malformed order identifier and 404 when the identifier does not resolve to an
 active order. Persistence, malformed-data, and unexpected failures return a
 sanitized status 500 response.
 
+## Kitchen pending-order queue API
+
+`GET /api/v1/kitchen/orders` requires an authenticated employee with the
+persisted `kitchen.queue.view` permission. It returns `{ "orders": [...] }`
+containing only `PENDING` orders, ordered by confirmation/creation time with the
+order identifier and number, service location, and creation timestamp used for
+elapsed-time priority display.
+
+Each order contains its current, non-removed preparation lines. A line includes
+the persisted product name, quantity, selected options, removed ingredients,
+and observations from its current immutable sale snapshot. Historical line
+revisions, prices, totals, tax data, payment data, waiter details, and other
+financial information are not exposed. An empty queue returns status 200;
+authentication and authorization failures return safe 401 and 403 envelopes,
+and persistence or unexpected failures return a sanitized status 500 response.
+
 ## Order-confirmation API
 
 `POST /api/v1/pos/orders` confirms a client order draft transactionally. It

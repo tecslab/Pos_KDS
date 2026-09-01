@@ -47,6 +47,15 @@ export {
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
 export {
+  KitchenQueueService,
+  type KitchenQueueError,
+  type KitchenQueueLine,
+  type KitchenQueueModification,
+  type KitchenQueueOrder,
+  type KitchenQueueReader,
+  type KitchenQueueServiceLocation,
+} from "./kitchen-queue";
+export {
   OrderCancellationService,
   cancelledOrderResult,
   orderCancellationFailure,

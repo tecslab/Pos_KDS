@@ -1,7 +1,7 @@
 ---
 id: T-047
 title: "Expose the kitchen pending-order queue"
-status: todo
+status: done
 priority: critical
 size: small
 type: api

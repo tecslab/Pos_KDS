@@ -4,6 +4,11 @@ export {
   mapActiveOrderListRow,
   SupabaseActiveOrderReader,
 } from "./supabase-active-order-reader";
+export {
+  KitchenQueueReadError,
+  mapKitchenQueueRow,
+  SupabaseKitchenQueueReader,
+} from "./supabase-kitchen-queue-reader";
 export { SupabaseOrderConfirmationGateway } from "./supabase-order-confirmation-gateway";
 export { SupabaseOrderConfirmationTransactionBoundary } from "./supabase-order-confirmation-transaction-boundary";
 export { SupabaseOrderCancellationGateway } from "./supabase-order-cancellation-gateway";
