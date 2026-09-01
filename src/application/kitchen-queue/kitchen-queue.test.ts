@@ -10,6 +10,7 @@ function order(
 ): KitchenQueueOrder {
   return {
     id,
+    restaurantId: "30000000-0000-4000-8000-000000000001",
     orderNumber: `ORD-${id.slice(-1)}`,
     status: "PENDING",
     serviceLocation: {
@@ -66,7 +67,6 @@ describe("KitchenQueueService", () => {
         "41000000-0000-4000-8000-000000000001",
         "2026-08-31T10:00:00.000Z",
       ),
-      restaurantId: "private-tenant",
       totalAmount: "99.99",
       paidAmount: "1.00",
       assignedWaiter: { displayName: "Private" },
@@ -97,7 +97,6 @@ describe("KitchenQueueService", () => {
     );
     const serialized = JSON.stringify(result.value);
     for (const forbidden of [
-      "restaurantId",
       "totalAmount",
       "paidAmount",
       "assignedWaiter",

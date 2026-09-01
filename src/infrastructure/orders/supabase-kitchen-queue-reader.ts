@@ -121,6 +121,7 @@ export function mapKitchenQueueRow(value: unknown): KitchenQueueOrder {
 
   return Object.freeze({
     id: value.id,
+    restaurantId,
     orderNumber: value.order_number,
     status: "PENDING",
     serviceLocation: Object.freeze({

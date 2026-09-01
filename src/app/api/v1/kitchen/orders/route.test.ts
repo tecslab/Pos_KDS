@@ -17,6 +17,7 @@ import { GET } from "./route";
 
 const queueOrder = Object.freeze({
   id: "41000000-0000-4000-8000-000000000001",
+  restaurantId: "21000000-0000-4000-8000-000000000001",
   orderNumber: "ORD-42",
   status: "PENDING",
   serviceLocation: {

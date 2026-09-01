@@ -50,7 +50,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-045 Implement authorized order cancellation with inventory rollback
 - [x] T-046 Expose order cancellation API and confirmation interface
 - [x] T-047 Expose the kitchen pending-order queue
-- [ ] T-048 Build the live Kitchen Display System queue
+- [x] T-048 Build the live Kitchen Display System queue
 - [ ] T-049 Implement and expose the Kitchen Ready transition
 - [ ] T-050 Expose the ready-order delivery queue
 - [ ] T-051 Build the Waiter Delivery Panel

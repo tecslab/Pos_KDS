@@ -116,6 +116,7 @@ describe("kitchen-queue persistence mapping", () => {
 
     expect(queueOrder).toEqual({
       id: orderId,
+      restaurantId,
       orderNumber: "ORD-42",
       status: "PENDING",
       serviceLocation: {

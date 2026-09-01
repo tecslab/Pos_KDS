@@ -22,6 +22,7 @@ export type KitchenQueueServiceLocation = Readonly<{
 
 export type KitchenQueueOrder = Readonly<{
   id: string;
+  restaurantId: string;
   orderNumber: string;
   status: "PENDING";
   serviceLocation: KitchenQueueServiceLocation;
@@ -76,6 +77,7 @@ export class KitchenQueueService {
 function projectOrder(order: KitchenQueueOrder): KitchenQueueOrder {
   return Object.freeze({
     id: order.id,
+    restaurantId: order.restaurantId,
     orderNumber: order.orderNumber,
     status: "PENDING",
     serviceLocation: Object.freeze({

@@ -12,6 +12,8 @@
   --brand-red: #d8231f;
   --status-new: #2f7d46;
   --status-new-bg: #e7f4ea;
+  --status-warning: #b7791f;
+  --status-warning-bg: #fff4d7;
   --status-critical: #b42318;
   --status-critical-bg: #fee4e2;
   --status-info: #475569;
@@ -20,6 +22,7 @@
   --shadow-md: 0 8px 24px rgba(16, 24, 20, 0.12);
   --sidebar-width: 280px;
   --topbar-height: 64px;
+  --kds-card-min: 280px;
   --content-max: 1440px;
 }
 

@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-048
-last_completed_task: T-047
+next_suggested_task: T-049
+last_completed_task: T-048
 last_commit: pending
-completed_tasks: 48
+completed_tasks: 49
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -80,13 +80,15 @@ T-046 — Expose order cancellation API and confirmation interface (commit pendi
 
 T-047 — Expose the kitchen pending-order queue (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-048 — Build the live Kitchen Display System queue (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-048 — Build the live Kitchen Display System queue.
+T-049 — Implement and expose the Kitchen Ready transition.
 
 ## Human Checkpoints
 

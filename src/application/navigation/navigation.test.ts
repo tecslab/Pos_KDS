@@ -50,14 +50,18 @@ describe("buildNavigation", () => {
     ).toEqual(["home", "payments"]);
   });
 
-  it("returns detached immutable presentation data and makes the implemented PoS reachable", () => {
-    const navigation = buildNavigation(["orders.create", "reports.view"]);
+  it("returns detached immutable presentation data and makes implemented modules reachable", () => {
+    const navigation = buildNavigation([
+      "orders.create",
+      "kitchen.queue.view",
+      "reports.view",
+    ]);
 
     expect(Object.isFrozen(navigation)).toBe(true);
     expect(navigation.every(Object.isFrozen)).toBe(true);
     expect(
       navigation.filter((item) => item.available).map((item) => item.id),
-    ).toEqual(["home", "orders"]);
+    ).toEqual(["home", "orders", "kitchen"]);
   });
 
   it("makes the PoS reachable only with orders.create, matching its page boundary", () => {
@@ -66,6 +70,19 @@ describe("buildNavigation", () => {
     ).toMatchObject({ href: "/orders", available: true });
     expect(
       buildNavigation(["orders.edit"]).find((item) => item.id === "orders"),
+    ).toBeUndefined();
+  });
+
+  it("makes the KDS reachable only with its exact queue-view permission", () => {
+    expect(
+      buildNavigation(["kitchen.queue.view"]).find(
+        (item) => item.id === "kitchen",
+      ),
+    ).toMatchObject({ href: "/kitchen", available: true });
+    expect(
+      buildNavigation(["kitchen.ready.mark"]).find(
+        (item) => item.id === "kitchen",
+      ),
     ).toBeUndefined();
   });
 

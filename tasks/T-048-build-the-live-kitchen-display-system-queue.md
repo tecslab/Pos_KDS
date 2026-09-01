@@ -1,7 +1,7 @@
 ---
 id: T-048
 title: "Build the live Kitchen Display System queue"
-status: todo
+status: done
 priority: critical
 size: medium
 type: ui
