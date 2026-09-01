@@ -10,6 +10,7 @@ import {
   kitchenPriority,
   KitchenQueueRealtimeController,
   parseKitchenQueuePayload,
+  parseKitchenReadyResult,
   type KitchenConnectionStatus,
   type KitchenPriority,
   type KitchenThresholds,
@@ -18,6 +19,7 @@ import {
 type KitchenQueueBoardProps = Readonly<{
   initialOrders: readonly KitchenQueueOrder[];
   thresholds: readonly KitchenThresholds[];
+  canMarkReady: boolean;
 }>;
 
 const priorityPresentation: Readonly<
@@ -54,6 +56,7 @@ const connectionPresentation: Readonly<
 export function KitchenQueueBoard({
   initialOrders,
   thresholds,
+  canMarkReady,
 }: KitchenQueueBoardProps) {
   const [orders, setOrders] = useState(initialOrders);
   const [now, setNow] = useState(0);
@@ -61,6 +64,12 @@ export function KitchenQueueBoard({
     useState<KitchenConnectionStatus>("connecting");
   const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [markingReady, setMarkingReady] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+  const [readyErrors, setReadyErrors] = useState<
+    Readonly<Record<string, string>>
+  >({});
   const requestAbort = useRef<AbortController | null>(null);
   const realtime = useRef<KitchenQueueRealtimeController | null>(null);
   const thresholdByRestaurant = useMemo(
@@ -167,6 +176,35 @@ export function KitchenQueueBoard({
     );
   };
 
+  const markReady = useCallback(async (orderId: string) => {
+    setMarkingReady((current) => new Set(current).add(orderId));
+    setReadyErrors((current) => withoutKey(current, orderId));
+
+    try {
+      const response = await fetch(`/api/v1/kitchen/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error("Ready transition failed.");
+
+      const result = parseKitchenReadyResult(await response.json(), orderId);
+      if (result === null) throw new Error("Ready response was invalid.");
+
+      setOrders((current) => current.filter((order) => order.id !== orderId));
+    } catch {
+      setReadyErrors((current) => ({
+        ...current,
+        [orderId]: "No se pudo marcar la orden como lista. Intenta nuevamente.",
+      }));
+    } finally {
+      setMarkingReady((current) => {
+        const next = new Set(current);
+        next.delete(orderId);
+        return next;
+      });
+    }
+  }, []);
+
   return (
     <div>
       <header className="flex flex-wrap items-start justify-between gap-4 rounded-lg bg-[var(--color-text)] p-5 text-white shadow-[var(--shadow-sm)]">
@@ -234,6 +272,10 @@ export function KitchenQueueBoard({
                 order={order}
                 now={now}
                 thresholds={configuredThresholds}
+                canMarkReady={canMarkReady}
+                isMarkingReady={markingReady.has(order.id)}
+                readyError={readyErrors[order.id] ?? null}
+                onMarkReady={markReady}
               />
             );
           })}
@@ -247,10 +289,18 @@ function KitchenOrderCard({
   order,
   now,
   thresholds,
+  canMarkReady,
+  isMarkingReady,
+  readyError,
+  onMarkReady,
 }: Readonly<{
   order: KitchenQueueOrder;
   now: number;
   thresholds: KitchenThresholds;
+  canMarkReady: boolean;
+  isMarkingReady: boolean;
+  readyError: string | null;
+  onMarkReady(orderId: string): void;
 }>) {
   const elapsed = elapsedMilliseconds(order.createdAt, now);
   const priority = kitchenPriority(order.createdAt, now, thresholds);
@@ -325,8 +375,41 @@ function KitchenOrderCard({
           </li>
         ))}
       </ul>
+      {canMarkReady ? (
+        <footer className="border-t border-[var(--color-border)] p-4">
+          {readyError !== null ? (
+            <p
+              id={`ready-error-${order.id}`}
+              role="alert"
+              className="mb-3 rounded-sm bg-[var(--status-critical-bg)] p-2 text-sm font-semibold text-[var(--status-critical)]"
+            >
+              {readyError}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => onMarkReady(order.id)}
+            disabled={isMarkingReady}
+            aria-describedby={
+              readyError === null ? undefined : `ready-error-${order.id}`
+            }
+            className="min-h-12 w-full rounded-md bg-[var(--brand-green)] px-4 text-lg font-bold text-white disabled:cursor-wait disabled:opacity-70"
+          >
+            {isMarkingReady ? "Marcando…" : "Listo"}
+          </button>
+        </footer>
+      ) : null}
     </article>
   );
+}
+
+function withoutKey(
+  value: Readonly<Record<string, string>>,
+  key: string,
+): Readonly<Record<string, string>> {
+  const next = { ...value };
+  delete next[key];
+  return next;
 }
 
 function formatCreatedAt(createdAt: string): string {

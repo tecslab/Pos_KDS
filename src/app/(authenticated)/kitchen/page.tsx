@@ -6,7 +6,10 @@ import { KitchenQueueBoard } from "./kitchen-queue-board";
 import type { KitchenThresholds } from "./kitchen-display";
 
 export default async function KitchenPage() {
-  await requireServerPermission("kitchen.queue.view", "/kitchen");
+  const context = await requireServerPermission(
+    "kitchen.queue.view",
+    "/kitchen",
+  );
   const data = await loadKitchenPageData();
 
   if (data === null) return <KitchenLoadFailure />;
@@ -15,6 +18,7 @@ export default async function KitchenPage() {
     <KitchenQueueBoard
       initialOrders={data.orders}
       thresholds={data.thresholds}
+      canMarkReady={context.permissionCodes.includes("kitchen.ready.mark")}
     />
   );
 }

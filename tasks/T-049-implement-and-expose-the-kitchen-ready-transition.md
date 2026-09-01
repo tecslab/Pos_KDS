@@ -1,7 +1,7 @@
 ---
 id: T-049
 title: "Implement and expose the Kitchen Ready transition"
-status: todo
+status: done
 priority: critical
 size: small
 type: feature

@@ -14,6 +14,7 @@ import {
   kitchenPriority,
   KitchenQueueRealtimeController,
   parseKitchenQueuePayload,
+  parseKitchenReadyResult,
   type KitchenConnectionStatus,
 } from "./kitchen-display";
 
@@ -129,10 +130,34 @@ describe("kitchen display presentation", () => {
       }),
     ).toBeNull();
   });
+
+  it("accepts only the expected canonical Ready response", () => {
+    const orderId = "41000000-0000-4000-8000-000000000001";
+    expect(
+      parseKitchenReadyResult(
+        {
+          orderId,
+          status: "READY",
+          readyAt: "2026-09-01T10:00:00.000Z",
+        },
+        orderId,
+      ),
+    ).toEqual({
+      orderId,
+      status: "READY",
+      readyAt: "2026-09-01T10:00:00.000Z",
+    });
+    expect(
+      parseKitchenReadyResult(
+        { orderId, status: "PENDING", readyAt: "not-a-time" },
+        orderId,
+      ),
+    ).toBeNull();
+  });
 });
 
 describe("KitchenQueueRealtimeController", () => {
-  it("refetches created, modified, and cancelled events and cleans up", async () => {
+  it("refetches queue and kitchen-status events and cleans up", async () => {
     const requests: RealtimeSubscriptionRequest[] = [];
     const unsubscribe = vi.fn().mockResolvedValue(undefined);
     const subscriber: RealtimeSubscriber = {
@@ -151,20 +176,16 @@ describe("KitchenQueueRealtimeController", () => {
     });
 
     await controller.start();
-    for (const eventName of [
+    const queueEvents = [
       "order.created",
       "order.modified",
       "order.cancelled",
-    ] as const) {
+      "kitchen.status.updated",
+    ] as const;
+    for (const [index, eventName] of queueEvents.entries()) {
       requests[0]!.onMessage(message(eventName));
       await vi.waitFor(() =>
-        expect(refreshQueue).toHaveBeenCalledTimes(
-          eventName === "order.created"
-            ? 2
-            : eventName === "order.modified"
-              ? 3
-              : 4,
-        ),
+        expect(refreshQueue).toHaveBeenCalledTimes(index + 2),
       );
     }
     requests[0]!.onMessage(message("inventory.alert"));
@@ -173,7 +194,7 @@ describe("KitchenQueueRealtimeController", () => {
     expect(subscriber.subscribe).toHaveBeenCalledWith(
       expect.objectContaining({ restaurantId, topic: "kitchen" }),
     );
-    expect(refreshQueue).toHaveBeenCalledTimes(4);
+    expect(refreshQueue).toHaveBeenCalledTimes(5);
 
     await controller.stop();
     await controller.stop();

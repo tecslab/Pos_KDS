@@ -165,6 +165,26 @@ financial information are not exposed. An empty queue returns status 200;
 authentication and authorization failures return safe 401 and 403 envelopes,
 and persistence or unexpected failures return a sanitized status 500 response.
 
+## Kitchen Ready transition API
+
+`PATCH /api/v1/kitchen/orders/{orderId}` requires an authenticated employee
+with the persisted `kitchen.ready.mark` permission. It accepts no request body
+or client-selected status: the operation performs only the fixed
+`PENDING → READY` transition. A successful request returns status 200 with the
+financial-data-free operational Ready projection, including the server-established `readyAt` timestamp;
+the order consequently disappears from the pending Kitchen queue.
+
+The state change, lifecycle timestamp, and immutable before/after audit event
+are committed atomically. After commit, one `OrderReady` domain event is
+published as `kitchen.status.updated` to the `kitchen`, `orders`, and `delivery`
+realtime topics. Publication failure cannot roll back or retry the committed
+transition.
+
+Authentication and permission failures return safe 401 and 403 envelopes. A
+missing order returns 404, an order no longer in `PENDING` returns 409, an
+invalid order identifier returns 422, and technical or post-commit publication
+failures return a sanitized 500 response.
+
 ## Order-confirmation API
 
 `POST /api/v1/pos/orders` confirms a client order draft transactionally. It

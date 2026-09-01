@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-049
-last_completed_task: T-048
+next_suggested_task: T-050
+last_completed_task: T-049
 last_commit: pending
-completed_tasks: 49
+completed_tasks: 50
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -88,7 +88,7 @@ None.
 
 ## Next Suggested Task
 
-T-049 — Implement and expose the Kitchen Ready transition.
+T-050 — Expose the ready-order delivery queue.
 
 ## Human Checkpoints
 

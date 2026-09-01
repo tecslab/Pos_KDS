@@ -19,7 +19,34 @@ const queueEventNames = new Set<RealtimeEventName>([
   "order.created",
   "order.modified",
   "order.cancelled",
+  "kitchen.status.updated",
 ]);
+
+export type KitchenReadyResult = Readonly<{
+  orderId: string;
+  status: "READY";
+  readyAt: string;
+}>;
+
+export function parseKitchenReadyResult(
+  value: unknown,
+  expectedOrderId: string,
+): KitchenReadyResult | null {
+  if (
+    !isRecord(value) ||
+    value.orderId !== expectedOrderId ||
+    value.status !== "READY" ||
+    !isCanonicalInstant(value.readyAt)
+  ) {
+    return null;
+  }
+
+  return Object.freeze({
+    orderId: value.orderId,
+    status: "READY",
+    readyAt: value.readyAt,
+  });
+}
 
 export function elapsedMilliseconds(createdAt: string, now: number): number {
   const createdAtMilliseconds = Date.parse(createdAt);

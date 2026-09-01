@@ -109,6 +109,18 @@ describe("live kitchen queue UI", () => {
     expect(dependencies.createOperatingSettingsService).not.toHaveBeenCalled();
   });
 
+  it("exposes the Ready action only from persisted server permission context", async () => {
+    dependencies.authorize.mockResolvedValue({
+      userId: "10000000-0000-4000-8000-000000000001",
+      permissionCodes: ["kitchen.queue.view", "kitchen.ready.mark"],
+    });
+
+    const markup = renderToStaticMarkup(await KitchenPage());
+
+    expect(markup).toContain("Listo");
+    expect(markup).toContain("min-h-12");
+  });
+
   it("fails safely when queue thresholds cannot be configured", async () => {
     dependencies.listSettings.mockResolvedValue({ ok: true, value: [] });
 
@@ -118,7 +130,7 @@ describe("live kitchen queue UI", () => {
     expect(markup).not.toContain("ORD-42");
   });
 
-  it("uses tablet-friendly and non-color semantic cues without order mutations", async () => {
+  it("uses tablet-friendly and non-color semantic cues with an API-only mutation", async () => {
     const source = await readFile(
       new URL("./kitchen-queue-board.tsx", import.meta.url),
       "utf8",
@@ -133,8 +145,8 @@ describe("live kitchen queue UI", () => {
     expect(source).toContain("aria-label={`Antigüedad de la orden:");
     expect(source).toContain('fetch("/api/v1/kitchen/orders"');
     expect(source).toContain('method: "GET"');
-    expect(source).not.toMatch(
-      /\.insert\(|\.update\(|\.delete\(|mark.*ready|listo|price|total/i,
-    );
+    expect(source).toContain('method: "PATCH"');
+    expect(source).not.toContain('.from("orders")');
+    expect(source).not.toContain(".rpc(");
   });
 });
