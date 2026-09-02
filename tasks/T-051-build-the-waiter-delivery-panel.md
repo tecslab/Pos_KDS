@@ -1,7 +1,7 @@
 ---
 id: T-051
 title: "Build the Waiter Delivery Panel"
-status: todo
+status: done
 priority: high
 size: medium
 type: ui

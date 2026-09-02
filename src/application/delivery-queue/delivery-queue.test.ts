@@ -98,6 +98,7 @@ describe("DeliveryQueueService", () => {
       value: [
         {
           id: "41000000-0000-4000-8000-000000000001",
+          restaurantId: "30000000-0000-4000-8000-000000000001",
           orderNumber: "ORD-1",
           status: "READY",
           serviceLocation: {

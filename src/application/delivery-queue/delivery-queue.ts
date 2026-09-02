@@ -41,6 +41,7 @@ export type DeliveryQueueOrder = Readonly<{
 
 export type DeliveryQueueItem = Readonly<{
   id: string;
+  restaurantId: string;
   orderNumber: string;
   status: "READY";
   serviceLocation: DeliveryQueueServiceLocation;
@@ -140,6 +141,7 @@ function projectOrder(
     order.status !== "READY" ||
     readyMilliseconds > nowMilliseconds ||
     !isNonblank(order.id) ||
+    !isUuid(order.restaurantId) ||
     !isNonblank(order.orderNumber) ||
     !validLocation(order.serviceLocation) ||
     (order.notes !== null && typeof order.notes !== "string") ||
@@ -167,6 +169,7 @@ function projectOrder(
 
   return Object.freeze({
     id: order.id,
+    restaurantId: order.restaurantId,
     orderNumber: order.orderNumber,
     status: "READY",
     serviceLocation: Object.freeze({ ...order.serviceLocation }),

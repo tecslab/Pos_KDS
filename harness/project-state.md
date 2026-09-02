@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-051
-last_completed_task: T-050
+next_suggested_task: T-052
+last_completed_task: T-051
 last_commit: pending
-completed_tasks: 51
+completed_tasks: 52
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -84,13 +84,15 @@ T-048 — Build the live Kitchen Display System queue (commit pending; the task 
 
 T-050 — Expose the ready-order delivery queue (commit pending; the task commit cannot self-reference in this tracked state file).
 
+T-051 — Build the Waiter Delivery Panel (commit pending; the task commit cannot self-reference in this tracked state file).
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-051 — Build the Waiter Delivery Panel.
+T-052 — Implement and expose the On-the-Way transition.
 
 ## Human Checkpoints
 
