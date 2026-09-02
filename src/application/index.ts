@@ -98,6 +98,16 @@ export {
   type OrderOnTheWayGateway,
 } from "./order-on-the-way";
 export {
+  OrderDeliveredService,
+  deliveredOrderResult,
+  orderDeliveredFailure,
+  type DeliveredOrder,
+  type MarkOrderDeliveredCommand,
+  type MarkOrderDeliveredInput,
+  type OrderDeliveredError,
+  type OrderDeliveredGateway,
+} from "./order-delivered";
+export {
   OrderModificationService,
   modifiedOrderResult,
   orderModificationFailure,
@@ -236,6 +246,7 @@ export {
   OrderConfirmedRealtimePublisher,
   OrderCancelledRealtimePublisher,
   OrderOnTheWayRealtimePublisher,
+  OrderDeliveredRealtimePublisher,
   OrderReadyRealtimePublisher,
   OrderUpdatedRealtimePublisher,
   parseRealtimeMessage,

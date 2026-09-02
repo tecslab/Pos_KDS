@@ -9,6 +9,8 @@ export { mapOrderReadyErrorToHttp } from "./order-ready-error-mapping";
 export type { OrderReadyHttpErrorDescriptor } from "./order-ready-error-mapping";
 export { mapOrderOnTheWayErrorToHttp } from "./order-on-the-way-error-mapping";
 export type { OrderOnTheWayHttpErrorDescriptor } from "./order-on-the-way-error-mapping";
+export { mapOrderDeliveredErrorToHttp } from "./order-delivered-error-mapping";
+export type { OrderDeliveredHttpErrorDescriptor } from "./order-delivered-error-mapping";
 export { mapOrderConfirmationErrorToHttp } from "./order-confirmation-error-mapping";
 export type {
   OrderConfirmationHttpErrorCode,

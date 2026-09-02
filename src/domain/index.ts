@@ -29,6 +29,7 @@ export type { OrderConfirmed, OrderConfirmedPayload } from "./order-confirmed";
 export type { OrderCancelled, OrderCancelledPayload } from "./order-cancelled";
 export type { OrderReady, OrderReadyPayload } from "./order-ready";
 export type { OrderOnTheWay, OrderOnTheWayPayload } from "./order-on-the-way";
+export type { OrderDelivered, OrderDeliveredPayload } from "./order-delivered";
 export type { OrderUpdated, OrderUpdatedPayload } from "./order-updated";
 export { err, ok } from "./result";
 export type { Err, Ok, Result } from "./result";

@@ -22,5 +22,7 @@ export { SupabaseOrderReadyGateway } from "./supabase-order-ready-gateway";
 export { SupabaseOrderReadyTransactionBoundary } from "./supabase-order-ready-transaction-boundary";
 export { SupabaseOrderOnTheWayGateway } from "./supabase-order-on-the-way-gateway";
 export { SupabaseOrderOnTheWayTransactionBoundary } from "./supabase-order-on-the-way-transaction-boundary";
+export { SupabaseOrderDeliveredGateway } from "./supabase-order-delivered-gateway";
+export { SupabaseOrderDeliveredTransactionBoundary } from "./supabase-order-delivered-transaction-boundary";
 export { SupabaseOrderModificationGateway } from "./supabase-order-modification-gateway";
 export { SupabaseOrderModificationTransactionBoundary } from "./supabase-order-modification-transaction-boundary";
