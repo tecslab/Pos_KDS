@@ -1,7 +1,7 @@
 ---
 id: T-052
 title: "Implement and expose the On-the-Way transition"
-status: todo
+status: done
 priority: high
 size: small
 type: feature
@@ -19,7 +19,7 @@ definition_of_done: harness/definition-of-done.md
 
 ## Expected Outcome
 
-- Allow only a waiter to move Ready to On the Way, record the collecting user and timestamp, audit it, and publish the update after commit.
+- Allow an authorized Admin or Waiter to move Ready to On the Way, record the collecting user and timestamp, audit it, and publish the update after commit.
 
 ## Not Included
 

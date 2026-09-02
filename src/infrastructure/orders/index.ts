@@ -20,5 +20,7 @@ export { SupabaseOrderCancellationGateway } from "./supabase-order-cancellation-
 export { SupabaseOrderCancellationTransactionBoundary } from "./supabase-order-cancellation-transaction-boundary";
 export { SupabaseOrderReadyGateway } from "./supabase-order-ready-gateway";
 export { SupabaseOrderReadyTransactionBoundary } from "./supabase-order-ready-transaction-boundary";
+export { SupabaseOrderOnTheWayGateway } from "./supabase-order-on-the-way-gateway";
+export { SupabaseOrderOnTheWayTransactionBoundary } from "./supabase-order-on-the-way-transaction-boundary";
 export { SupabaseOrderModificationGateway } from "./supabase-order-modification-gateway";
 export { SupabaseOrderModificationTransactionBoundary } from "./supabase-order-modification-transaction-boundary";

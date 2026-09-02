@@ -21,6 +21,7 @@ export {
 export { OrderConfirmedRealtimePublisher } from "./order-confirmed-realtime-publisher";
 export { OrderCancelledRealtimePublisher } from "./order-cancelled-realtime-publisher";
 export { OrderReadyRealtimePublisher } from "./order-ready-realtime-publisher";
+export { OrderOnTheWayRealtimePublisher } from "./order-on-the-way-realtime-publisher";
 export type {
   RealtimeMessageHandler,
   RealtimeSubscriber,

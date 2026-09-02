@@ -88,6 +88,16 @@ export {
   type ReadyOrder,
 } from "./order-ready";
 export {
+  OrderOnTheWayService,
+  onTheWayOrderResult,
+  orderOnTheWayFailure,
+  type MarkOrderOnTheWayCommand,
+  type MarkOrderOnTheWayInput,
+  type OnTheWayOrder,
+  type OrderOnTheWayError,
+  type OrderOnTheWayGateway,
+} from "./order-on-the-way";
+export {
   OrderModificationService,
   modifiedOrderResult,
   orderModificationFailure,
@@ -225,6 +235,7 @@ export {
   mapDomainEventToRealtime,
   OrderConfirmedRealtimePublisher,
   OrderCancelledRealtimePublisher,
+  OrderOnTheWayRealtimePublisher,
   OrderReadyRealtimePublisher,
   OrderUpdatedRealtimePublisher,
   parseRealtimeMessage,
