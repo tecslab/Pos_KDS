@@ -5,6 +5,11 @@ export {
   SupabaseActiveOrderReader,
 } from "./supabase-active-order-reader";
 export {
+  DeliveryQueueReadError,
+  mapDeliveryQueueRow,
+  SupabaseDeliveryQueueReader,
+} from "./supabase-delivery-queue-reader";
+export {
   KitchenQueueReadError,
   mapKitchenQueueRow,
   SupabaseKitchenQueueReader,

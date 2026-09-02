@@ -1,7 +1,7 @@
 ---
 id: T-050
 title: "Expose the ready-order delivery queue"
-status: todo
+status: done
 priority: high
 size: small
 type: api

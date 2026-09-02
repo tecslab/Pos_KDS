@@ -165,6 +165,32 @@ financial information are not exposed. An empty queue returns status 200;
 authentication and authorization failures return safe 401 and 403 envelopes,
 and persistence or unexpected failures return a sanitized status 500 response.
 
+## Ready-order delivery queue API
+
+`GET /api/v1/delivery/orders` requires an authenticated employee with the
+persisted `delivery.panel.view` permission. It returns `{ "orders": [...] }`
+containing only `READY` orders, ordered by their Ready timestamp. Each
+operational, non-financial order projection includes its identifier and order
+number, service-location identifier/name/type, creation and Ready timestamps,
+server-calculated `waitingTimeSeconds`, active-line quantity-sum
+`productCount`, and `specialObservations` from the order notes and active-line
+observations. Prices, totals, balances, and payment information are not
+exposed.
+
+The endpoint accepts no request body and supports these optional exact-match
+filters:
+
+- `serviceLocationId`: a UUID exact match.
+- `orderNumber`: a trimmed exact match of at most 100 characters.
+- `minimumWaitingMinutes`: an integer from 0 through 1440, inclusive. It
+  includes an order when `readyAt <= server now - minimumWaitingMinutes`.
+
+Unknown, repeated, or invalid query keys/values return a sanitized 400 error.
+Authorization is checked before queue composition: unauthenticated or
+unauthorized requests receive safe 401 or 403 error envelopes. A successful
+empty queue returns `{ "orders": [] }` with status 200; persistence and other
+unexpected failures return a sanitized 500 response.
+
 ## Kitchen Ready transition API
 
 `PATCH /api/v1/kitchen/orders/{orderId}` requires an authenticated employee

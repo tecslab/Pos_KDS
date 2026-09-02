@@ -47,6 +47,18 @@ export {
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
 export {
+  DeliveryQueueService,
+  parseDeliveryQueueFilters,
+  type DeliveryQueueError,
+  type DeliveryQueueFilterInput,
+  type DeliveryQueueFilters,
+  type DeliveryQueueItem,
+  type DeliveryQueueLine,
+  type DeliveryQueueOrder,
+  type DeliveryQueueReader,
+  type DeliveryQueueServiceLocation,
+} from "./delivery-queue";
+export {
   KitchenQueueService,
   type KitchenQueueError,
   type KitchenQueueLine,
