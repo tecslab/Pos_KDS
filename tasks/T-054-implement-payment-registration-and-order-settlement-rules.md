@@ -1,7 +1,7 @@
 ---
 id: T-054
 title: "Implement payment registration and order settlement rules"
-status: todo
+status: done
 priority: critical
 size: medium
 type: domain

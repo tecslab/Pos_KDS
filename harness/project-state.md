@@ -4,9 +4,9 @@ current_milestone: M1
 current_task: null
 current_phase: idle
 next_suggested_task: T-054
-last_completed_task: T-053
+last_completed_task: T-054
 last_commit: pending
-completed_tasks: 54
+completed_tasks: 55
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -96,7 +96,7 @@ None.
 
 ## Next Suggested Task
 
-T-054 — Implement payment registration and order settlement rules.
+T-055 — Expose payment queries and registration API.
 
 ## Human Checkpoints
 

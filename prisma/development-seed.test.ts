@@ -14,6 +14,7 @@ const initialRoleMatrix = [
   ["administrator", "delivery.on_the_way.mark"],
   ["administrator", "delivery.delivered.mark"],
   ["administrator", "payments.register"],
+  ["administrator", "payments.overage.authorize"],
   ["administrator", "inventory.view"],
   ["administrator", "administration.inventory.manage"],
   ["administrator", "inventory.purchases.register"],
@@ -63,7 +64,7 @@ describe("development seed", () => {
 
     expect(matrix).toEqual(initialRoleMatrix);
     expect(matrix.filter(([role]) => role === "administrator")).toHaveLength(
-      23,
+      24,
     );
     expect(matrix.filter(([role]) => role === "waiter")).toHaveLength(7);
     expect(
@@ -90,10 +91,18 @@ describe("development seed", () => {
       ),
     ].map(([, code]) => code);
 
-    expect(permissionCodes).toHaveLength(32);
-    expect(new Set(permissionCodes).size).toBe(32);
+    expect(permissionCodes).toHaveLength(33);
+    expect(new Set(permissionCodes).size).toBe(33);
+    expect(permissionCodes).toContain("payments.overage.authorize");
     expect(permissionCodes).toContain("payments.refund");
     expect(initialRoleMatrix.flat()).not.toContain("payments.refund");
+    expect(
+      initialRoleMatrix.filter(
+        ([role, permission]) =>
+          permission === "payments.overage.authorize" &&
+          role !== "administrator",
+      ),
+    ).toEqual([]);
   });
 
   it("contains only the approved T-003 development baseline", async () => {

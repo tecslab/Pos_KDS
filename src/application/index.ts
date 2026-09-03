@@ -175,6 +175,16 @@ export {
   type SavePaymentMethodInput,
 } from "./payment-method-administration";
 export {
+  PaymentRegistrationService,
+  paymentRegistrationFailure,
+  registeredPaymentResult,
+  type PaymentRegistrationError,
+  type PaymentRegistrationGateway,
+  type RegisterPaymentCommand,
+  type RegisterPaymentInput,
+  type RegisteredPayment,
+} from "./payment-registration";
+export {
   PosOrderingContextService,
   type PosOrderingContext,
   type PosOrderingContextCategory,
@@ -247,6 +257,7 @@ export {
   OrderCancelledRealtimePublisher,
   OrderOnTheWayRealtimePublisher,
   OrderDeliveredRealtimePublisher,
+  PaymentCompletedRealtimePublisher,
   OrderReadyRealtimePublisher,
   OrderUpdatedRealtimePublisher,
   parseRealtimeMessage,

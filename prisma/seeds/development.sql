@@ -49,7 +49,8 @@ VALUES
   ('20000000-0000-4000-8000-000000000029', 'administration.payment_methods.configure', 'Configure Payment Methods', NULL),
   ('20000000-0000-4000-8000-000000000030', 'administration.printers.configure', 'Configure Printers', NULL),
   ('20000000-0000-4000-8000-000000000031', 'audit.log.view', 'View Audit Log', NULL),
-  ('20000000-0000-4000-8000-000000000032', 'administration.inventory.manage', 'Manage Inventory Items', 'Create, edit, activate, and deactivate inventory item definitions.')
+  ('20000000-0000-4000-8000-000000000032', 'administration.inventory.manage', 'Manage Inventory Items', 'Create, edit, activate, and deactivate inventory item definitions.'),
+  ('20000000-0000-4000-8000-000000000033', 'payments.overage.authorize', 'Authorize Payment Overage', 'Authorize a payment above the selected basket outstanding balance with a recorded reason.')
 ON CONFLICT (code) DO UPDATE
 SET
   name = EXCLUDED.name,
@@ -78,6 +79,7 @@ VALUES
   ('administrator', 'delivery.on_the_way.mark'),
   ('administrator', 'delivery.delivered.mark'),
   ('administrator', 'payments.register'),
+  ('administrator', 'payments.overage.authorize'),
   ('administrator', 'inventory.view'),
   ('administrator', 'administration.inventory.manage'),
   ('administrator', 'inventory.purchases.register'),
