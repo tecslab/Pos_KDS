@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-054
-last_completed_task: T-054
+next_suggested_task: T-056
+last_completed_task: T-055
 last_commit: pending
-completed_tasks: 55
+completed_tasks: 56
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -90,13 +90,17 @@ T-052 — Implement and expose the On-the-Way transition (commit pending; the ta
 
 T-053 — Implement and expose the Delivered transition (commit pending; the task commit cannot self-reference in this tracked state file). Human-approved business configuration allows both Admin and Waiter through `delivery.delivered.mark`.
 
+T-054 — Implement payment registration and order settlement rules (commit pending; the task commit cannot self-reference in this tracked state file). Human-approved configuration grants Administrator-only `payments.overage.authorize`; self-authorization is allowed with an immutable mandatory reason.
+
+T-055 — Expose payment queries and registration API (commit pending; the task commit cannot self-reference in this tracked state file). Human-approved configuration grants `payments.view` to Administrator and Waiter, excludes Kitchen Personnel, and preserves permission-derived custom roles.
+
 ## Current Task
 
 None.
 
 ## Next Suggested Task
 
-T-055 — Expose payment queries and registration API.
+T-056 — Build split and partial payment experience.
 
 ## Human Checkpoints
 

@@ -58,7 +58,7 @@ SET
   updated_at = CURRENT_TIMESTAMP;
 
 -- Reconcile the three initial roles to the grants in PRD 10.3 plus the
--- explicitly approved Administrator-only administration grants. The
+-- explicitly approved business configuration grants. The
 -- different wording in the matrix (for example, "Register Payments") maps to
 -- the canonical permission from PRD 10.2 ("Register Payment") by stable code.
 CREATE TEMPORARY TABLE seed_desired_role_permissions (
@@ -79,6 +79,7 @@ VALUES
   ('administrator', 'delivery.on_the_way.mark'),
   ('administrator', 'delivery.delivered.mark'),
   ('administrator', 'payments.register'),
+  ('administrator', 'payments.view'),
   ('administrator', 'payments.overage.authorize'),
   ('administrator', 'inventory.view'),
   ('administrator', 'administration.inventory.manage'),
@@ -100,6 +101,7 @@ VALUES
   ('waiter', 'delivery.on_the_way.mark'),
   ('waiter', 'delivery.delivered.mark'),
   ('waiter', 'payments.register'),
+  ('waiter', 'payments.view'),
   ('kitchen_personnel', 'orders.view'),
   ('kitchen_personnel', 'kitchen.queue.view'),
   ('kitchen_personnel', 'kitchen.ready.mark');

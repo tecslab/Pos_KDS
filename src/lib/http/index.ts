@@ -21,3 +21,5 @@ export type {
   OrderModificationHttpErrorCode,
   OrderModificationHttpErrorDescriptor,
 } from "./order-modification-error-mapping";
+export { mapPaymentRegistrationErrorToHttp } from "./payment-registration-error-mapping";
+export type { PaymentRegistrationHttpErrorDescriptor } from "./payment-registration-error-mapping";

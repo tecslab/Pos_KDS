@@ -57,7 +57,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-052 Implement and expose the On-the-Way transition
 - [x] T-053 Implement and expose the Delivered transition
 - [x] T-054 Implement payment registration and order settlement rules
-- [ ] T-055 Expose payment queries and registration API
+- [x] T-055 Expose payment queries and registration API
 - [ ] T-056 Build split and partial payment experience
 - [ ] T-057 Generate and dispatch configurable payment receipts
 - [ ] T-058 Implement inventory purchase registration

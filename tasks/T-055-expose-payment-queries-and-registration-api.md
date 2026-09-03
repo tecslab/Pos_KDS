@@ -1,7 +1,7 @@
 ---
 id: T-055
 title: "Expose payment queries and registration API"
-status: todo
+status: done
 priority: critical
 size: small
 type: api
@@ -28,3 +28,7 @@ definition_of_done: harness/definition-of-done.md
 ## Definition of Done
 
 Inherits the [Shared Definition of Done](../harness/definition-of-done.md).
+
+## Authorization Configuration
+
+Human-approved business configuration: grant `payments.view` to the initial Administrator and Waiter roles; exclude Kitchen Personnel. Custom roles receive payment-read access only through the permission.

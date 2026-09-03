@@ -14,6 +14,7 @@ const initialRoleMatrix = [
   ["administrator", "delivery.on_the_way.mark"],
   ["administrator", "delivery.delivered.mark"],
   ["administrator", "payments.register"],
+  ["administrator", "payments.view"],
   ["administrator", "payments.overage.authorize"],
   ["administrator", "inventory.view"],
   ["administrator", "administration.inventory.manage"],
@@ -35,6 +36,7 @@ const initialRoleMatrix = [
   ["waiter", "delivery.on_the_way.mark"],
   ["waiter", "delivery.delivered.mark"],
   ["waiter", "payments.register"],
+  ["waiter", "payments.view"],
   ["kitchen_personnel", "orders.view"],
   ["kitchen_personnel", "kitchen.queue.view"],
   ["kitchen_personnel", "kitchen.ready.mark"],
@@ -64,9 +66,9 @@ describe("development seed", () => {
 
     expect(matrix).toEqual(initialRoleMatrix);
     expect(matrix.filter(([role]) => role === "administrator")).toHaveLength(
-      24,
+      25,
     );
-    expect(matrix.filter(([role]) => role === "waiter")).toHaveLength(7);
+    expect(matrix.filter(([role]) => role === "waiter")).toHaveLength(8);
     expect(
       matrix.filter(([role]) => role === "kitchen_personnel"),
     ).toHaveLength(3);
@@ -75,6 +77,12 @@ describe("development seed", () => {
         ([role, permission]) =>
           permission === "administration.payment_methods.configure" &&
           role !== "administrator",
+      ),
+    ).toEqual([]);
+    expect(
+      matrix.filter(
+        ([role, permission]) =>
+          permission === "payments.view" && role === "kitchen_personnel",
       ),
     ).toEqual([]);
   });

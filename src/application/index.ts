@@ -185,6 +185,22 @@ export {
   type RegisteredPayment,
 } from "./payment-registration";
 export {
+  PaymentQueryService,
+  UNPAID_ORDER_STATUSES,
+  parsePaymentQueryFilters,
+  type PaymentHistoryEntry,
+  type PaymentHistoryRecorder,
+  type PaymentQueryError,
+  type PaymentQueryFilterInput,
+  type PaymentQueryFilters,
+  type PaymentQueryReader,
+  type PendingPaymentBasket,
+  type PendingPaymentOrder,
+  type PendingPaymentServiceLocation,
+  type PendingPaymentWaiter,
+  type UnpaidOrderStatus,
+} from "./payment-queries";
+export {
   PosOrderingContextService,
   type PosOrderingContext,
   type PosOrderingContextCategory,
