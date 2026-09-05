@@ -26,10 +26,7 @@ const navigationDefinitions: readonly NavigationDefinition[] = Object.freeze([
   definition("orders", "Punto de venta", "/orders", ["orders.create"], true),
   definition("kitchen", "Cocina", "/kitchen", ["kitchen.queue.view"], true),
   definition("delivery", "Entregas", "/delivery", ["delivery.panel.view"]),
-  definition("payments", "Pagos", "/payments", [
-    "payments.register",
-    "payments.view",
-  ]),
+  definition("payments", "Pagos", "/payments", ["payments.view"], true),
   definition("inventory", "Inventario", "/inventory", [
     "inventory.view",
     "inventory.purchases.register",

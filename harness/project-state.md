@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-056
-last_completed_task: T-055
+next_suggested_task: T-057
+last_completed_task: T-056
 last_commit: pending
-completed_tasks: 56
+completed_tasks: 57
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -94,13 +94,19 @@ T-054 — Implement payment registration and order settlement rules (commit pend
 
 T-055 — Expose payment queries and registration API (commit pending; the task commit cannot self-reference in this tracked state file). Human-approved configuration grants `payments.view` to Administrator and Waiter, excludes Kitchen Personnel, and preserves permission-derived custom roles.
 
+T-056 — Build split and partial payment experience (commit pending; the task commit cannot self-reference in this tracked state file). Includes accessible split/partial payment registration, immutable basket history, authorized overage reasons, protected realtime reconciliation, and behavioral UI coverage.
+
 ## Current Task
+
+None.
+
+## Active Blockers
 
 None.
 
 ## Next Suggested Task
 
-T-056 — Build split and partial payment experience.
+T-057 — Generate and dispatch configurable payment receipts.
 
 ## Human Checkpoints
 

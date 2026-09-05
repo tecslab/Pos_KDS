@@ -1,7 +1,7 @@
 ---
 id: T-056
 title: "Build split and partial payment experience"
-status: todo
+status: done
 priority: critical
 size: medium
 type: ui

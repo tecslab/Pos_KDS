@@ -14,7 +14,7 @@ describe("buildNavigation", () => {
         "orders.edit",
         "orders.view",
         "delivery.panel.view",
-        "payments.register",
+        "payments.view",
       ]),
     ).toEqual(["home", "orders", "delivery", "payments"]);
   });
@@ -48,6 +48,17 @@ describe("buildNavigation", () => {
     expect(
       ids(["payments.view", " future.invalid", "unknown.permission"]),
     ).toEqual(["home", "payments"]);
+  });
+
+  it("makes payments reachable only with its exact view permission", () => {
+    expect(
+      buildNavigation(["payments.view"]).find((item) => item.id === "payments"),
+    ).toMatchObject({ href: "/payments", available: true });
+    expect(
+      buildNavigation(["payments.register"]).find(
+        (item) => item.id === "payments",
+      ),
+    ).toBeUndefined();
   });
 
   it("returns detached immutable presentation data and makes implemented modules reachable", () => {

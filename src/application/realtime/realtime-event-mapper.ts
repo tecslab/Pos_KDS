@@ -22,11 +22,16 @@ const invalidValue = Symbol("invalid-realtime-value");
 type InvalidValue = typeof invalidValue;
 
 const routes = Object.freeze({
-  "order.created": Object.freeze(["orders", "kitchen"]),
-  "order.modified": Object.freeze(["orders", "kitchen"]),
-  "order.cancelled": Object.freeze(["orders", "kitchen", "delivery"]),
+  "order.created": Object.freeze(["orders", "kitchen", "payments"]),
+  "order.modified": Object.freeze(["orders", "kitchen", "payments"]),
+  "order.cancelled": Object.freeze([
+    "orders",
+    "kitchen",
+    "delivery",
+    "payments",
+  ]),
   "kitchen.status.updated": Object.freeze(["kitchen", "orders", "delivery"]),
-  "delivery.status.updated": Object.freeze(["delivery", "orders"]),
+  "delivery.status.updated": Object.freeze(["delivery", "orders", "payments"]),
   "payment.completed": Object.freeze(["payments", "orders"]),
   "inventory.alert": Object.freeze(["inventory"]),
 } satisfies Readonly<Record<RealtimeEventName, readonly RealtimeTopic[]>>);

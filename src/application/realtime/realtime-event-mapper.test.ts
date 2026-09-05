@@ -27,11 +27,11 @@ function event(
 
 describe("realtime event mapping", () => {
   it.each([
-    ["order.created", ["orders", "kitchen"]],
-    ["order.modified", ["orders", "kitchen"]],
-    ["order.cancelled", ["orders", "kitchen", "delivery"]],
+    ["order.created", ["orders", "kitchen", "payments"]],
+    ["order.modified", ["orders", "kitchen", "payments"]],
+    ["order.cancelled", ["orders", "kitchen", "delivery", "payments"]],
     ["kitchen.status.updated", ["kitchen", "orders", "delivery"]],
-    ["delivery.status.updated", ["delivery", "orders"]],
+    ["delivery.status.updated", ["delivery", "orders", "payments"]],
     ["payment.completed", ["payments", "orders"]],
     ["inventory.alert", ["inventory"]],
   ] as const)("maps %s to stable deterministic topics", (type, topics) => {
