@@ -80,6 +80,7 @@ VALUES
   ('administrator', 'delivery.delivered.mark'),
   ('administrator', 'payments.register'),
   ('administrator', 'payments.view'),
+  ('administrator', 'payments.receipt.print'),
   ('administrator', 'payments.overage.authorize'),
   ('administrator', 'inventory.view'),
   ('administrator', 'administration.inventory.manage'),
@@ -102,6 +103,7 @@ VALUES
   ('waiter', 'delivery.delivered.mark'),
   ('waiter', 'payments.register'),
   ('waiter', 'payments.view'),
+  ('waiter', 'payments.receipt.print'),
   ('kitchen_personnel', 'orders.view'),
   ('kitchen_personnel', 'kitchen.queue.view'),
   ('kitchen_personnel', 'kitchen.ready.mark');

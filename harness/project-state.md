@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-057
-last_completed_task: T-056
+next_suggested_task: T-058
+last_completed_task: T-057
 last_commit: pending
-completed_tasks: 57
+completed_tasks: 58
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -96,6 +96,8 @@ T-055 — Expose payment queries and registration API (commit pending; the task 
 
 T-056 — Build split and partial payment experience (commit pending; the task commit cannot self-reference in this tracked state file). Includes accessible split/partial payment registration, immutable basket history, authorized overage reasons, protected realtime reconciliation, and behavioral UI coverage.
 
+T-057 — Generate and dispatch configurable payment receipts (commit pending; the task commit cannot self-reference in this tracked state file). Receipt dispatch is permission-derived and post-payment best effort; the remote `grant_payment_receipt_print_permission` migration was verified for Administrator/Waiter grants and Kitchen exclusion.
+
 ## Current Task
 
 None.
@@ -106,7 +108,7 @@ None.
 
 ## Next Suggested Task
 
-T-057 — Generate and dispatch configurable payment receipts.
+T-058 — Implement inventory purchase registration.
 
 ## Human Checkpoints
 

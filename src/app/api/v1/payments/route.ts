@@ -1,7 +1,11 @@
-import type { RegisterPaymentInput } from "../../../../application";
+import {
+  paymentReceiptPreparationFailure,
+  type RegisterPaymentInput,
+} from "../../../../application";
 import { authorizeApiPermission } from "../../../../lib/auth/api-authorization";
 import { mapPaymentRegistrationErrorToHttp } from "../../../../lib/http";
 import { createPaymentRegistrationService } from "../../../../lib/payment-registration/server";
+import { dispatchPaymentReceiptAfterPersistence } from "../../../../lib/payment-receipts/server";
 
 export async function POST(request: Request) {
   try {
@@ -29,7 +33,16 @@ export async function POST(request: Request) {
       const response = mapPaymentRegistrationErrorToHttp(result.error);
       return Response.json(response.body, { status: response.status });
     }
-    return Response.json({ payment: result.value }, { status: 201 });
+    let receipt;
+    try {
+      receipt = await dispatchPaymentReceiptAfterPersistence(
+        authorization.value.userId,
+        result.value,
+      );
+    } catch {
+      receipt = paymentReceiptPreparationFailure(result.value.paymentId);
+    }
+    return Response.json({ payment: result.value, receipt }, { status: 201 });
   } catch {
     return internalError();
   }

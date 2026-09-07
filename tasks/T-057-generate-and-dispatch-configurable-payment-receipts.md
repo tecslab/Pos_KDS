@@ -1,7 +1,7 @@
 ---
 id: T-057
 title: "Generate and dispatch configurable payment receipts"
-status: todo
+status: done
 priority: medium
 size: small
 type: feature

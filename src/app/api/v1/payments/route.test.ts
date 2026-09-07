@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const dependencies = vi.hoisted(() => ({
   authorize: vi.fn(),
   createService: vi.fn(),
+  dispatchReceipt: vi.fn(),
   register: vi.fn(),
 }));
 
@@ -11,6 +12,9 @@ vi.mock("../../../../lib/auth/api-authorization", () => ({
 }));
 vi.mock("../../../../lib/payment-registration/server", () => ({
   createPaymentRegistrationService: dependencies.createService,
+}));
+vi.mock("../../../../lib/payment-receipts/server", () => ({
+  dispatchPaymentReceiptAfterPersistence: dependencies.dispatchReceipt,
 }));
 
 import { POST } from "./route";
@@ -24,6 +28,12 @@ const registered = Object.freeze({
   amount: "5.00",
   recordedById: actorId,
   recordedAt: "2026-09-03T10:00:00.000Z",
+});
+const receipt = Object.freeze({
+  status: "skipped",
+  jobId: `payment-receipt:${registered.paymentId}`,
+  attemptId: "attempt-1",
+  reason: "ADAPTER_NOOP",
 });
 
 function request(value: unknown) {
@@ -46,6 +56,7 @@ beforeEach(() => {
     ok: true,
     value: registered,
   });
+  dependencies.dispatchReceipt.mockReset().mockResolvedValue(receipt);
 });
 
 describe("POST /api/v1/payments", () => {
@@ -68,7 +79,10 @@ describe("POST /api/v1/payments", () => {
     );
 
     expect(response.status).toBe(201);
-    await expect(response.json()).resolves.toEqual({ payment: registered });
+    await expect(response.json()).resolves.toEqual({
+      payment: registered,
+      receipt,
+    });
     expect(dependencies.authorize).toHaveBeenCalledWith("payments.register");
     expect(dependencies.register).toHaveBeenCalledWith(actorId, {
       basketId,
@@ -78,6 +92,59 @@ describe("POST /api/v1/payments", () => {
       comments: "Partial payment",
       overageReason: null,
       sourceIp: null,
+    });
+    expect(dependencies.dispatchReceipt).toHaveBeenCalledWith(
+      actorId,
+      registered,
+    );
+    expect(dependencies.register.mock.invocationCallOrder[0]).toBeLessThan(
+      dependencies.dispatchReceipt.mock.invocationCallOrder[0] as number,
+    );
+  });
+
+  it("keeps a committed payment successful when receipt dispatch reports failure", async () => {
+    dependencies.dispatchReceipt.mockResolvedValue({
+      status: "failed",
+      jobId: `payment-receipt:${registered.paymentId}`,
+      attemptId: "attempt-1",
+      failure: { code: "PRINTER_UNAVAILABLE", retryable: true },
+      retry: { action: "RETRY", nextAttemptNumber: 2 },
+    });
+
+    const response = await POST(
+      request({ basketId, paymentMethodId, amount: "5.00" }),
+    );
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({
+      payment: registered,
+      receipt: {
+        status: "failed",
+        failure: { code: "PRINTER_UNAVAILABLE", retryable: true },
+        retry: { action: "RETRY", nextAttemptNumber: 2 },
+      },
+    });
+  });
+
+  it("keeps a committed payment successful when receipt composition unexpectedly rejects", async () => {
+    dependencies.dispatchReceipt.mockRejectedValue(
+      new Error("receipt composition secret"),
+    );
+
+    const response = await POST(
+      request({ basketId, paymentMethodId, amount: "5.00" }),
+    );
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toEqual({
+      payment: registered,
+      receipt: {
+        status: "failed",
+        jobId: `payment-receipt:${registered.paymentId}`,
+        attemptId: null,
+        failure: { code: "RECEIPT_PREPARATION_FAILED", retryable: false },
+        retry: { action: "STOP" },
+      },
     });
   });
 
@@ -95,6 +162,7 @@ describe("POST /api/v1/payments", () => {
       expect(response.status).toBe(status);
       expect(json).not.toHaveBeenCalled();
       expect(dependencies.createService).not.toHaveBeenCalled();
+      expect(dependencies.dispatchReceipt).not.toHaveBeenCalled();
     },
   );
 
@@ -107,6 +175,7 @@ describe("POST /api/v1/payments", () => {
       error: { code: "INVALID_REQUEST" },
     });
     expect(dependencies.createService).not.toHaveBeenCalled();
+    expect(dependencies.dispatchReceipt).not.toHaveBeenCalled();
 
     dependencies.register.mockResolvedValue({
       ok: false,
@@ -117,6 +186,7 @@ describe("POST /api/v1/payments", () => {
     await expect(invalidPayment.json()).resolves.toMatchObject({
       error: { code: "INVALID_PAYMENT" },
     });
+    expect(dependencies.dispatchReceipt).not.toHaveBeenCalled();
   });
 
   it.each([

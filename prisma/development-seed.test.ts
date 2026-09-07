@@ -15,6 +15,7 @@ const initialRoleMatrix = [
   ["administrator", "delivery.delivered.mark"],
   ["administrator", "payments.register"],
   ["administrator", "payments.view"],
+  ["administrator", "payments.receipt.print"],
   ["administrator", "payments.overage.authorize"],
   ["administrator", "inventory.view"],
   ["administrator", "administration.inventory.manage"],
@@ -37,6 +38,7 @@ const initialRoleMatrix = [
   ["waiter", "delivery.delivered.mark"],
   ["waiter", "payments.register"],
   ["waiter", "payments.view"],
+  ["waiter", "payments.receipt.print"],
   ["kitchen_personnel", "orders.view"],
   ["kitchen_personnel", "kitchen.queue.view"],
   ["kitchen_personnel", "kitchen.ready.mark"],
@@ -51,7 +53,7 @@ function tuplesBetween(seed: string, start: string, end: string) {
 }
 
 describe("development seed", () => {
-  it("seeds the PRD matrix plus approved Administrator-only administration grants", async () => {
+  it("seeds the PRD matrix plus approved business configuration grants", async () => {
     const seed = await readFile(seedPath, "utf8");
 
     for (const role of ["Administrator", "Waiter", "Kitchen Personnel"]) {
@@ -66,9 +68,9 @@ describe("development seed", () => {
 
     expect(matrix).toEqual(initialRoleMatrix);
     expect(matrix.filter(([role]) => role === "administrator")).toHaveLength(
-      25,
+      26,
     );
-    expect(matrix.filter(([role]) => role === "waiter")).toHaveLength(8);
+    expect(matrix.filter(([role]) => role === "waiter")).toHaveLength(9);
     expect(
       matrix.filter(([role]) => role === "kitchen_personnel"),
     ).toHaveLength(3);
@@ -83,6 +85,13 @@ describe("development seed", () => {
       matrix.filter(
         ([role, permission]) =>
           permission === "payments.view" && role === "kitchen_personnel",
+      ),
+    ).toEqual([]);
+    expect(
+      matrix.filter(
+        ([role, permission]) =>
+          permission === "payments.receipt.print" &&
+          role === "kitchen_personnel",
       ),
     ).toEqual([]);
   });

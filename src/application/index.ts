@@ -185,6 +185,18 @@ export {
   type RegisteredPayment,
 } from "./payment-registration";
 export {
+  ConfiguredPaymentReceiptPrinterSelector,
+  PaymentReceiptService,
+  formatPaymentReceipt,
+  paymentReceiptPreparationFailure,
+  type PaymentReceiptDispatchOutcome,
+  type PaymentReceiptLine,
+  type PaymentReceiptPrinterConfiguration,
+  type PaymentReceiptSnapshot,
+  type PaymentReceiptSnapshotReader,
+  type PaymentReceiptSnapshotRequest,
+} from "./payment-receipts";
+export {
   PaymentQueryService,
   UNPAID_ORDER_STATUSES,
   parsePaymentQueryFilters,
