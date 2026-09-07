@@ -17,6 +17,7 @@ export const realtimeEventNames = [
   "kitchen.status.updated",
   "delivery.status.updated",
   "payment.completed",
+  "inventory.updated",
   "inventory.alert",
 ] as const;
 

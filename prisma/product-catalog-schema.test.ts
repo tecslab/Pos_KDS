@@ -43,8 +43,8 @@ describe("versioned product catalog schema", () => {
     expect(schema).toMatch(
       /model ProductCatalog \{\s+restaurantId\s+String\s+@id @map\("restaurant_id"\) @db\.Uuid/,
     );
-    expect(schema).toContain("productCatalog    ProductCatalog?");
-    expect(schema).not.toContain("productCatalogs   ProductCatalog[]");
+    expect(schema).toMatch(/^\s*productCatalog\s+ProductCatalog\?$/m);
+    expect(schema).not.toMatch(/^\s*productCatalogs\s+ProductCatalog\[\]$/m);
     expect(schema).toContain(
       "@@unique([restaurantId, productId, versionNumber])",
     );

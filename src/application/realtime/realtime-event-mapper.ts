@@ -33,6 +33,7 @@ const routes = Object.freeze({
   "kitchen.status.updated": Object.freeze(["kitchen", "orders", "delivery"]),
   "delivery.status.updated": Object.freeze(["delivery", "orders", "payments"]),
   "payment.completed": Object.freeze(["payments", "orders"]),
+  "inventory.updated": Object.freeze(["inventory"]),
   "inventory.alert": Object.freeze(["inventory"]),
 } satisfies Readonly<Record<RealtimeEventName, readonly RealtimeTopic[]>>);
 

@@ -33,6 +33,7 @@ describe("realtime event mapping", () => {
     ["kitchen.status.updated", ["kitchen", "orders", "delivery"]],
     ["delivery.status.updated", ["delivery", "orders", "payments"]],
     ["payment.completed", ["payments", "orders"]],
+    ["inventory.updated", ["inventory"]],
     ["inventory.alert", ["inventory"]],
   ] as const)("maps %s to stable deterministic topics", (type, topics) => {
     const result = mapDomainEventToRealtime(event(type));

@@ -1,7 +1,7 @@
 ---
 id: T-058
 title: "Implement inventory purchase registration"
-status: todo
+status: done
 priority: high
 size: medium
 type: domain

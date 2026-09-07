@@ -161,6 +161,18 @@ export {
   type SaveInventoryItemInput,
 } from "./inventory-item-administration";
 export {
+  InventoryPurchaseRegistrationService,
+  inventoryPurchaseRegistrationFailure,
+  registeredInventoryPurchaseResult,
+  type InventoryPurchaseRegistrationError,
+  type InventoryPurchaseRegistrationGateway,
+  type RegisterInventoryPurchaseCommand,
+  type RegisterInventoryPurchaseInput,
+  type RegisterInventoryPurchaseLineInput,
+  type RegisteredInventoryPurchase,
+  type RegisteredInventoryPurchaseLine,
+} from "./inventory-purchase-registration";
+export {
   OperatingSettingsService,
   type OperatingSettings,
   type OperatingSettingsError,
@@ -285,6 +297,7 @@ export {
   OrderCancelledRealtimePublisher,
   OrderOnTheWayRealtimePublisher,
   OrderDeliveredRealtimePublisher,
+  InventoryPurchaseRegisteredRealtimePublisher,
   PaymentCompletedRealtimePublisher,
   OrderReadyRealtimePublisher,
   OrderUpdatedRealtimePublisher,

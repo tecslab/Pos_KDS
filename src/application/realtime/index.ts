@@ -24,6 +24,7 @@ export { OrderReadyRealtimePublisher } from "./order-ready-realtime-publisher";
 export { OrderOnTheWayRealtimePublisher } from "./order-on-the-way-realtime-publisher";
 export { OrderDeliveredRealtimePublisher } from "./order-delivered-realtime-publisher";
 export { PaymentCompletedRealtimePublisher } from "./payment-completed-realtime-publisher";
+export { InventoryPurchaseRegisteredRealtimePublisher } from "./inventory-purchase-registered-realtime-publisher";
 export type {
   RealtimeMessageHandler,
   RealtimeSubscriber,

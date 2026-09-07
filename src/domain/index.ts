@@ -25,6 +25,11 @@ export type {
   InventoryReconciledMovement,
   InventoryReconciledPayload,
 } from "./inventory-reconciled";
+export type {
+  InventoryPurchaseRegistered,
+  InventoryPurchaseRegisteredLine,
+  InventoryPurchaseRegisteredPayload,
+} from "./inventory-purchase-registered";
 export type { OrderConfirmed, OrderConfirmedPayload } from "./order-confirmed";
 export type { OrderCancelled, OrderCancelledPayload } from "./order-cancelled";
 export type { OrderReady, OrderReadyPayload } from "./order-ready";
