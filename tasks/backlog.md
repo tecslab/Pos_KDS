@@ -61,7 +61,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-056 Build split and partial payment experience
 - [x] T-057 Generate and dispatch configurable payment receipts
 - [x] T-058 Implement inventory purchase registration
-- [ ] T-059 Build inventory purchase registration UI
+- [x] T-059 Build inventory purchase registration UI
 - [ ] T-060 Implement inventory adjustment and waste registration
 - [ ] T-061 Build inventory adjustment and waste UI
 - [ ] T-062 Implement low-stock calculation and inventory alert events

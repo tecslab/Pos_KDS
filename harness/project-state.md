@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-059
-last_completed_task: T-058
+next_suggested_task: T-060
+last_completed_task: T-059
 last_commit: pending
-completed_tasks: 59
+completed_tasks: 60
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -100,6 +100,8 @@ T-057 — Generate and dispatch configurable payment receipts (commit pending; t
 
 T-058 — Implement inventory purchase registration (commit pending; the task commit cannot self-reference in this tracked state file). The remote inventory-purchase migrations and rollback probe are verified; purchases append immutable stock-ins and a matching expense atomically.
 
+T-059 — Build inventory purchase registration UI (commit pending; the task commit cannot self-reference in this tracked state file). Includes an Admin-authorized responsive purchase form, selectable item context with visible units, success/failure feedback, and explicit accessible feedback when an action's authorized service result is rejected.
+
 ## Current Task
 
 None.
@@ -110,7 +112,7 @@ None.
 
 ## Next Suggested Task
 
-T-059 — Build inventory purchase registration UI.
+T-060 — Implement inventory adjustment and waste registration.
 
 ## Human Checkpoints
 

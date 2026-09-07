@@ -1,7 +1,7 @@
 ---
 id: T-059
 title: "Build inventory purchase registration UI"
-status: todo
+status: done
 priority: high
 size: small
 type: ui
