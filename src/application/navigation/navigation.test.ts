@@ -61,21 +61,21 @@ describe("buildNavigation", () => {
     ).toBeUndefined();
   });
 
-  it("makes inventory reachable only with its exact purchase-registration permission", () => {
-    expect(
-      buildNavigation(["inventory.purchases.register"]).find(
-        (item) => item.id === "inventory",
-      ),
-    ).toMatchObject({ href: "/inventory", available: true });
+  it("makes inventory reachable with a supported inventory-operation permission", () => {
     for (const permission of [
-      "inventory.view",
+      "inventory.purchases.register",
       "inventory.adjustments.register",
       "inventory.waste.register",
     ]) {
       expect(
         buildNavigation([permission]).find((item) => item.id === "inventory"),
-      ).toBeUndefined();
+      ).toMatchObject({ href: "/inventory", available: true });
     }
+    expect(
+      buildNavigation(["inventory.view"]).find(
+        (item) => item.id === "inventory",
+      ),
+    ).toBeUndefined();
   });
 
   it("returns detached immutable presentation data and makes implemented modules reachable", () => {

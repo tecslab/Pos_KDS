@@ -1,6 +1,8 @@
-import { requireServerPermission } from "@/lib/auth/server-authorization";
+import { unauthorizedError } from "../../../domain";
+import { requireServerAuthorizationContext } from "@/lib/auth/server-authorization";
 import { createInventoryPurchaseContextService } from "@/lib/inventory-purchase-registration/context";
 
+import { AdjustmentWasteRegistrationForms } from "./adjustment-waste-registration-forms";
 import { PurchaseRegistrationForm } from "./purchase-registration-form";
 
 type PageProps = Readonly<{
@@ -27,11 +29,20 @@ const feedback: Readonly<Record<string, string>> = {
 };
 
 export default async function InventoryPage({ searchParams }: PageProps) {
-  await requireServerPermission("inventory.purchases.register", "/inventory");
-  const [context, params] = await Promise.all([
+  const [authorization, context, params] = await Promise.all([
+    requireServerAuthorizationContext("/inventory"),
     createInventoryPurchaseContextService().list(),
     searchParams,
   ]);
+  const permissions = new Set(authorization.permissionCodes);
+  const canRegisterPurchase = permissions.has("inventory.purchases.register");
+  const canRegisterAdjustment = permissions.has(
+    "inventory.adjustments.register",
+  );
+  const canRegisterWaste = permissions.has("inventory.waste.register");
+  if (!canRegisterPurchase && !canRegisterAdjustment && !canRegisterWaste) {
+    throw unauthorizedError();
+  }
   const rawStatus = params.status;
   const status = Array.isArray(rawStatus) ? rawStatus[0] : rawStatus;
   const isError = status !== "registered";
@@ -42,10 +53,10 @@ export default async function InventoryPage({ searchParams }: PageProps) {
         <p className="text-sm font-semibold text-[var(--brand-green)]">
           Inventario
         </p>
-        <h1 className="mt-2 text-3xl font-bold">Registrar compra</h1>
+        <h1 className="mt-2 text-3xl font-bold">Movimientos de inventario</h1>
         <p className="mt-2 max-w-3xl text-[var(--color-text-muted)]">
-          Registra una entrega de proveedor. La compra agrega existencias y
-          registra el gasto correspondiente de forma conjunta.
+          Registra compras, ajustes físicos y desperdicios. Cada movimiento
+          conserva su motivo, responsable y saldo resultante.
         </p>
       </header>
 
@@ -60,23 +71,35 @@ export default async function InventoryPage({ searchParams }: PageProps) {
 
       {!context.ok ? (
         <p role="alert" className="mt-6 text-[var(--status-critical)]">
-          No se pudo cargar la información necesaria para registrar compras.
-          Actualiza la página e inténtalo nuevamente.
+          No se pudo cargar la información necesaria para registrar movimientos
+          de inventario. Actualiza la página e inténtalo nuevamente.
         </p>
       ) : (
-        <section
-          className="mt-6 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]"
-          aria-labelledby="purchase-form-title"
-        >
-          <h2 id="purchase-form-title" className="text-xl font-bold">
-            Entrega de proveedor
-          </h2>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            La unidad se toma del artículo seleccionado y no se puede cambiar
-            aquí.
-          </p>
-          <PurchaseRegistrationForm {...context.value} />
-        </section>
+        <div className="mt-6 space-y-6">
+          {canRegisterPurchase ? (
+            <section
+              className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]"
+              aria-labelledby="purchase-form-title"
+            >
+              <h2 id="purchase-form-title" className="text-xl font-bold">
+                Entrega de proveedor
+              </h2>
+              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                La unidad se toma del artículo seleccionado y no se puede
+                cambiar aquí.
+              </p>
+              <PurchaseRegistrationForm {...context.value} />
+            </section>
+          ) : null}
+          {canRegisterAdjustment || canRegisterWaste ? (
+            <AdjustmentWasteRegistrationForms
+              restaurants={context.value.restaurants}
+              items={context.value.items}
+              canRegisterAdjustment={canRegisterAdjustment}
+              canRegisterWaste={canRegisterWaste}
+            />
+          ) : null}
+        </div>
       )}
     </div>
   );

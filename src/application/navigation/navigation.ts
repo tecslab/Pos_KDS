@@ -31,7 +31,11 @@ const navigationDefinitions: readonly NavigationDefinition[] = Object.freeze([
     "inventory",
     "Inventario",
     "/inventory",
-    ["inventory.purchases.register"],
+    [
+      "inventory.purchases.register",
+      "inventory.adjustments.register",
+      "inventory.waste.register",
+    ],
     true,
   ),
   definition(

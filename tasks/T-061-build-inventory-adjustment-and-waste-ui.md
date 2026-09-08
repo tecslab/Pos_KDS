@@ -1,7 +1,7 @@
 ---
 id: T-061
 title: "Build inventory adjustment and waste UI"
-status: todo
+status: done
 priority: high
 size: small
 type: ui
