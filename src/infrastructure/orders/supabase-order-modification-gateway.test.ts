@@ -43,6 +43,7 @@ function row() {
         reversed_movement_id: null as string | null,
       },
     ],
+    inventory_alert_transitions: [],
     baskets: [
       {
         id: basketId,

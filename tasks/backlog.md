@@ -64,7 +64,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-059 Build inventory purchase registration UI
 - [x] T-060 Implement inventory adjustment and waste registration
 - [x] T-061 Build inventory adjustment and waste UI
-- [ ] T-062 Implement low-stock calculation and inventory alert events
+- [x] T-062 Implement low-stock calculation and inventory alert events
 - [ ] T-063 Build inventory balance, movement, and alert views
 - [ ] T-064 Implement transactional production-batch completion
 - [ ] T-065 Build production registration and history UI

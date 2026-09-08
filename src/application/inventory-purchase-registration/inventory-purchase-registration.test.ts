@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
   err,
   ok,
+  type InventoryAlertChanged,
+  type InventoryAlertTransition,
   type InventoryPurchaseRegistered,
   type Result,
 } from "../../domain";
@@ -22,6 +24,15 @@ const purchaseId = "51000000-0000-4000-8000-000000000001";
 const expenseId = "52000000-0000-4000-8000-000000000001";
 const itemId = "53000000-0000-4000-8000-000000000001";
 const movementId = "54000000-0000-4000-8000-000000000001";
+const alertTransition: InventoryAlertTransition = Object.freeze({
+  inventoryAlertId: "61000000-0000-4000-8000-000000000001",
+  inventoryMovementId: movementId,
+  inventoryItemId: itemId,
+  status: "RESOLVED",
+  threshold: "5.000",
+  observedBalance: "7.500",
+  occurredAt: "2026-09-06T10:00:00.000Z",
+});
 
 const purchase: RegisteredInventoryPurchase = Object.freeze({
   purchaseId,
@@ -60,16 +71,23 @@ class Boundary implements TransactionBoundary {
 
 function setup(
   permissions: readonly string[] = ["inventory.purchases.register"],
+  inventoryAlertTransitions: readonly InventoryAlertTransition[] = [],
 ) {
   const activity: string[] = [];
   const gateway: InventoryPurchaseRegistrationGateway = {
     register: vi.fn().mockImplementation(async () => {
       activity.push("rpc");
-      return ok(purchase);
+      return ok(
+        inventoryAlertTransitions.length === 0
+          ? purchase
+          : Object.freeze({ ...purchase, inventoryAlertTransitions }),
+      );
     }),
   };
-  const published: InventoryPurchaseRegistered[] = [];
-  const publisher: DomainEventPublisher<InventoryPurchaseRegistered> = {
+  const published: (InventoryPurchaseRegistered | InventoryAlertChanged)[] = [];
+  const publisher: DomainEventPublisher<
+    InventoryPurchaseRegistered | InventoryAlertChanged
+  > = {
     async publish(events) {
       activity.push("publish");
       published.push(...events);
@@ -206,5 +224,43 @@ describe("InventoryPurchaseRegistrationService", () => {
     });
     expect(activity).toEqual(["transaction:start", "transaction:rollback"]);
     expect(published).toEqual([]);
+  });
+
+  it("records exactly one resolved alert event only after commit", async () => {
+    const { activity, published, service } = setup(
+      ["inventory.purchases.register"],
+      [alertTransition],
+    );
+
+    await expect(
+      service.register(actorId, {
+        restaurantId,
+        expenseCategoryId: categoryId,
+        lines: [
+          { inventoryItemId: itemId, quantity: "2.5", unitPrice: "4.94" },
+        ],
+      }),
+    ).resolves.toEqual(ok(purchase));
+
+    expect(activity).toEqual([
+      "transaction:start",
+      "rpc",
+      "transaction:commit",
+      "publish",
+    ]);
+    expect(published.map((event) => event.type)).toEqual([
+      "inventory.purchase.registered",
+      "inventory.alert.changed",
+    ]);
+    expect(published[1]).toMatchObject({
+      type: "inventory.alert.changed",
+      payload: {
+        restaurantId,
+        inventoryAlertId: alertTransition.inventoryAlertId,
+        inventoryMovementId: movementId,
+        inventoryItemId: itemId,
+        status: "RESOLVED",
+      },
+    });
   });
 });

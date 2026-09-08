@@ -1,6 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { err, ok, type OrderConfirmed, type Result } from "../../domain";
+import {
+  err,
+  ok,
+  type InventoryAlertChanged,
+  type InventoryAlertTransition,
+  type OrderConfirmed,
+  type Result,
+} from "../../domain";
 import type { DomainEventPublisher } from "../domain-event-publisher";
 import type { TransactionBoundary } from "../transaction-boundary";
 import { TransactionalOperationRunner } from "../transactional-operation-runner";
@@ -10,6 +17,7 @@ import {
   type ConfirmOrderInput,
   type OrderConfirmationError,
   type OrderConfirmationGateway,
+  type PersistedOrderConfirmation,
 } from "./order-confirmation";
 
 const actorId = "10000000-0000-4000-8000-000000000001";
@@ -19,6 +27,15 @@ const productVersionId = "36000000-0000-4000-8000-000000000002";
 const optionOne = "37000000-0000-4000-8000-000000000001";
 const optionTwo = "37000000-0000-4000-8000-000000000002";
 const removalId = "38000000-0000-4000-8000-000000000001";
+const alertTransition: InventoryAlertTransition = Object.freeze({
+  inventoryAlertId: "61000000-0000-4000-8000-000000000001",
+  inventoryMovementId: "61000000-0000-4000-8000-000000000002",
+  inventoryItemId: "61000000-0000-4000-8000-000000000003",
+  status: "ACTIVE",
+  threshold: "5.000",
+  observedBalance: "4.000",
+  occurredAt: "2026-08-25T10:00:00.000Z",
+});
 
 const confirmed: ConfirmedOrder = Object.freeze({
   orderId: "41000000-0000-4000-8000-000000000001",
@@ -91,11 +108,14 @@ class RecordingBoundary implements TransactionBoundary {
 }
 
 function setup(
-  gatewayResult: Result<ConfirmedOrder, OrderConfirmationError> = ok(confirmed),
+  gatewayResult: Result<
+    ConfirmedOrder | PersistedOrderConfirmation,
+    OrderConfirmationError
+  > = ok(confirmed),
   overrides: {
     active?: boolean;
     permissions?: readonly string[];
-    publisher?: DomainEventPublisher<OrderConfirmed>;
+    publisher?: DomainEventPublisher<OrderConfirmed | InventoryAlertChanged>;
   } = {},
 ) {
   const activity: string[] = [];
@@ -105,7 +125,7 @@ function setup(
       return gatewayResult;
     }),
   };
-  const published: OrderConfirmed[] = [];
+  const published: (OrderConfirmed | InventoryAlertChanged)[] = [];
   const publisher =
     overrides.publisher ??
     ({
@@ -113,7 +133,7 @@ function setup(
         activity.push("publish");
         published.push(...events);
       },
-    } satisfies DomainEventPublisher<OrderConfirmed>);
+    } satisfies DomainEventPublisher<OrderConfirmed | InventoryAlertChanged>);
   const service = new OrderConfirmationService(
     {
       findByAuthenticatedUserId: vi.fn().mockResolvedValue({
@@ -346,5 +366,44 @@ describe("OrderConfirmationService", () => {
       publisherFailure,
     );
     expect(activity).toEqual(["publish"]);
+  });
+
+  it("records an alert state change from the committed RPC snapshot", async () => {
+    const { activity, published, service } = setup(
+      ok(
+        Object.freeze({
+          ...confirmed,
+          inventoryAlertTransitions: [alertTransition],
+        }),
+      ),
+    );
+
+    await expect(service.confirm(actorId, draft())).resolves.toEqual(
+      ok(confirmed),
+    );
+
+    expect(activity).toEqual([
+      "transaction:start",
+      "rpc",
+      "transaction:commit",
+      "publish",
+    ]);
+    expect(published.map((event) => event.type)).toEqual([
+      "order.confirmed",
+      "inventory.alert.changed",
+    ]);
+    expect(published[1]).toEqual({
+      type: "inventory.alert.changed",
+      occurredAt: alertTransition.occurredAt,
+      payload: {
+        restaurantId,
+        inventoryAlertId: alertTransition.inventoryAlertId,
+        inventoryMovementId: alertTransition.inventoryMovementId,
+        inventoryItemId: alertTransition.inventoryItemId,
+        status: "ACTIVE",
+        threshold: "5.000",
+        observedBalance: "4.000",
+      },
+    });
   });
 });

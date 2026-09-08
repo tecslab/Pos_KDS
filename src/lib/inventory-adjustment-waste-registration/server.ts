@@ -1,10 +1,15 @@
 import "server-only";
 
 import {
+  InventoryAlertChangedRealtimePublisher,
   InventoryAdjustmentWasteRegisteredRealtimePublisher,
   InventoryAdjustmentWasteRegistrationService,
   TransactionalOperationRunner,
 } from "../../application";
+import type {
+  InventoryAdjustmentWasteRegistered,
+  InventoryAlertChanged,
+} from "../../domain";
 import { SystemAuditClock } from "../../infrastructure/audit";
 import { SupabaseAuthorizationProfileReader } from "../../infrastructure/auth";
 import { InProcessDomainEventPublisher } from "../../infrastructure/events";
@@ -17,17 +22,25 @@ import { createSupabaseAdminClient } from "../supabase/admin";
 
 export function createInventoryAdjustmentWasteRegistrationService() {
   const client = createSupabaseAdminClient();
-  const dispatcher = new InProcessDomainEventPublisher();
+  const dispatcher = new InProcessDomainEventPublisher<
+    InventoryAdjustmentWasteRegistered | InventoryAlertChanged
+  >();
   const realtimePublisher =
     new InventoryAdjustmentWasteRegisteredRealtimePublisher(
       new SupabaseRealtimePublisher(client),
     );
+  const inventoryAlertPublisher = new InventoryAlertChangedRealtimePublisher(
+    new SupabaseRealtimePublisher(client),
+  );
 
   dispatcher.subscribe("inventory.adjustment.registered", (event) =>
     realtimePublisher.publish(Object.freeze([event])),
   );
   dispatcher.subscribe("inventory.waste.registered", (event) =>
     realtimePublisher.publish(Object.freeze([event])),
+  );
+  dispatcher.subscribe("inventory.alert.changed", (event) =>
+    inventoryAlertPublisher.publish(Object.freeze([event])),
   );
 
   return new InventoryAdjustmentWasteRegistrationService(

@@ -32,6 +32,7 @@ function row(overrides: Record<string, unknown> = {}) {
     recorded_at: "2026-09-07T10:00:00+00:00",
     previous_balance: "5.000",
     new_balance: "7.500",
+    inventory_alert_transitions: [],
     ...overrides,
   };
 }

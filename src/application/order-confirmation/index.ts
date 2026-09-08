@@ -1,6 +1,7 @@
 export {
   OrderConfirmationService,
   confirmedOrderResult,
+  persistedOrderConfirmationResult,
   orderConfirmationFailure,
   type ConfirmedOrder,
   type ConfirmedOrderBasket,
@@ -14,4 +15,5 @@ export {
   type OrderConfirmationCommandLine,
   type OrderConfirmationError,
   type OrderConfirmationGateway,
+  type PersistedOrderConfirmation,
 } from "./order-confirmation";

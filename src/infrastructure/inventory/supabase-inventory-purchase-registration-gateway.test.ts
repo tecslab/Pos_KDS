@@ -52,6 +52,7 @@ function row(overrides: Record<string, unknown> = {}) {
     total_amount: "12.35",
     recorded_at: "2026-09-06T10:00:00+00:00",
     lines: [line()],
+    inventory_alert_transitions: [],
     ...overrides,
   };
 }

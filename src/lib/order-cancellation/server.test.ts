@@ -10,6 +10,8 @@ const dependencies = vi.hoisted(() => ({
   realtimePublisher: vi.fn(),
   orderCancelledPublisher: vi.fn(),
   orderCancelledPublish: vi.fn(),
+  inventoryAlertPublisher: vi.fn(),
+  inventoryAlertPublish: vi.fn(),
   dispatcher: vi.fn(),
   subscribe: vi.fn(),
   operationRunner: vi.fn(),
@@ -64,6 +66,14 @@ vi.mock("../../infrastructure/events", () => ({
   },
 }));
 vi.mock("../../application", () => ({
+  InventoryAlertChangedRealtimePublisher: class {
+    constructor(publisher: unknown) {
+      dependencies.inventoryAlertPublisher(publisher);
+    }
+    publish(events: unknown) {
+      return dependencies.inventoryAlertPublish(events);
+    }
+  },
   OrderCancelledRealtimePublisher: class {
     constructor(publisher: unknown) {
       dependencies.orderCancelledPublisher(publisher);
@@ -99,6 +109,7 @@ beforeEach(() => {
   }
   dependencies.createSupabaseAdminClient.mockReturnValue(dependencies.client);
   dependencies.orderCancelledPublish.mockResolvedValue(undefined);
+  dependencies.inventoryAlertPublish.mockResolvedValue(undefined);
 });
 
 describe("createOrderCancellationService", () => {
@@ -117,10 +128,15 @@ describe("createOrderCancellationService", () => {
     expect(dependencies.transaction).toHaveBeenCalledOnce();
     expect(dependencies.dispatcher).toHaveBeenCalledOnce();
     expect(dependencies.orderCancelledPublisher).toHaveBeenCalledOnce();
+    expect(dependencies.inventoryAlertPublisher).toHaveBeenCalledOnce();
     expect(dependencies.operationRunner).toHaveBeenCalledOnce();
     expect(dependencies.service).toHaveBeenCalledOnce();
     expect(dependencies.subscribe).toHaveBeenCalledWith(
       "order.cancelled",
+      expect.any(Function),
+    );
+    expect(dependencies.subscribe).toHaveBeenCalledWith(
+      "inventory.alert.changed",
       expect.any(Function),
     );
 
@@ -135,5 +151,14 @@ describe("createOrderCancellationService", () => {
     await handler(event);
 
     expect(dependencies.orderCancelledPublish).toHaveBeenCalledWith([event]);
+
+    const alertEvent = Object.freeze({ type: "inventory.alert.changed" });
+    const alertHandler = dependencies.subscribe.mock.calls[1]?.[1] as (
+      event: unknown,
+    ) => Promise<void>;
+    await alertHandler(alertEvent);
+    expect(dependencies.inventoryAlertPublish).toHaveBeenCalledWith([
+      alertEvent,
+    ]);
   });
 });

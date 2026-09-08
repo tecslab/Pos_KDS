@@ -1,7 +1,7 @@
 ---
 id: T-062
 title: "Implement low-stock calculation and inventory alert events"
-status: todo
+status: done
 priority: high
 size: small
 type: domain

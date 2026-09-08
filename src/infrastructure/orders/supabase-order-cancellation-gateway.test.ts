@@ -45,6 +45,7 @@ function committedRow() {
         reversed_movement_id: saleId,
       },
     ],
+    inventory_alert_transitions: [],
   };
 }
 
@@ -81,6 +82,7 @@ describe("SupabaseOrderCancellationGateway", () => {
             reversedMovementId: saleId,
           },
         ],
+        inventoryAlertTransitions: [],
       },
     });
     expect(rpc).toHaveBeenCalledTimes(1);

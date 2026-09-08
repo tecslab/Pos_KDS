@@ -27,6 +27,12 @@ export type {
   InventoryWasteRegistered,
 } from "./inventory-adjustment-waste-registered";
 export type {
+  InventoryAlertChanged,
+  InventoryAlertChangedPayload,
+  InventoryAlertStatus,
+  InventoryAlertTransition,
+} from "./inventory-alert-changed";
+export type {
   InventoryReconciled,
   InventoryReconciledMovement,
   InventoryReconciledPayload,

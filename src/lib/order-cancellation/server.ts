@@ -1,10 +1,12 @@
 import "server-only";
 
 import {
+  InventoryAlertChangedRealtimePublisher,
   OrderCancellationService,
   OrderCancelledRealtimePublisher,
   TransactionalOperationRunner,
 } from "../../application";
+import type { InventoryAlertChanged, OrderCancelled } from "../../domain";
 import { SystemAuditClock } from "../../infrastructure/audit";
 import { SupabaseAuthorizationProfileReader } from "../../infrastructure/auth";
 import { InProcessDomainEventPublisher } from "../../infrastructure/events";
@@ -17,13 +19,21 @@ import { createSupabaseAdminClient } from "../supabase/admin";
 
 export function createOrderCancellationService() {
   const client = createSupabaseAdminClient();
-  const dispatcher = new InProcessDomainEventPublisher();
+  const dispatcher = new InProcessDomainEventPublisher<
+    OrderCancelled | InventoryAlertChanged
+  >();
   const realtimePublisher = new OrderCancelledRealtimePublisher(
+    new SupabaseRealtimePublisher(client),
+  );
+  const inventoryAlertPublisher = new InventoryAlertChangedRealtimePublisher(
     new SupabaseRealtimePublisher(client),
   );
 
   dispatcher.subscribe("order.cancelled", (event) =>
     realtimePublisher.publish(Object.freeze([event])),
+  );
+  dispatcher.subscribe("inventory.alert.changed", (event) =>
+    inventoryAlertPublisher.publish(Object.freeze([event])),
   );
 
   return new OrderCancellationService(

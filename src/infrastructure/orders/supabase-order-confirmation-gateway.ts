@@ -1,8 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
-  confirmedOrderResult,
   orderConfirmationFailure,
+  persistedOrderConfirmationResult,
   type ConfirmedOrder,
   type ConfirmedOrderBasket,
   type ConfirmedOrderLine,
@@ -10,6 +10,7 @@ import {
   type OrderConfirmationCommand,
   type OrderConfirmationGateway,
 } from "../../application";
+import { mapInventoryAlertTransitions } from "../inventory/map-inventory-alert-transitions";
 
 export class SupabaseOrderConfirmationGateway implements OrderConfirmationGateway {
   constructor(private readonly client: SupabaseClient) {}
@@ -30,9 +31,14 @@ export class SupabaseOrderConfirmationGateway implements OrderConfirmationGatewa
         return orderConfirmationFailure("OPERATION_FAILED");
       }
       const order = mapConfirmedOrder(data[0]);
-      return order === null
+      const inventoryAlertTransitions = mapInventoryAlertTransitions(
+        isRecord(data[0]) ? data[0].inventory_alert_transitions : null,
+      );
+      return order === null || inventoryAlertTransitions === null
         ? orderConfirmationFailure("OPERATION_FAILED")
-        : confirmedOrderResult(order);
+        : persistedOrderConfirmationResult(
+            Object.freeze({ ...order, inventoryAlertTransitions }),
+          );
     } catch {
       return orderConfirmationFailure("OPERATION_FAILED");
     }

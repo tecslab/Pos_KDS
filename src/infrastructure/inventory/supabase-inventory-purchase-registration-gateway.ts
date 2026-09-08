@@ -2,12 +2,13 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
   inventoryPurchaseRegistrationFailure,
-  registeredInventoryPurchaseResult,
+  persistedInventoryPurchaseRegistrationResult,
   type InventoryPurchaseRegistrationGateway,
   type RegisterInventoryPurchaseCommand,
   type RegisteredInventoryPurchase,
   type RegisteredInventoryPurchaseLine,
 } from "../../application";
+import { mapInventoryAlertTransitions } from "./map-inventory-alert-transitions";
 
 export class SupabaseInventoryPurchaseRegistrationGateway implements InventoryPurchaseRegistrationGateway {
   constructor(private readonly client: SupabaseClient) {}
@@ -33,9 +34,14 @@ export class SupabaseInventoryPurchaseRegistrationGateway implements InventoryPu
         return inventoryPurchaseRegistrationFailure("OPERATION_FAILED");
       }
       const purchase = mapRegisteredInventoryPurchase(data[0]);
-      return purchase === null
+      const inventoryAlertTransitions = mapInventoryAlertTransitions(
+        isRecord(data[0]) ? data[0].inventory_alert_transitions : null,
+      );
+      return purchase === null || inventoryAlertTransitions === null
         ? inventoryPurchaseRegistrationFailure("OPERATION_FAILED")
-        : registeredInventoryPurchaseResult(purchase);
+        : persistedInventoryPurchaseRegistrationResult(
+            Object.freeze({ ...purchase, inventoryAlertTransitions }),
+          );
     } catch {
       return inventoryPurchaseRegistrationFailure("OPERATION_FAILED");
     }

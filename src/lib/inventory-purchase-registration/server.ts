@@ -1,10 +1,15 @@
 import "server-only";
 
 import {
+  InventoryAlertChangedRealtimePublisher,
   InventoryPurchaseRegisteredRealtimePublisher,
   InventoryPurchaseRegistrationService,
   TransactionalOperationRunner,
 } from "../../application";
+import type {
+  InventoryAlertChanged,
+  InventoryPurchaseRegistered,
+} from "../../domain";
 import { SystemAuditClock } from "../../infrastructure/audit";
 import { SupabaseAuthorizationProfileReader } from "../../infrastructure/auth";
 import { InProcessDomainEventPublisher } from "../../infrastructure/events";
@@ -17,13 +22,21 @@ import { createSupabaseAdminClient } from "../supabase/admin";
 
 export function createInventoryPurchaseRegistrationService() {
   const client = createSupabaseAdminClient();
-  const dispatcher = new InProcessDomainEventPublisher();
+  const dispatcher = new InProcessDomainEventPublisher<
+    InventoryPurchaseRegistered | InventoryAlertChanged
+  >();
   const realtimePublisher = new InventoryPurchaseRegisteredRealtimePublisher(
+    new SupabaseRealtimePublisher(client),
+  );
+  const inventoryAlertPublisher = new InventoryAlertChangedRealtimePublisher(
     new SupabaseRealtimePublisher(client),
   );
 
   dispatcher.subscribe("inventory.purchase.registered", (event) =>
     realtimePublisher.publish(Object.freeze([event])),
+  );
+  dispatcher.subscribe("inventory.alert.changed", (event) =>
+    inventoryAlertPublisher.publish(Object.freeze([event])),
   );
 
   return new InventoryPurchaseRegistrationService(

@@ -1,10 +1,13 @@
 import {
   err,
   ok,
+  type InventoryAlertChanged,
+  type InventoryAlertTransition,
   type InventoryReconciledMovement,
   type OrderCancelled,
   type Result,
 } from "../../domain";
+import { recordInventoryAlertEvents } from "../inventory-alerts";
 import type { AuditClock } from "../audit";
 import {
   AuthorizationService,
@@ -44,6 +47,11 @@ export type CancelledOrder = Readonly<{
   inventoryMovements: readonly InventoryReconciledMovement[];
 }>;
 
+export type PersistedOrderCancellation = CancelledOrder &
+  Readonly<{
+    inventoryAlertTransitions: readonly InventoryAlertTransition[];
+  }>;
+
 export type OrderCancellationError = Readonly<{
   kind: "order-cancellation-error";
   code:
@@ -57,7 +65,9 @@ export type OrderCancellationError = Readonly<{
 export interface OrderCancellationGateway {
   cancel(
     command: OrderCancellationCommand,
-  ): Promise<Result<CancelledOrder, OrderCancellationError>>;
+  ): Promise<
+    Result<CancelledOrder | PersistedOrderCancellation, OrderCancellationError>
+  >;
 }
 
 export class OrderCancellationService {
@@ -65,7 +75,9 @@ export class OrderCancellationService {
     private readonly profiles: AuthorizationProfileReader,
     private readonly gateway: OrderCancellationGateway,
     private readonly clock: AuditClock,
-    private readonly operations: TransactionalOperationRunner<OrderCancelled>,
+    private readonly operations: TransactionalOperationRunner<
+      OrderCancelled | InventoryAlertChanged
+    >,
   ) {}
 
   async cancel(
@@ -101,7 +113,14 @@ export class OrderCancellationService {
       );
       if (!result.ok) return result;
 
-      const order = result.value;
+      const order =
+        "inventoryAlertTransitions" in result.value
+          ? withoutInventoryAlertTransitions(result.value)
+          : result.value;
+      const inventoryAlertTransitions =
+        "inventoryAlertTransitions" in result.value
+          ? result.value.inventoryAlertTransitions
+          : [];
       events.record(
         Object.freeze({
           type: "order.cancelled" as const,
@@ -122,7 +141,12 @@ export class OrderCancellationService {
           }),
         }),
       );
-      return result;
+      recordInventoryAlertEvents(
+        events,
+        order.restaurantId,
+        inventoryAlertTransitions,
+      );
+      return cancelledOrderResult(order);
     });
   }
 }
@@ -175,6 +199,20 @@ export function orderCancellationFailure(
 
 export function cancelledOrderResult(order: CancelledOrder) {
   return ok(order);
+}
+
+export function persistedOrderCancellationResult(
+  persisted: PersistedOrderCancellation,
+) {
+  return ok(persisted);
+}
+
+function withoutInventoryAlertTransitions({
+  inventoryAlertTransitions: _inventoryAlertTransitions,
+  ...order
+}: PersistedOrderCancellation): CancelledOrder {
+  void _inventoryAlertTransitions;
+  return Object.freeze(order);
 }
 
 function failure(code: OrderCancellationError["code"]) {

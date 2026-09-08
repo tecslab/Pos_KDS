@@ -46,6 +46,7 @@ export {
 } from "./authorization";
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
+export { recordInventoryAlertEvents } from "./inventory-alerts";
 export {
   DeliveryQueueService,
   parseDeliveryQueueFilters,
@@ -70,12 +71,14 @@ export {
 export {
   OrderCancellationService,
   cancelledOrderResult,
+  persistedOrderCancellationResult,
   orderCancellationFailure,
   type CancelledOrder,
   type CancelOrderInput,
   type OrderCancellationCommand,
   type OrderCancellationError,
   type OrderCancellationGateway,
+  type PersistedOrderCancellation,
 } from "./order-cancellation";
 export {
   OrderReadyService,
@@ -130,6 +133,7 @@ export {
 export {
   OrderConfirmationService,
   confirmedOrderResult,
+  persistedOrderConfirmationResult,
   orderConfirmationFailure,
   type ConfirmedOrder,
   type ConfirmedOrderBasket,
@@ -143,6 +147,7 @@ export {
   type OrderConfirmationCommandLine,
   type OrderConfirmationError,
   type OrderConfirmationGateway,
+  type PersistedOrderConfirmation,
 } from "./order-confirmation";
 export {
   buildNavigation,
@@ -153,6 +158,7 @@ export {
 export {
   InventoryAdjustmentWasteRegistrationService,
   inventoryAdjustmentWasteRegistrationFailure,
+  persistedInventoryAdjustmentWasteRegistrationResult,
   registeredInventoryAdjustmentWasteResult,
   type InventoryAdjustmentWasteOperation,
   type InventoryAdjustmentWasteRegistrationError,
@@ -160,6 +166,7 @@ export {
   type RegisterInventoryAdjustmentWasteCommand,
   type RegisterInventoryAdjustmentWasteInput,
   type RegisteredInventoryAdjustmentWaste,
+  type PersistedInventoryAdjustmentWasteRegistration,
 } from "./inventory-adjustment-waste-registration";
 export {
   InventoryItemAdministrationService,
@@ -183,6 +190,7 @@ export {
 export {
   InventoryPurchaseRegistrationService,
   inventoryPurchaseRegistrationFailure,
+  persistedInventoryPurchaseRegistrationResult,
   registeredInventoryPurchaseResult,
   type InventoryPurchaseRegistrationError,
   type InventoryPurchaseRegistrationGateway,
@@ -191,6 +199,7 @@ export {
   type RegisterInventoryPurchaseLineInput,
   type RegisteredInventoryPurchase,
   type RegisteredInventoryPurchaseLine,
+  type PersistedInventoryPurchaseRegistration,
 } from "./inventory-purchase-registration";
 export {
   OperatingSettingsService,
@@ -319,6 +328,7 @@ export {
   OrderOnTheWayRealtimePublisher,
   OrderDeliveredRealtimePublisher,
   InventoryPurchaseRegisteredRealtimePublisher,
+  InventoryAlertChangedRealtimePublisher,
   PaymentCompletedRealtimePublisher,
   OrderReadyRealtimePublisher,
   OrderUpdatedRealtimePublisher,

@@ -2,11 +2,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
   inventoryAdjustmentWasteRegistrationFailure,
-  registeredInventoryAdjustmentWasteResult,
+  persistedInventoryAdjustmentWasteRegistrationResult,
   type InventoryAdjustmentWasteRegistrationGateway,
   type RegisterInventoryAdjustmentWasteCommand,
   type RegisteredInventoryAdjustmentWaste,
 } from "../../application";
+import { mapInventoryAlertTransitions } from "./map-inventory-alert-transitions";
 
 export class SupabaseInventoryAdjustmentWasteRegistrationGateway implements InventoryAdjustmentWasteRegistrationGateway {
   constructor(private readonly client: SupabaseClient) {}
@@ -31,9 +32,14 @@ export class SupabaseInventoryAdjustmentWasteRegistrationGateway implements Inve
         return inventoryAdjustmentWasteRegistrationFailure("OPERATION_FAILED");
       }
       const movement = mapRegisteredInventoryAdjustmentWaste(data[0]);
-      return movement === null
+      const inventoryAlertTransitions = mapInventoryAlertTransitions(
+        isRecord(data[0]) ? data[0].inventory_alert_transitions : null,
+      );
+      return movement === null || inventoryAlertTransitions === null
         ? inventoryAdjustmentWasteRegistrationFailure("OPERATION_FAILED")
-        : registeredInventoryAdjustmentWasteResult(movement);
+        : persistedInventoryAdjustmentWasteRegistrationResult(
+            Object.freeze({ ...movement, inventoryAlertTransitions }),
+          );
     } catch {
       return inventoryAdjustmentWasteRegistrationFailure("OPERATION_FAILED");
     }

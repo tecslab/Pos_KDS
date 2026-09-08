@@ -1,10 +1,18 @@
-import { err, ok, type OrderConfirmed, type Result } from "../../domain";
+import {
+  err,
+  ok,
+  type InventoryAlertChanged,
+  type InventoryAlertTransition,
+  type OrderConfirmed,
+  type Result,
+} from "../../domain";
 import type { AuditClock } from "../audit";
 import {
   AuthorizationService,
   type AuthorizationProfileReader,
 } from "../authorization";
 import type { TransactionalOperationRunner } from "../transactional-operation-runner";
+import { recordInventoryAlertEvents } from "../inventory-alerts";
 
 const MAX_INT = 2_147_483_647;
 const MAX_BASKETS = 100;
@@ -98,6 +106,11 @@ export type ConfirmedOrder = Readonly<{
   baskets: readonly ConfirmedOrderBasket[];
 }>;
 
+export type PersistedOrderConfirmation = ConfirmedOrder &
+  Readonly<{
+    inventoryAlertTransitions: readonly InventoryAlertTransition[];
+  }>;
+
 export type OrderConfirmationError = Readonly<{
   kind: "order-confirmation-error";
   code:
@@ -112,7 +125,9 @@ export type OrderConfirmationError = Readonly<{
 export interface OrderConfirmationGateway {
   confirm(
     command: OrderConfirmationCommand,
-  ): Promise<Result<ConfirmedOrder, OrderConfirmationError>>;
+  ): Promise<
+    Result<ConfirmedOrder | PersistedOrderConfirmation, OrderConfirmationError>
+  >;
 }
 
 export class OrderConfirmationService {
@@ -120,7 +135,9 @@ export class OrderConfirmationService {
     private readonly profiles: AuthorizationProfileReader,
     private readonly gateway: OrderConfirmationGateway,
     private readonly clock: AuditClock,
-    private readonly operations: TransactionalOperationRunner<OrderConfirmed>,
+    private readonly operations: TransactionalOperationRunner<
+      OrderConfirmed | InventoryAlertChanged
+    >,
   ) {}
 
   async confirm(
@@ -157,7 +174,14 @@ export class OrderConfirmationService {
 
       if (!result.ok) return result;
 
-      const order = result.value;
+      const order =
+        "inventoryAlertTransitions" in result.value
+          ? withoutInventoryAlertTransitions(result.value)
+          : result.value;
+      const inventoryAlertTransitions =
+        "inventoryAlertTransitions" in result.value
+          ? result.value.inventoryAlertTransitions
+          : [];
       events.record(
         Object.freeze({
           type: "order.confirmed" as const,
@@ -173,7 +197,12 @@ export class OrderConfirmationService {
           }),
         }),
       );
-      return result;
+      recordInventoryAlertEvents(
+        events,
+        order.restaurantId,
+        inventoryAlertTransitions,
+      );
+      return confirmedOrderResult(order);
     });
   }
 }
@@ -347,4 +376,18 @@ function failure(code: OrderConfirmationError["code"]) {
 
 export function confirmedOrderResult(order: ConfirmedOrder) {
   return ok(order);
+}
+
+export function persistedOrderConfirmationResult(
+  persisted: PersistedOrderConfirmation,
+) {
+  return ok(persisted);
+}
+
+function withoutInventoryAlertTransitions({
+  inventoryAlertTransitions: _inventoryAlertTransitions,
+  ...order
+}: PersistedOrderConfirmation): ConfirmedOrder {
+  void _inventoryAlertTransitions;
+  return Object.freeze(order);
 }

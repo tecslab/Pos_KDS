@@ -2,12 +2,13 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { InventoryReconciledMovement } from "../../domain";
 
 import {
-  cancelledOrderResult,
   orderCancellationFailure,
+  persistedOrderCancellationResult,
   type CancelledOrder,
   type OrderCancellationCommand,
   type OrderCancellationGateway,
 } from "../../application";
+import { mapInventoryAlertTransitions } from "../inventory/map-inventory-alert-transitions";
 
 export class SupabaseOrderCancellationGateway implements OrderCancellationGateway {
   constructor(private readonly client: SupabaseClient) {}
@@ -25,9 +26,14 @@ export class SupabaseOrderCancellationGateway implements OrderCancellationGatewa
       if (!Array.isArray(data) || data.length !== 1)
         return orderCancellationFailure("OPERATION_FAILED");
       const order = mapCancelledOrder(data[0]);
-      return order === null
+      const inventoryAlertTransitions = mapInventoryAlertTransitions(
+        isRecord(data[0]) ? data[0].inventory_alert_transitions : null,
+      );
+      return order === null || inventoryAlertTransitions === null
         ? orderCancellationFailure("OPERATION_FAILED")
-        : cancelledOrderResult(order);
+        : persistedOrderCancellationResult(
+            Object.freeze({ ...order, inventoryAlertTransitions }),
+          );
     } catch {
       return orderCancellationFailure("OPERATION_FAILED");
     }

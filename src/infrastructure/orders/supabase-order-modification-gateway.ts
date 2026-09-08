@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { InventoryReconciledMovement } from "../../domain";
+import { mapInventoryAlertTransitions } from "../inventory/map-inventory-alert-transitions";
 
 import {
   orderModificationFailure,
@@ -61,8 +62,20 @@ function mapPersistedModification(value: unknown) {
   if (!isRecord(value)) return null;
   const order = mapOrder(value);
   const inventoryMovements = mapInventoryMovements(value.inventory_movements);
-  if (order === null || inventoryMovements === null) return null;
-  return Object.freeze({ order, inventoryMovements });
+  const inventoryAlertTransitions = mapInventoryAlertTransitions(
+    value.inventory_alert_transitions,
+  );
+  if (
+    order === null ||
+    inventoryMovements === null ||
+    inventoryAlertTransitions === null
+  )
+    return null;
+  return Object.freeze({
+    order,
+    inventoryMovements,
+    inventoryAlertTransitions,
+  });
 }
 
 function mapInventoryMovements(

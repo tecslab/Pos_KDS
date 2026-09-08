@@ -1,11 +1,14 @@
 import {
   err,
   ok,
+  type InventoryAlertChanged,
+  type InventoryAlertTransition,
   type InventoryReconciled,
   type InventoryReconciledMovement,
   type OrderUpdated,
   type Result,
 } from "../../domain";
+import { recordInventoryAlertEvents } from "../inventory-alerts";
 import type { AuditClock } from "../audit";
 import {
   AuthorizationService,
@@ -138,6 +141,7 @@ export type ModifiedOrder = Readonly<{
 export type PersistedOrderModification = Readonly<{
   order: ModifiedOrder;
   inventoryMovements: readonly InventoryReconciledMovement[];
+  inventoryAlertTransitions?: readonly InventoryAlertTransition[];
 }>;
 
 export type OrderModificationError = Readonly<{
@@ -165,7 +169,7 @@ export class OrderModificationService {
     private readonly gateway: OrderModificationGateway,
     private readonly clock: AuditClock,
     private readonly operations: TransactionalOperationRunner<
-      OrderUpdated | InventoryReconciled
+      OrderUpdated | InventoryReconciled | InventoryAlertChanged
     >,
   ) {}
 
@@ -199,7 +203,11 @@ export class OrderModificationService {
         }),
       );
       if (!result.ok) return result;
-      const { order, inventoryMovements } = result.value;
+      const {
+        order,
+        inventoryMovements,
+        inventoryAlertTransitions = [],
+      } = result.value;
       events.record(
         Object.freeze({
           type: "order.updated" as const,
@@ -229,6 +237,11 @@ export class OrderModificationService {
           }),
         );
       }
+      recordInventoryAlertEvents(
+        events,
+        order.restaurantId,
+        inventoryAlertTransitions,
+      );
       return modifiedOrderResult(order);
     });
   }

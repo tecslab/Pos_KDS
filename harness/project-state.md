@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-062
-last_completed_task: T-061
+next_suggested_task: T-063
+last_completed_task: T-062
 last_commit: pending
-completed_tasks: 62
+completed_tasks: 63
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -106,6 +106,8 @@ T-060 — Implement inventory adjustment and waste registration (commit pending;
 
 T-061 — Build inventory adjustment and waste UI (commit pending; the task commit cannot self-reference in this tracked state file). Permission-gated adjustment and waste forms clarify signed versus positive quantities, require reasons, show item units and accessible post-save balance feedback, while preserving purchase and immutable-history boundaries.
 
+T-062 — Implement low-stock calculation and inventory alert events (commit pending; the task commit cannot self-reference in this tracked state file). Immutable movement-derived balances are compared strictly against configured minima by database reconciliation; alert history and transition snapshots change only on healthy/low state transitions, and all current movement producers emit sanitized post-commit `inventory.alert` events. The remote migration and rollback probe are verified.
+
 ## Current Task
 
 None.
@@ -116,7 +118,7 @@ None.
 
 ## Next Suggested Task
 
-T-062 — Implement low-stock calculation and inventory alert events.
+T-063 — Build inventory balance, movement, and alert views.
 
 ## Human Checkpoints
 

@@ -46,6 +46,7 @@ function committedRow() {
     notes: null,
     total_amount: "10.00",
     confirmed_at: "2026-08-25T10:00:00+00:00",
+    inventory_alert_transitions: [],
     baskets: [
       {
         id: basketId,
@@ -98,6 +99,7 @@ describe("SupabaseOrderConfirmationGateway", () => {
         notes: null,
         totalAmount: "10.00",
         confirmedAt: "2026-08-25T10:00:00.000Z",
+        inventoryAlertTransitions: [],
         baskets: [
           {
             id: basketId,

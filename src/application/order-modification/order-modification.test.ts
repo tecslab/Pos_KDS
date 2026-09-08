@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
   err,
   ok,
+  type InventoryAlertChanged,
+  type InventoryAlertTransition,
   type InventoryReconciled,
   type OrderUpdated,
   type Result,
@@ -28,6 +30,15 @@ const productVersionId = "36000000-0000-4000-8000-000000000002";
 const optionId = "37000000-0000-4000-8000-000000000001";
 const inventoryItemId = "45000000-0000-4000-8000-000000000001";
 const inventoryMovementId = "46000000-0000-4000-8000-000000000001";
+const alertTransition: InventoryAlertTransition = Object.freeze({
+  inventoryAlertId: "61000000-0000-4000-8000-000000000001",
+  inventoryMovementId,
+  inventoryItemId,
+  status: "ACTIVE",
+  threshold: "5.000",
+  observedBalance: "4.000",
+  occurredAt: "2026-08-28T10:00:00.000Z",
+});
 
 const modified: ModifiedOrder = Object.freeze({
   orderId,
@@ -91,18 +102,27 @@ class Boundary implements TransactionBoundary {
 function setup(
   permissions: readonly string[] = ["orders.edit"],
   movements = inventoryMovements,
+  inventoryAlertTransitions: readonly InventoryAlertTransition[] = [],
 ) {
   const activity: string[] = [];
   const gateway: OrderModificationGateway = {
     modify: vi.fn().mockImplementation(async () => {
       activity.push("rpc");
       return ok(
-        Object.freeze({ order: modified, inventoryMovements: movements }),
+        Object.freeze({
+          order: modified,
+          inventoryMovements: movements,
+          inventoryAlertTransitions,
+        }),
       );
     }),
   };
-  const published: (OrderUpdated | InventoryReconciled)[] = [];
-  const publisher: DomainEventPublisher<OrderUpdated | InventoryReconciled> = {
+  const published: (
+    OrderUpdated | InventoryReconciled | InventoryAlertChanged
+  )[] = [];
+  const publisher: DomainEventPublisher<
+    OrderUpdated | InventoryReconciled | InventoryAlertChanged
+  > = {
     async publish(events) {
       activity.push("publish");
       published.push(...events);
@@ -266,4 +286,40 @@ describe("OrderModificationService", () => {
       expect(gateway.modify).not.toHaveBeenCalled();
     },
   );
+
+  it("records exactly one alert event after a successful committed transition", async () => {
+    const { activity, published, service } = setup(
+      ["orders.edit"],
+      inventoryMovements,
+      [alertTransition],
+    );
+
+    await expect(service.modify(actorId, input())).resolves.toEqual(
+      ok(modified),
+    );
+
+    expect(activity).toEqual([
+      "transaction:start",
+      "rpc",
+      "transaction:commit",
+      "publish",
+    ]);
+    expect(published.map((event) => event.type)).toEqual([
+      "order.updated",
+      "inventory.reconciled",
+      "inventory.alert.changed",
+    ]);
+    expect(
+      published.filter((event) => event.type === "inventory.alert.changed"),
+    ).toEqual([
+      expect.objectContaining({
+        occurredAt: alertTransition.occurredAt,
+        payload: expect.objectContaining({
+          restaurantId,
+          inventoryAlertId: alertTransition.inventoryAlertId,
+          status: "ACTIVE",
+        }),
+      }),
+    ]);
+  });
 });

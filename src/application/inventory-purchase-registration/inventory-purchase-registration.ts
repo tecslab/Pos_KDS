@@ -1,9 +1,12 @@
 import {
   err,
   ok,
+  type InventoryAlertChanged,
+  type InventoryAlertTransition,
   type InventoryPurchaseRegistered,
   type Result,
 } from "../../domain";
+import { recordInventoryAlertEvents } from "../inventory-alerts";
 import type { AuditClock } from "../audit";
 import {
   AuthorizationService,
@@ -65,6 +68,12 @@ export type RegisteredInventoryPurchase = Readonly<{
   lines: readonly RegisteredInventoryPurchaseLine[];
 }>;
 
+export type PersistedInventoryPurchaseRegistration =
+  RegisteredInventoryPurchase &
+    Readonly<{
+      inventoryAlertTransitions: readonly InventoryAlertTransition[];
+    }>;
+
 export type InventoryPurchaseRegistrationError = Readonly<{
   kind: "inventory-purchase-registration-error";
   code:
@@ -80,7 +89,10 @@ export interface InventoryPurchaseRegistrationGateway {
   register(
     command: RegisterInventoryPurchaseCommand,
   ): Promise<
-    Result<RegisteredInventoryPurchase, InventoryPurchaseRegistrationError>
+    Result<
+      RegisteredInventoryPurchase | PersistedInventoryPurchaseRegistration,
+      InventoryPurchaseRegistrationError
+    >
   >;
 }
 
@@ -89,7 +101,9 @@ export class InventoryPurchaseRegistrationService {
     private readonly profiles: AuthorizationProfileReader,
     private readonly gateway: InventoryPurchaseRegistrationGateway,
     private readonly clock: AuditClock,
-    private readonly operations: TransactionalOperationRunner<InventoryPurchaseRegistered>,
+    private readonly operations: TransactionalOperationRunner<
+      InventoryPurchaseRegistered | InventoryAlertChanged
+    >,
   ) {}
 
   async register(
@@ -127,7 +141,14 @@ export class InventoryPurchaseRegistrationService {
       );
       if (!result.ok) return result;
 
-      const purchase = result.value;
+      const purchase =
+        "inventoryAlertTransitions" in result.value
+          ? withoutInventoryAlertTransitions(result.value)
+          : result.value;
+      const inventoryAlertTransitions =
+        "inventoryAlertTransitions" in result.value
+          ? result.value.inventoryAlertTransitions
+          : [];
       events.record(
         Object.freeze({
           type: "inventory.purchase.registered" as const,
@@ -153,7 +174,12 @@ export class InventoryPurchaseRegistrationService {
           }),
         }),
       );
-      return result;
+      recordInventoryAlertEvents(
+        events,
+        purchase.restaurantId,
+        inventoryAlertTransitions,
+      );
+      return registeredInventoryPurchaseResult(purchase);
     });
   }
 }
@@ -274,6 +300,20 @@ export function registeredInventoryPurchaseResult(
   purchase: RegisteredInventoryPurchase,
 ) {
   return ok(purchase);
+}
+
+export function persistedInventoryPurchaseRegistrationResult(
+  persisted: PersistedInventoryPurchaseRegistration,
+) {
+  return ok(persisted);
+}
+
+function withoutInventoryAlertTransitions({
+  inventoryAlertTransitions: _inventoryAlertTransitions,
+  ...purchase
+}: PersistedInventoryPurchaseRegistration): RegisteredInventoryPurchase {
+  void _inventoryAlertTransitions;
+  return Object.freeze(purchase);
 }
 
 function failure(code: InventoryPurchaseRegistrationError["code"]) {

@@ -26,6 +26,7 @@ export { OrderDeliveredRealtimePublisher } from "./order-delivered-realtime-publ
 export { PaymentCompletedRealtimePublisher } from "./payment-completed-realtime-publisher";
 export { InventoryAdjustmentWasteRegisteredRealtimePublisher } from "./inventory-adjustment-waste-registered-realtime-publisher";
 export { InventoryPurchaseRegisteredRealtimePublisher } from "./inventory-purchase-registered-realtime-publisher";
+export { InventoryAlertChangedRealtimePublisher } from "./inventory-alert-changed-realtime-publisher";
 export type {
   RealtimeMessageHandler,
   RealtimeSubscriber,

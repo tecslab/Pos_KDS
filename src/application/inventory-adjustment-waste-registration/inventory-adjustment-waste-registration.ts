@@ -1,9 +1,12 @@
 import {
   err,
   ok,
+  type InventoryAlertChanged,
+  type InventoryAlertTransition,
   type InventoryAdjustmentWasteRegistered,
   type Result,
 } from "../../domain";
+import { recordInventoryAlertEvents } from "../inventory-alerts";
 import type { AuditClock } from "../audit";
 import {
   AuthorizationService,
@@ -50,6 +53,12 @@ export type RegisteredInventoryAdjustmentWaste = Readonly<{
   newBalance: string;
 }>;
 
+export type PersistedInventoryAdjustmentWasteRegistration =
+  RegisteredInventoryAdjustmentWaste &
+    Readonly<{
+      inventoryAlertTransitions: readonly InventoryAlertTransition[];
+    }>;
+
 export type InventoryAdjustmentWasteRegistrationError = Readonly<{
   kind: "inventory-adjustment-waste-registration-error";
   code:
@@ -66,7 +75,8 @@ export interface InventoryAdjustmentWasteRegistrationGateway {
     command: RegisterInventoryAdjustmentWasteCommand,
   ): Promise<
     Result<
-      RegisteredInventoryAdjustmentWaste,
+      | RegisteredInventoryAdjustmentWaste
+      | PersistedInventoryAdjustmentWasteRegistration,
       InventoryAdjustmentWasteRegistrationError
     >
   >;
@@ -77,7 +87,9 @@ export class InventoryAdjustmentWasteRegistrationService {
     private readonly profiles: AuthorizationProfileReader,
     private readonly gateway: InventoryAdjustmentWasteRegistrationGateway,
     private readonly clock: AuditClock,
-    private readonly operations: TransactionalOperationRunner<InventoryAdjustmentWasteRegistered>,
+    private readonly operations: TransactionalOperationRunner<
+      InventoryAdjustmentWasteRegistered | InventoryAlertChanged
+    >,
   ) {}
 
   async register(
@@ -128,7 +140,14 @@ export class InventoryAdjustmentWasteRegistrationService {
       );
       if (!result.ok) return result;
 
-      const movement = result.value;
+      const movement =
+        "inventoryAlertTransitions" in result.value
+          ? withoutInventoryAlertTransitions(result.value)
+          : result.value;
+      const inventoryAlertTransitions =
+        "inventoryAlertTransitions" in result.value
+          ? result.value.inventoryAlertTransitions
+          : [];
       events.record(
         Object.freeze({
           type:
@@ -149,7 +168,12 @@ export class InventoryAdjustmentWasteRegistrationService {
           }),
         }),
       );
-      return result;
+      recordInventoryAlertEvents(
+        events,
+        movement.restaurantId,
+        inventoryAlertTransitions,
+      );
+      return registeredInventoryAdjustmentWasteResult(movement);
     });
   }
 }
@@ -233,6 +257,20 @@ export function registeredInventoryAdjustmentWasteResult(
   movement: RegisteredInventoryAdjustmentWaste,
 ) {
   return ok(movement);
+}
+
+export function persistedInventoryAdjustmentWasteRegistrationResult(
+  persisted: PersistedInventoryAdjustmentWasteRegistration,
+) {
+  return ok(persisted);
+}
+
+function withoutInventoryAlertTransitions({
+  inventoryAlertTransitions: _inventoryAlertTransitions,
+  ...movement
+}: PersistedInventoryAdjustmentWasteRegistration): RegisteredInventoryAdjustmentWaste {
+  void _inventoryAlertTransitions;
+  return Object.freeze(movement);
 }
 
 function failure(code: InventoryAdjustmentWasteRegistrationError["code"]) {

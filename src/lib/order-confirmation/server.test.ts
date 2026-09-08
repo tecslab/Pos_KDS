@@ -9,6 +9,11 @@ const dependencies = vi.hoisted(() => ({
   transaction: vi.fn(),
   realtimePublisher: vi.fn(),
   orderConfirmedPublisher: vi.fn(),
+  orderConfirmedPublish: vi.fn(),
+  inventoryAlertPublisher: vi.fn(),
+  inventoryAlertPublish: vi.fn(),
+  dispatcher: vi.fn(),
+  subscribe: vi.fn(),
   operationRunner: vi.fn(),
   service: vi.fn(),
 }));
@@ -50,10 +55,31 @@ vi.mock("../../infrastructure/realtime", () => ({
     }
   },
 }));
+vi.mock("../../infrastructure/events", () => ({
+  InProcessDomainEventPublisher: class {
+    constructor() {
+      dependencies.dispatcher();
+    }
+    subscribe(type: unknown, handler: unknown) {
+      dependencies.subscribe(type, handler);
+    }
+  },
+}));
 vi.mock("../../application", () => ({
+  InventoryAlertChangedRealtimePublisher: class {
+    constructor(publisher: unknown) {
+      dependencies.inventoryAlertPublisher(publisher);
+    }
+    publish(events: unknown) {
+      return dependencies.inventoryAlertPublish(events);
+    }
+  },
   OrderConfirmedRealtimePublisher: class {
     constructor(publisher: unknown) {
       dependencies.orderConfirmedPublisher(publisher);
+    }
+    publish(events: unknown) {
+      return dependencies.orderConfirmedPublish(events);
     }
   },
   TransactionalOperationRunner: class {
@@ -83,13 +109,20 @@ beforeEach(() => {
   dependencies.transaction.mockReset();
   dependencies.realtimePublisher.mockReset();
   dependencies.orderConfirmedPublisher.mockReset();
+  dependencies.orderConfirmedPublish.mockReset();
+  dependencies.inventoryAlertPublisher.mockReset();
+  dependencies.inventoryAlertPublish.mockReset();
+  dependencies.dispatcher.mockReset();
+  dependencies.subscribe.mockReset();
   dependencies.operationRunner.mockReset();
   dependencies.service.mockReset();
   dependencies.createSupabaseAdminClient.mockReturnValue(dependencies.client);
+  dependencies.orderConfirmedPublish.mockResolvedValue(undefined);
+  dependencies.inventoryAlertPublish.mockResolvedValue(undefined);
 });
 
 describe("createOrderConfirmationService", () => {
-  it("composes confirmation and realtime publication with one admin client", () => {
+  it("composes confirmation and realtime publication with one admin client", async () => {
     createOrderConfirmationService();
 
     expect(dependencies.createSupabaseAdminClient).toHaveBeenCalledOnce();
@@ -103,7 +136,35 @@ describe("createOrderConfirmationService", () => {
     expect(dependencies.clock).toHaveBeenCalledOnce();
     expect(dependencies.transaction).toHaveBeenCalledOnce();
     expect(dependencies.orderConfirmedPublisher).toHaveBeenCalledOnce();
+    expect(dependencies.inventoryAlertPublisher).toHaveBeenCalledOnce();
+    expect(dependencies.dispatcher).toHaveBeenCalledOnce();
     expect(dependencies.operationRunner).toHaveBeenCalledOnce();
     expect(dependencies.service).toHaveBeenCalledOnce();
+    expect(dependencies.subscribe).toHaveBeenCalledWith(
+      "order.confirmed",
+      expect.any(Function),
+    );
+    expect(dependencies.subscribe).toHaveBeenCalledWith(
+      "inventory.alert.changed",
+      expect.any(Function),
+    );
+
+    const orderEvent = Object.freeze({ type: "order.confirmed" });
+    const orderHandler = dependencies.subscribe.mock.calls[0]?.[1] as (
+      event: unknown,
+    ) => Promise<void>;
+    await orderHandler(orderEvent);
+    expect(dependencies.orderConfirmedPublish).toHaveBeenCalledWith([
+      orderEvent,
+    ]);
+
+    const alertEvent = Object.freeze({ type: "inventory.alert.changed" });
+    const alertHandler = dependencies.subscribe.mock.calls[1]?.[1] as (
+      event: unknown,
+    ) => Promise<void>;
+    await alertHandler(alertEvent);
+    expect(dependencies.inventoryAlertPublish).toHaveBeenCalledWith([
+      alertEvent,
+    ]);
   });
 });
