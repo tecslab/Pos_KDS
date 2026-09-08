@@ -151,6 +151,17 @@ export {
   type NavigationItem,
 } from "./navigation";
 export {
+  InventoryAdjustmentWasteRegistrationService,
+  inventoryAdjustmentWasteRegistrationFailure,
+  registeredInventoryAdjustmentWasteResult,
+  type InventoryAdjustmentWasteOperation,
+  type InventoryAdjustmentWasteRegistrationError,
+  type InventoryAdjustmentWasteRegistrationGateway,
+  type RegisterInventoryAdjustmentWasteCommand,
+  type RegisterInventoryAdjustmentWasteInput,
+  type RegisteredInventoryAdjustmentWaste,
+} from "./inventory-adjustment-waste-registration";
+export {
   InventoryItemAdministrationService,
   type InventoryItem,
   type InventoryItemAdministrationError,
@@ -302,6 +313,7 @@ export {
 } from "./printing";
 export {
   mapDomainEventToRealtime,
+  InventoryAdjustmentWasteRegisteredRealtimePublisher,
   OrderConfirmedRealtimePublisher,
   OrderCancelledRealtimePublisher,
   OrderOnTheWayRealtimePublisher,

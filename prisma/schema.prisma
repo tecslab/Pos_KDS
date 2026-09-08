@@ -9,23 +9,25 @@ datasource db {
 }
 
 model ApplicationUser {
-  id                 String               @id @db.Uuid
-  displayName        String               @map("display_name")
-  isActive           Boolean              @default(true) @map("is_active")
-  createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt          DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                 String                 @id @db.Uuid
+  displayName        String                 @map("display_name")
+  isActive           Boolean                @default(true) @map("is_active")
+  createdAt          DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
   roles              UserRoleAssignment[]
   auditEvents        AuditEvent[]
-  assignedOrders     Order[]              @relation("AssignedWaiter")
+  assignedOrders     Order[]                @relation("AssignedWaiter")
   orderCancellations OrderCancellation[]
-  recordedPayments   Payment[]            @relation("PaymentRecorder")
-  authorizedOverages Payment[]            @relation("PaymentOverageAuthorizer")
+  recordedPayments   Payment[]              @relation("PaymentRecorder")
+  authorizedOverages Payment[]              @relation("PaymentOverageAuthorizer")
   inventoryMovements InventoryMovement[]
-  recipeVersions     RecipeVersion[]      @relation("RecipeVersionCreator")
-  createdBatches     ProductionBatch[]    @relation("ProductionBatchCreator")
-  completedBatches   ProductionBatch[]    @relation("ProductionBatchCompleter")
+  recipeVersions     RecipeVersion[]        @relation("RecipeVersionCreator")
+  createdBatches     ProductionBatch[]      @relation("ProductionBatchCreator")
+  completedBatches   ProductionBatch[]      @relation("ProductionBatchCompleter")
   operatingExpenses  OperatingExpense[]
   recordedPurchases  InventoryPurchase[]
+  adjustments        InventoryAdjustment[]
+  wasteRecords       InventoryWasteRecord[]
   removedOrderLines  OrderLineRemoval[]
 
   @@map("application_users")
@@ -116,6 +118,8 @@ model Restaurant {
   recipes            Recipe[]
   expenseCategories  ExpenseCategory[]
   inventoryPurchases InventoryPurchase[]
+  adjustments        InventoryAdjustment[]
+  wasteRecords       InventoryWasteRecord[]
 
   @@map("restaurants")
 }
@@ -544,6 +548,8 @@ model InventoryItem {
   recipeIngredients     RecipeIngredient[]      @relation("RecipeIngredientItem")
   resaleProductVersions ProductVersion[]        @relation("ProductVersionResaleItem")
   purchaseLines         InventoryPurchaseLine[]
+  adjustmentRecords     InventoryAdjustment[]
+  wasteRecords          InventoryWasteRecord[]
 
   @@unique([restaurantId, name])
   @@unique([restaurantId, id])
@@ -569,6 +575,8 @@ model InventoryMovement {
   reversedMovement   InventoryMovement?          @relation("InventoryMovementReversal", fields: [restaurantId, inventoryItemId, reversedMovementId], references: [restaurantId, inventoryItemId, id], onDelete: Restrict, onUpdate: Restrict, map: "inventory_movements_reversed_fkey")
   reversalMovements  InventoryMovement[]         @relation("InventoryMovementReversal")
   purchaseLine       InventoryPurchaseLine?      @relation("PurchaseLineMovement")
+  adjustmentOrigin   InventoryAdjustment?        @relation("AdjustmentMovement")
+  wasteOrigin        InventoryWasteRecord?       @relation("WasteMovement")
 
   @@unique([restaurantId, inventoryItemId, id], map: "inventory_movements_item_id_key")
   @@index([restaurantId, inventoryItemId, recordedAt])
@@ -792,4 +800,50 @@ model InventoryPurchaseLine {
   @@unique([restaurantId, inventoryMovementId], map: "inventory_purchase_lines_movement_key")
   @@index([restaurantId, inventoryItemId])
   @@map("inventory_purchase_lines")
+}
+
+model InventoryAdjustment {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId        String            @map("restaurant_id") @db.Uuid
+  inventoryItemId     String            @map("inventory_item_id") @db.Uuid
+  inventoryMovementId String            @map("inventory_movement_id") @db.Uuid
+  quantityDelta       Decimal           @map("quantity_delta") @db.Decimal(14, 3)
+  unitOfMeasure       String            @map("unit_of_measure")
+  reason              String
+  recordedById        String            @map("recorded_by_id") @db.Uuid
+  recordedAt          DateTime          @default(now()) @map("recorded_at") @db.Timestamptz(6)
+  restaurant          Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  inventoryItem       InventoryItem     @relation(fields: [restaurantId, inventoryItemId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "inventory_adjustments_item_fkey")
+  inventoryMovement   InventoryMovement @relation("AdjustmentMovement", fields: [restaurantId, inventoryItemId, inventoryMovementId], references: [restaurantId, inventoryItemId, id], onDelete: Restrict, onUpdate: Restrict, map: "inventory_adjustments_movement_fkey")
+  recordedBy          ApplicationUser   @relation(fields: [recordedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([restaurantId, id])
+  @@unique([restaurantId, inventoryItemId, inventoryMovementId], map: "inventory_adjustments_item_movement_key")
+  @@unique([restaurantId, inventoryMovementId], map: "inventory_adjustments_movement_key")
+  @@index([restaurantId, inventoryItemId, recordedAt])
+  @@index([recordedById, recordedAt])
+  @@map("inventory_adjustments")
+}
+
+model InventoryWasteRecord {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId        String            @map("restaurant_id") @db.Uuid
+  inventoryItemId     String            @map("inventory_item_id") @db.Uuid
+  inventoryMovementId String            @map("inventory_movement_id") @db.Uuid
+  quantity            Decimal           @db.Decimal(14, 3)
+  unitOfMeasure       String            @map("unit_of_measure")
+  reason              String
+  recordedById        String            @map("recorded_by_id") @db.Uuid
+  recordedAt          DateTime          @default(now()) @map("recorded_at") @db.Timestamptz(6)
+  restaurant          Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  inventoryItem       InventoryItem     @relation(fields: [restaurantId, inventoryItemId], references: [restaurantId, id], onDelete: Restrict, onUpdate: Restrict, map: "inventory_waste_records_item_fkey")
+  inventoryMovement   InventoryMovement @relation("WasteMovement", fields: [restaurantId, inventoryItemId, inventoryMovementId], references: [restaurantId, inventoryItemId, id], onDelete: Restrict, onUpdate: Restrict, map: "inventory_waste_records_movement_fkey")
+  recordedBy          ApplicationUser   @relation(fields: [recordedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([restaurantId, id])
+  @@unique([restaurantId, inventoryItemId, inventoryMovementId], map: "inventory_waste_records_item_movement_key")
+  @@unique([restaurantId, inventoryMovementId], map: "inventory_waste_records_movement_key")
+  @@index([restaurantId, inventoryItemId, recordedAt])
+  @@index([recordedById, recordedAt])
+  @@map("inventory_waste_records")
 }

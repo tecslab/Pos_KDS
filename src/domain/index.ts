@@ -21,6 +21,12 @@ export type {
 } from "./business-error";
 export type { DomainEvent } from "./domain-event";
 export type {
+  InventoryAdjustmentRegistered,
+  InventoryAdjustmentWasteRegistered,
+  InventoryAdjustmentWasteRegisteredPayload,
+  InventoryWasteRegistered,
+} from "./inventory-adjustment-waste-registered";
+export type {
   InventoryReconciled,
   InventoryReconciledMovement,
   InventoryReconciledPayload,

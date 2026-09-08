@@ -1,7 +1,7 @@
 ---
 id: T-060
 title: "Implement inventory adjustment and waste registration"
-status: todo
+status: done
 priority: high
 size: medium
 type: domain

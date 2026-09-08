@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-060
-last_completed_task: T-059
+next_suggested_task: T-061
+last_completed_task: T-060
 last_commit: pending
-completed_tasks: 60
+completed_tasks: 61
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -102,6 +102,8 @@ T-058 — Implement inventory purchase registration (commit pending; the task co
 
 T-059 — Build inventory purchase registration UI (commit pending; the task commit cannot self-reference in this tracked state file). Includes an Admin-authorized responsive purchase form, selectable item context with visible units, success/failure feedback, and explicit accessible feedback when an action's authorized service result is rejected.
 
+T-060 — Implement inventory adjustment and waste registration (commit pending; the task commit cannot self-reference in this tracked state file). Distinct permission-authorized operations atomically append immutable adjustment or waste origins and inventory movements with required reasons, audit provenance, configured negative-stock validation, and post-commit inventory updates; the remote migration and rollback probe are verified.
+
 ## Current Task
 
 None.
@@ -112,7 +114,7 @@ None.
 
 ## Next Suggested Task
 
-T-060 — Implement inventory adjustment and waste registration.
+T-061 — Build inventory adjustment and waste UI.
 
 ## Human Checkpoints
 
