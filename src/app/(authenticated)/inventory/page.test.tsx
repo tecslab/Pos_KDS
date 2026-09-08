@@ -1,16 +1,23 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { requireServerAuthorizationContext, list } = vi.hoisted(() => ({
-  requireServerAuthorizationContext: vi.fn(),
+const { authorize, list, listViews } = vi.hoisted(() => ({
+  authorize: vi.fn(),
   list: vi.fn(),
+  listViews: vi.fn(),
 }));
 
 vi.mock("@/lib/auth/server-authorization", () => ({
-  requireServerAuthorizationContext,
+  requireServerPermission: authorize,
 }));
 vi.mock("@/lib/inventory-purchase-registration/context", () => ({
   createInventoryPurchaseContextService: () => ({ list }),
+}));
+vi.mock("@/lib/inventory-views/server", () => ({
+  createInventoryViewsService: () => ({ list: listViews }),
+}));
+vi.mock("./inventory-workspace", () => ({
+  InventoryWorkspace: () => <p>inventory views</p>,
 }));
 vi.mock("./purchase-registration-form", () => ({
   PurchaseRegistrationForm: () => null,
@@ -36,6 +43,7 @@ const context = Object.freeze({
   items: Object.freeze([]),
   expenseCategories: Object.freeze([]),
 });
+const views = Object.freeze({ balances: [], movements: [], activeAlerts: [] });
 
 async function page(status?: string) {
   return renderToStaticMarkup(
@@ -47,28 +55,29 @@ async function page(status?: string) {
 
 describe("InventoryPage", () => {
   beforeEach(() => {
-    requireServerAuthorizationContext.mockReset();
+    authorize
+      .mockReset()
+      .mockResolvedValue({ permissionCodes: ["inventory.view"] });
     list.mockReset();
+    listViews.mockReset().mockResolvedValue({ ok: true, value: views });
   });
 
   it("shows the permitted inventory workspace and confirmed purchase feedback", async () => {
-    requireServerAuthorizationContext.mockResolvedValue({
-      permissionCodes: ["inventory.purchases.register"],
+    authorize.mockResolvedValue({
+      permissionCodes: ["inventory.view", "inventory.purchases.register"],
     });
     list.mockResolvedValue({ ok: true, value: context });
 
     const markup = await page("registered");
 
-    expect(requireServerAuthorizationContext).toHaveBeenCalledWith(
-      "/inventory",
-    );
+    expect(authorize).toHaveBeenCalledWith("inventory.view", "/inventory");
     expect(markup).toContain('role="status"');
     expect(markup).toContain("Compra registrada. El inventario y el gasto");
   });
 
   it("presents a clear alert when the server rejects stale or invalid input", async () => {
-    requireServerAuthorizationContext.mockResolvedValue({
-      permissionCodes: ["inventory.purchases.register"],
+    authorize.mockResolvedValue({
+      permissionCodes: ["inventory.view", "inventory.purchases.register"],
     });
     list.mockResolvedValue({ ok: true, value: context });
 
@@ -79,8 +88,8 @@ describe("InventoryPage", () => {
   });
 
   it("visibly explains when a rejected purchase action redirects as unauthorized", async () => {
-    requireServerAuthorizationContext.mockResolvedValue({
-      permissionCodes: ["inventory.purchases.register"],
+    authorize.mockResolvedValue({
+      permissionCodes: ["inventory.view", "inventory.purchases.register"],
     });
     list.mockResolvedValue({ ok: true, value: context });
 
@@ -94,8 +103,9 @@ describe("InventoryPage", () => {
   });
 
   it("renders adjustment and waste forms from their independently granted permissions", async () => {
-    requireServerAuthorizationContext.mockResolvedValue({
+    authorize.mockResolvedValue({
       permissionCodes: [
+        "inventory.view",
         "inventory.adjustments.register",
         "inventory.waste.register",
       ],
@@ -106,5 +116,25 @@ describe("InventoryPage", () => {
 
     expect(markup).toContain("forms:true:true");
     expect(markup).not.toContain("Entrega de proveedor");
+  });
+
+  it("keeps registration permissions out of the read boundary", async () => {
+    await page();
+
+    expect(authorize).toHaveBeenCalledWith("inventory.view", "/inventory");
+    expect(list).not.toHaveBeenCalled();
+    expect(listViews).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows a safe persisted-view failure without attempting a form mutation", async () => {
+    listViews.mockResolvedValue({
+      ok: false,
+      error: { code: "OPERATION_FAILED" },
+    });
+
+    const markup = await page();
+
+    expect(markup).toContain("No se pudo cargar el inventario");
+    expect(markup).toContain('role="alert"');
   });
 });

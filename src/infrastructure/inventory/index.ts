@@ -10,3 +10,7 @@ export {
 export { SupabaseInventoryPurchaseContextReader } from "./supabase-inventory-purchase-context-reader";
 export { SupabaseInventoryPurchaseRegistrationTransactionBoundary } from "./supabase-inventory-purchase-registration-transaction-boundary";
 export { mapInventoryAlertTransitions } from "./map-inventory-alert-transitions";
+export {
+  InventoryViewsReadError,
+  SupabaseInventoryViewsReader,
+} from "./supabase-inventory-views-reader";

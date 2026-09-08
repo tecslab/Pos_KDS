@@ -1,7 +1,7 @@
 ---
 id: T-063
 title: "Build inventory balance, movement, and alert views"
-status: todo
+status: done
 priority: high
 size: medium
 type: feature

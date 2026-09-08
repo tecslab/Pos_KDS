@@ -179,6 +179,15 @@ export {
   type SaveInventoryItemInput,
 } from "./inventory-item-administration";
 export {
+  InventoryViewsService,
+  type InventoryBalanceView,
+  type InventoryLowStockAlertView,
+  type InventoryMovementView,
+  type InventoryViews,
+  type InventoryViewsError,
+  type InventoryViewsReader,
+} from "./inventory-views";
+export {
   InventoryPurchaseContextService,
   type InventoryPurchaseContext,
   type InventoryPurchaseContextError,

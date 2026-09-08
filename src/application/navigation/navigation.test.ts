@@ -28,7 +28,7 @@ describe("buildNavigation", () => {
   it("combines permissions across roles without consulting role names", () => {
     expect(
       ids([
-        "inventory.purchases.register",
+        "inventory.view",
         "production.batch.create",
         "reports.view",
         "administration.products.manage",
@@ -61,7 +61,12 @@ describe("buildNavigation", () => {
     ).toBeUndefined();
   });
 
-  it("makes inventory reachable with a supported inventory-operation permission", () => {
+  it("makes inventory reachable with its exact view permission", () => {
+    expect(
+      buildNavigation(["inventory.view"]).find(
+        (item) => item.id === "inventory",
+      ),
+    ).toMatchObject({ href: "/inventory", available: true });
     for (const permission of [
       "inventory.purchases.register",
       "inventory.adjustments.register",
@@ -69,13 +74,8 @@ describe("buildNavigation", () => {
     ]) {
       expect(
         buildNavigation([permission]).find((item) => item.id === "inventory"),
-      ).toMatchObject({ href: "/inventory", available: true });
+      ).toBeUndefined();
     }
-    expect(
-      buildNavigation(["inventory.view"]).find(
-        (item) => item.id === "inventory",
-      ),
-    ).toBeUndefined();
   });
 
   it("returns detached immutable presentation data and makes implemented modules reachable", () => {

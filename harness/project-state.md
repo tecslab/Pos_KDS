@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-063
-last_completed_task: T-062
+next_suggested_task: T-064
+last_completed_task: T-063
 last_commit: pending
-completed_tasks: 63
+completed_tasks: 64
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -108,6 +108,8 @@ T-061 — Build inventory adjustment and waste UI (commit pending; the task comm
 
 T-062 — Implement low-stock calculation and inventory alert events (commit pending; the task commit cannot self-reference in this tracked state file). Immutable movement-derived balances are compared strictly against configured minima by database reconciliation; alert history and transition snapshots change only on healthy/low state transitions, and all current movement producers emit sanitized post-commit `inventory.alert` events. The remote migration and rollback probe are verified.
 
+T-063 — Build inventory balance, movement, and alert views (commit pending; the task commit cannot self-reference in this tracked state file). Authorized inventory views show persisted balances, immutable movement traceability and origins, and active low-stock alerts with provider-independent realtime refetch; registration forms remain separate and the inventory navigation entry requires `inventory.view`.
+
 ## Current Task
 
 None.
@@ -118,7 +120,7 @@ None.
 
 ## Next Suggested Task
 
-T-063 — Build inventory balance, movement, and alert views.
+T-064 — Implement transactional production-batch completion.
 
 ## Human Checkpoints
 

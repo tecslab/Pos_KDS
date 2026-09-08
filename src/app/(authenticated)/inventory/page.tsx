@@ -1,8 +1,9 @@
-import { unauthorizedError } from "../../../domain";
-import { requireServerAuthorizationContext } from "@/lib/auth/server-authorization";
+import { requireServerPermission } from "@/lib/auth/server-authorization";
 import { createInventoryPurchaseContextService } from "@/lib/inventory-purchase-registration/context";
+import { createInventoryViewsService } from "@/lib/inventory-views/server";
 
 import { AdjustmentWasteRegistrationForms } from "./adjustment-waste-registration-forms";
+import { InventoryWorkspace } from "./inventory-workspace";
 import { PurchaseRegistrationForm } from "./purchase-registration-form";
 
 type PageProps = Readonly<{
@@ -29,36 +30,34 @@ const feedback: Readonly<Record<string, string>> = {
 };
 
 export default async function InventoryPage({ searchParams }: PageProps) {
-  const [authorization, context, params] = await Promise.all([
-    requireServerAuthorizationContext("/inventory"),
-    createInventoryPurchaseContextService().list(),
-    searchParams,
-  ]);
+  const authorization = await requireServerPermission(
+    "inventory.view",
+    "/inventory",
+  );
   const permissions = new Set(authorization.permissionCodes);
   const canRegisterPurchase = permissions.has("inventory.purchases.register");
   const canRegisterAdjustment = permissions.has(
     "inventory.adjustments.register",
   );
   const canRegisterWaste = permissions.has("inventory.waste.register");
-  if (!canRegisterPurchase && !canRegisterAdjustment && !canRegisterWaste) {
-    throw unauthorizedError();
-  }
+  const [views, context, params] = await Promise.all([
+    createInventoryViewsService().list(),
+    canRegisterPurchase || canRegisterAdjustment || canRegisterWaste
+      ? createInventoryPurchaseContextService().list()
+      : Promise.resolve(null),
+    searchParams,
+  ]);
   const rawStatus = params.status;
   const status = Array.isArray(rawStatus) ? rawStatus[0] : rawStatus;
   const isError = status !== "registered";
 
   return (
     <div>
-      <header>
-        <p className="text-sm font-semibold text-[var(--brand-green)]">
-          Inventario
-        </p>
-        <h1 className="mt-2 text-3xl font-bold">Movimientos de inventario</h1>
-        <p className="mt-2 max-w-3xl text-[var(--color-text-muted)]">
-          Registra compras, ajustes físicos y desperdicios. Cada movimiento
-          conserva su motivo, responsable y saldo resultante.
-        </p>
-      </header>
+      {views.ok ? (
+        <InventoryWorkspace initialViews={views.value} />
+      ) : (
+        <InventoryLoadFailure />
+      )}
 
       {status && feedback[status] ? (
         <p
@@ -69,12 +68,12 @@ export default async function InventoryPage({ searchParams }: PageProps) {
         </p>
       ) : null}
 
-      {!context.ok ? (
+      {context !== null && !context.ok ? (
         <p role="alert" className="mt-6 text-[var(--status-critical)]">
           No se pudo cargar la información necesaria para registrar movimientos
           de inventario. Actualiza la página e inténtalo nuevamente.
         </p>
-      ) : (
+      ) : context !== null && context.ok ? (
         <div className="mt-6 space-y-6">
           {canRegisterPurchase ? (
             <section
@@ -100,7 +99,22 @@ export default async function InventoryPage({ searchParams }: PageProps) {
             />
           ) : null}
         </div>
-      )}
+      ) : null}
     </div>
+  );
+}
+
+function InventoryLoadFailure() {
+  return (
+    <section
+      role="alert"
+      className="rounded-lg border border-[var(--status-critical)] bg-[var(--status-critical-bg)] p-6 text-[var(--status-critical)]"
+    >
+      <h1 className="text-2xl font-bold">No se pudo cargar el inventario</h1>
+      <p className="mt-2">
+        Actualiza la página para volver a consultar los saldos, movimientos y
+        alertas.
+      </p>
+    </section>
   );
 }
