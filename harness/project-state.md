@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-064
-last_completed_task: T-063
+next_suggested_task: T-065
+last_completed_task: T-064
 last_commit: pending
-completed_tasks: 64
+completed_tasks: 65
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -110,6 +110,8 @@ T-062 — Implement low-stock calculation and inventory alert events (commit pen
 
 T-063 — Build inventory balance, movement, and alert views (commit pending; the task commit cannot self-reference in this tracked state file). Authorized inventory views show persisted balances, immutable movement traceability and origins, and active low-stock alerts with provider-independent realtime refetch; registration forms remain separate and the inventory navigation entry requires `inventory.view`.
 
+T-064 — Implement transactional production-batch completion (commit pending; the task commit cannot self-reference in this tracked state file). Administrator-authorized production atomically selects an immutable recipe version, creates and completes a batch, consumes ingredients, adds produced stock, writes immutable audit/history and low-stock transitions, and emits sanitized post-commit production/inventory events. The original remote migration and its forward-only qualification repair are applied and verified; the rollback-only probe passed.
+
 ## Current Task
 
 None.
@@ -120,7 +122,7 @@ None.
 
 ## Next Suggested Task
 
-T-064 — Implement transactional production-batch completion.
+T-065 — Build production registration and history UI.
 
 ## Human Checkpoints
 

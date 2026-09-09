@@ -1,7 +1,7 @@
 ---
 id: T-064
 title: "Implement transactional production-batch completion"
-status: todo
+status: done
 priority: high
 size: medium
 type: domain

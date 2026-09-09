@@ -6,6 +6,7 @@ export const realtimeTopics = [
   "delivery",
   "payments",
   "inventory",
+  "production",
 ] as const;
 
 export type RealtimeTopic = (typeof realtimeTopics)[number];
@@ -19,6 +20,7 @@ export const realtimeEventNames = [
   "payment.completed",
   "inventory.updated",
   "inventory.alert",
+  "production.completed",
 ] as const;
 
 export type RealtimeEventName = (typeof realtimeEventNames)[number];

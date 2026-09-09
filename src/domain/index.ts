@@ -51,6 +51,12 @@ export type {
   PaymentCompleted,
   PaymentCompletedPayload,
 } from "./payment-completed";
+export type {
+  ProductionCompleted,
+  ProductionCompletedIngredient,
+  ProductionCompletedOutput,
+  ProductionCompletedPayload,
+} from "./production-completed";
 export type { OrderUpdated, OrderUpdatedPayload } from "./order-updated";
 export { err, ok } from "./result";
 export type { Err, Ok, Result } from "./result";

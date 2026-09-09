@@ -35,6 +35,7 @@ const routes = Object.freeze({
   "payment.completed": Object.freeze(["payments", "orders"]),
   "inventory.updated": Object.freeze(["inventory"]),
   "inventory.alert": Object.freeze(["inventory"]),
+  "production.completed": Object.freeze(["production", "inventory"]),
 } satisfies Readonly<Record<RealtimeEventName, readonly RealtimeTopic[]>>);
 
 const invalidRealtimeEvent: InvalidRealtimeEventError = Object.freeze({
