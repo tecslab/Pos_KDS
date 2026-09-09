@@ -59,6 +59,17 @@ export {
   type DailySalesReportRestaurant,
   type HourlyRevenue,
 } from "./daily-sales-report";
+export {
+  OperationalPerformanceReportService,
+  UNATTRIBUTED_HISTORICAL_CATEGORY,
+  type OperationalCategorySale,
+  type OperationalHourlyCount,
+  type OperationalPerformanceReport,
+  type OperationalPerformanceReportError,
+  type OperationalPerformanceReportInput,
+  type OperationalPerformanceReportReader,
+  type OperationalProductSale,
+} from "./operational-performance-report";
 export { recordInventoryAlertEvents } from "./inventory-alerts";
 export {
   DeliveryQueueService,

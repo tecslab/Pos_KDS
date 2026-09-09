@@ -1,7 +1,7 @@
 ---
 id: T-067
 title: "Build product, kitchen, and delivery performance reports"
-status: todo
+status: done
 priority: medium
 size: medium
 type: feature
@@ -25,6 +25,10 @@ definition_of_done: harness/definition-of-done.md
 ## Not Included
 
 - Employee disciplinary scoring or exports.
+
+## Approved Historical Category Policy
+
+For pre-existing sale snapshots that lack transaction-time category data, category reporting must group the sale under the exact label **Unattributed historical category**. The report must never infer that legacy category from the mutable current catalog. Future sales must persist a category snapshot at transaction time, so later product recategorization cannot alter historical category reporting.
 
 ## Definition of Done
 

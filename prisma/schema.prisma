@@ -412,6 +412,8 @@ model OrderLineSaleSnapshot {
   revisionNumber     Int               @map("revision_number")
   productVersionId   String            @map("product_version_id") @db.Uuid
   productName        String            @map("product_name")
+  categoryId         String?           @map("category_id") @db.Uuid
+  categoryName       String?           @map("category_name")
   quantity           Int
   baseUnitPrice      Decimal           @map("base_unit_price") @db.Decimal(12, 2)
   finalUnitPrice     Decimal           @map("final_unit_price") @db.Decimal(12, 2)
@@ -432,6 +434,7 @@ model OrderLineSaleSnapshot {
   @@unique([restaurantId, orderLineId, revisionNumber], map: "order_line_snapshots_line_revision_key")
   @@unique([restaurantId, orderLineId, id], map: "order_line_snapshots_current_key")
   @@index([restaurantId, productVersionId], map: "order_line_snapshots_product_version_idx")
+  @@index([restaurantId, categoryId], map: "order_line_snapshots_category_idx")
   @@map("order_line_sale_snapshots")
 }
 

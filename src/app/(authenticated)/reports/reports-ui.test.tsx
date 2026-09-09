@@ -4,8 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const dependencies = vi.hoisted(() => ({
   authorize: vi.fn(),
   createService: vi.fn(),
+  createOperationalService: vi.fn(),
   listRestaurants: vi.fn(),
   read: vi.fn(),
+  operationalRead: vi.fn(),
 }));
 
 vi.mock("@/lib/auth/server-authorization", () => ({
@@ -13,6 +15,10 @@ vi.mock("@/lib/auth/server-authorization", () => ({
 }));
 vi.mock("@/lib/daily-sales-report/server", () => ({
   createDailySalesReportService: dependencies.createService,
+}));
+vi.mock("@/lib/operational-performance-report/server", () => ({
+  createOperationalPerformanceReportService:
+    dependencies.createOperationalService,
 }));
 vi.mock("@/application", () => ({
   currentGuayaquilDate: () => "2026-09-06",
@@ -42,6 +48,44 @@ const report = Object.freeze({
     ),
   ),
 });
+const operationalReport = Object.freeze({
+  restaurant: restaurants[0],
+  date: "2026-09-06",
+  timeZone: "America/Guayaquil" as const,
+  periodStart: "2026-09-06T05:00:00.000Z",
+  periodEnd: "2026-09-07T05:00:00.000Z",
+  productSales: Object.freeze([]),
+  categorySales: Object.freeze([]),
+  averagePreparationMinutes: "12.00",
+  longestPreparationMinutes: "15.00",
+  ordersCurrentlyInPreparation: 1,
+  peakPreparationPeriods: Object.freeze(
+    Array.from({ length: 24 }, (_, hour) => ({ hour, orders: 0 })),
+  ),
+  averageReadyToOnTheWayMinutes: "3.00",
+  averageOnTheWayToDeliveredMinutes: "8.00",
+  deliveredOrders: 2,
+  ordersWaitingForDelivery: 1,
+});
+const populatedOperationalReport = Object.freeze({
+  ...operationalReport,
+  productSales: Object.freeze([
+    Object.freeze({
+      productId: "20000000-0000-4000-8000-000000000001",
+      productName: "Taco al pastor",
+      quantitySold: 7,
+      revenue: "42.00",
+    }),
+  ]),
+  categorySales: Object.freeze([
+    Object.freeze({
+      categoryId: null,
+      categoryName: "Unattributed historical category",
+      quantitySold: 7,
+      revenue: "42.00",
+    }),
+  ]),
+});
 
 beforeEach(() => {
   dependencies.authorize.mockReset().mockResolvedValue({ userId: actorId });
@@ -49,11 +93,17 @@ beforeEach(() => {
     listRestaurants: dependencies.listRestaurants,
     read: dependencies.read,
   });
+  dependencies.createOperationalService.mockReset().mockReturnValue({
+    read: dependencies.operationalRead,
+  });
   dependencies.listRestaurants.mockReset().mockResolvedValue({
     ok: true,
     value: restaurants,
   });
   dependencies.read.mockReset().mockResolvedValue({ ok: true, value: report });
+  dependencies.operationalRead
+    .mockReset()
+    .mockResolvedValue({ ok: true, value: operationalReport });
 });
 
 async function render(params: Record<string, string> = {}) {
@@ -74,6 +124,12 @@ describe("daily sales dashboard UI", () => {
       dependencies.createService.mock.invocationCallOrder[0],
     );
     expect(dependencies.read).toHaveBeenCalledWith({
+      actorId,
+      restaurantId,
+      date: "2026-09-06",
+      timeZone: "America/Guayaquil",
+    });
+    expect(dependencies.operationalRead).toHaveBeenCalledWith({
       actorId,
       restaurantId,
       date: "2026-09-06",
@@ -142,5 +198,36 @@ describe("daily sales dashboard UI", () => {
     const markup = await render({ date: "2026-09-06", restaurantId });
     expect(markup.match(/scope="row"/g)).toHaveLength(24);
     expect(markup).toContain("$0,00");
+  });
+
+  it("renders nonempty persisted product, category, kitchen, and delivery metrics", async () => {
+    dependencies.operationalRead.mockResolvedValue({
+      ok: true,
+      value: populatedOperationalReport,
+    });
+
+    const markup = await render({ date: "2026-09-06", restaurantId });
+    expect(markup).toContain("Productos más vendidos");
+    expect(markup).toContain("Taco al pastor");
+    expect(markup).toContain("Unattributed historical category");
+    expect(markup).toContain("$42,00");
+    expect(markup).toContain("Preparación");
+    expect(markup).toContain("12.00 min");
+    expect(markup).toContain("Tiempos y cuellos de botella");
+    expect(markup).toContain("3.00 min");
+    expect(markup).toContain("8.00 min");
+    expect(markup).toContain("Esperando entrega");
+  });
+
+  it("shows a safe accessible failure when the operational report cannot load", async () => {
+    dependencies.operationalRead.mockResolvedValue({
+      ok: false,
+      error: { code: "OPERATION_FAILED", detail: "private database details" },
+    });
+
+    const markup = await render({ date: "2026-09-06", restaurantId });
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain("No se pudo cargar el reporte operativo");
+    expect(markup).not.toContain("private database details");
   });
 });

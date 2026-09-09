@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-067
-last_completed_task: T-066
+next_suggested_task: T-068
+last_completed_task: T-067
 last_commit: pending
-completed_tasks: 67
+completed_tasks: 68
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -114,6 +114,8 @@ T-064 — Implement transactional production-batch completion (commit pending; t
 
 T-065 — Build production registration and history UI (commit pending; the task commit cannot self-reference in this tracked state file). Permission-derived production registration separates batch creation, recipe editing, and history viewing; it accepts selected active recipe versions, quantity and optional notes, provides actionable insufficient-stock feedback, and renders immutable completed-batch product, recipe/version, quantity, actor, timestamp, and notes without edit or scheduling controls.
 
+T-067 — Build product, kitchen, and delivery performance reports (commit pending; the task commit cannot self-reference in this tracked state file). Persisted, permission-protected operational reporting provides product/category, kitchen, and delivery metrics. Human-approved historical category policy: legacy sale snapshots without transaction-time category data are grouped as `Unattributed historical category`, never inferred from mutable catalog data; future sale snapshots preserve a category snapshot so recategorization cannot revise historical reports.
+
 ## Current Task
 
 None.
@@ -124,7 +126,7 @@ None.
 
 ## Next Suggested Task
 
-T-067 — Build product, kitchen, and delivery performance reports.
+T-068 — Build payment reporting.
 
 ## Human Checkpoints
 

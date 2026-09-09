@@ -1,6 +1,7 @@
 import { currentGuayaquilDate, REPORTING_TIME_ZONE } from "@/application";
 import { requireServerPermission } from "@/lib/auth/server-authorization";
 import { createDailySalesReportService } from "@/lib/daily-sales-report/server";
+import { createOperationalPerformanceReportService } from "@/lib/operational-performance-report/server";
 
 import { DailySalesDashboard } from "./daily-sales-dashboard";
 
@@ -16,6 +17,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     "/reports",
   );
   const service = createDailySalesReportService();
+  const operationalService = createOperationalPerformanceReportService();
   const [restaurantsResult, params] = await Promise.all([
     service.listRestaurants(),
     searchParams,
@@ -33,12 +35,20 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   const restaurantId =
     first(params.restaurantId) ?? restaurantsResult.value[0].id;
   const date = first(params.date) ?? currentGuayaquilDate();
-  const report = await service.read({
-    actorId: authorization.userId,
-    restaurantId,
-    date,
-    timeZone: REPORTING_TIME_ZONE,
-  });
+  const [report, operationalReport] = await Promise.all([
+    service.read({
+      actorId: authorization.userId,
+      restaurantId,
+      date,
+      timeZone: REPORTING_TIME_ZONE,
+    }),
+    operationalService.read({
+      actorId: authorization.userId,
+      restaurantId,
+      date,
+      timeZone: REPORTING_TIME_ZONE,
+    }),
+  ]);
 
   if (!report.ok) {
     return (
@@ -53,11 +63,15 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
       />
     );
   }
+  if (!operationalReport.ok) {
+    return <ReportFailure message="No se pudo cargar el reporte operativo." />;
+  }
 
   return (
     <DailySalesDashboard
       report={report.value}
       restaurants={restaurantsResult.value}
+      operationalReport={operationalReport.value}
     />
   );
 }
