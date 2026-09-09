@@ -1,7 +1,7 @@
 ---
 id: T-065
 title: "Build production registration and history UI"
-status: todo
+status: done
 priority: high
 size: medium
 type: feature

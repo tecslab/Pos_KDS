@@ -158,11 +158,11 @@ describe("buildNavigation", () => {
   });
 
   it.each(["production.batch.create", "production.history.view"])(
-    "keeps production visible but unavailable with only %s",
+    "makes production available with each independently granted capability: %s",
     (permission) => {
       expect(
         buildNavigation([permission]).find((item) => item.id === "production"),
-      ).toMatchObject({ href: "/production", available: false });
+      ).toMatchObject({ href: "/production", available: true });
     },
   );
 

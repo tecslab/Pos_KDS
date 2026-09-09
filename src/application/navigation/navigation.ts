@@ -109,8 +109,6 @@ export function buildNavigation(
           icon: item.icon,
           available:
             item.available &&
-            (item.id !== "production" ||
-              grants.has("production.recipes.edit")) &&
             (item.id !== "administration" ||
               grants.has("administration.users.manage") ||
               grants.has("administration.restaurant.configure") ||

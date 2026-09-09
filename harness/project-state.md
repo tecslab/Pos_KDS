@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-065
-last_completed_task: T-064
+next_suggested_task: T-066
+last_completed_task: T-065
 last_commit: pending
-completed_tasks: 65
+completed_tasks: 66
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -112,6 +112,8 @@ T-063 — Build inventory balance, movement, and alert views (commit pending; th
 
 T-064 — Implement transactional production-batch completion (commit pending; the task commit cannot self-reference in this tracked state file). Administrator-authorized production atomically selects an immutable recipe version, creates and completes a batch, consumes ingredients, adds produced stock, writes immutable audit/history and low-stock transitions, and emits sanitized post-commit production/inventory events. The original remote migration and its forward-only qualification repair are applied and verified; the rollback-only probe passed.
 
+T-065 — Build production registration and history UI (commit pending; the task commit cannot self-reference in this tracked state file). Permission-derived production registration separates batch creation, recipe editing, and history viewing; it accepts selected active recipe versions, quantity and optional notes, provides actionable insufficient-stock feedback, and renders immutable completed-batch product, recipe/version, quantity, actor, timestamp, and notes without edit or scheduling controls.
+
 ## Current Task
 
 None.
@@ -122,7 +124,7 @@ None.
 
 ## Next Suggested Task
 
-T-065 — Build production registration and history UI.
+T-066 — Build the daily sales dashboard.
 
 ## Human Checkpoints
 
