@@ -68,7 +68,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-063 Build inventory balance, movement, and alert views
 - [x] T-064 Implement transactional production-batch completion
 - [x] T-065 Build production registration and history UI
-- [ ] T-066 Build the daily sales dashboard
+- [x] T-066 Build the daily sales dashboard
 - [ ] T-067 Build product, kitchen, and delivery performance reports
 - [ ] T-068 Build payment reporting
 - [ ] T-069 Build inventory, production, and expense reporting

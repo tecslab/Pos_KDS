@@ -46,6 +46,19 @@ export {
 } from "./authorization";
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
+export {
+  DailySalesReportService,
+  REPORTING_TIME_ZONE,
+  currentGuayaquilDate,
+  parseDailySalesReportQuery,
+  type DailySalesReport,
+  type DailySalesReportError,
+  type DailySalesReportInput,
+  type DailySalesReportQuery,
+  type DailySalesReportReader,
+  type DailySalesReportRestaurant,
+  type HourlyRevenue,
+} from "./daily-sales-report";
 export { recordInventoryAlertEvents } from "./inventory-alerts";
 export {
   DeliveryQueueService,

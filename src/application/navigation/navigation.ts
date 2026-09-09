@@ -39,10 +39,7 @@ const navigationDefinitions: readonly NavigationDefinition[] = Object.freeze([
     ],
     true,
   ),
-  definition("reports", "Reportes", "/reports", [
-    "reports.view",
-    "reports.export",
-  ]),
+  definition("reports", "Reportes", "/reports", ["reports.view"], true),
   definition(
     "administration",
     "Administración",

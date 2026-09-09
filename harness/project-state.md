@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-066
-last_completed_task: T-065
+next_suggested_task: T-067
+last_completed_task: T-066
 last_commit: pending
-completed_tasks: 66
+completed_tasks: 67
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -124,7 +124,7 @@ None.
 
 ## Next Suggested Task
 
-T-066 — Build the daily sales dashboard.
+T-067 — Build product, kitchen, and delivery performance reports.
 
 ## Human Checkpoints
 

@@ -89,7 +89,7 @@ describe("buildNavigation", () => {
     expect(navigation.every(Object.isFrozen)).toBe(true);
     expect(
       navigation.filter((item) => item.available).map((item) => item.id),
-    ).toEqual(["home", "orders", "kitchen"]);
+    ).toEqual(["home", "orders", "kitchen", "reports"]);
   });
 
   it("makes the PoS reachable only with orders.create, matching its page boundary", () => {
@@ -111,6 +111,15 @@ describe("buildNavigation", () => {
       buildNavigation(["kitchen.ready.mark"]).find(
         (item) => item.id === "kitchen",
       ),
+    ).toBeUndefined();
+  });
+
+  it("makes reports reachable only with reports.view, matching its page boundary", () => {
+    expect(
+      buildNavigation(["reports.view"]).find((item) => item.id === "reports"),
+    ).toMatchObject({ href: "/reports", available: true });
+    expect(
+      buildNavigation(["reports.export"]).find((item) => item.id === "reports"),
     ).toBeUndefined();
   });
 

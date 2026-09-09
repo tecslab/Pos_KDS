@@ -364,6 +364,8 @@ model Order {
 
   @@unique([restaurantId, id])
   @@index([restaurantId, status, createdAt])
+  @@index([restaurantId, createdAt], map: "orders_restaurant_created_at_idx")
+  @@index([restaurantId, paidAt], map: "orders_restaurant_paid_at_idx")
   @@index([restaurantId, serviceLocationId, status])
   @@index([assignedWaiterId, status])
   @@map("orders")
@@ -486,6 +488,7 @@ model Payment {
 
   @@unique([restaurantId, id])
   @@index([restaurantId, basketId, recordedAt])
+  @@index([restaurantId, recordedAt], map: "payments_restaurant_recorded_at_idx")
   @@index([restaurantId, paymentMethodId])
   @@index([recordedById, recordedAt])
   @@index([overageAuthorizedById])

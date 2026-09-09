@@ -1,7 +1,7 @@
 ---
 id: T-066
 title: "Build the daily sales dashboard"
-status: todo
+status: done
 priority: high
 size: medium
 type: feature
