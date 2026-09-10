@@ -2,12 +2,15 @@ import type {
   DailySalesReport,
   DailySalesReportRestaurant,
   OperationalPerformanceReport,
+  PaymentBalance,
+  PaymentReport,
 } from "@/application";
 
 type DailySalesDashboardProps = Readonly<{
   report: DailySalesReport;
   restaurants: readonly DailySalesReportRestaurant[];
   operationalReport: OperationalPerformanceReport;
+  paymentReport: PaymentReport;
 }>;
 
 const currency = new Intl.NumberFormat("es-EC", {
@@ -21,6 +24,7 @@ export function DailySalesDashboard({
   report,
   restaurants,
   operationalReport,
+  paymentReport,
 }: DailySalesDashboardProps) {
   const peakRevenue = Math.max(
     0,
@@ -179,7 +183,303 @@ export function DailySalesDashboard({
       </section>
 
       <OperationalPerformancePanel report={operationalReport} />
+      <PaymentReportPanel report={paymentReport} />
     </div>
+  );
+}
+
+function PaymentReportPanel({ report }: Readonly<{ report: PaymentReport }>) {
+  return (
+    <section aria-labelledby="payment-report-title" className="mt-5 space-y-5">
+      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
+        <p className="text-sm font-semibold text-[var(--brand-green)]">
+          Conciliación de pagos
+        </p>
+        <h2 id="payment-report-title" className="mt-1 text-xl font-bold">
+          Ingresos, saldos e historial
+        </h2>
+        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+          Los ingresos y el historial corresponden al día seleccionado. Los
+          saldos se reconstruyen al cierre del día desde líneas y pagos
+          inmutables.
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <Metric
+            label="Ingresos cobrados"
+            value={formatMoney(report.totalRevenue)}
+          />
+          <Metric
+            label="Saldo pendiente al cierre"
+            value={formatMoney(report.totalOutstanding)}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-5 xl:grid-cols-2">
+        <RevenueByMethod report={report} />
+        <BalanceTable
+          id="outstanding-balances-title"
+          title="Saldos pendientes al cierre"
+          emptyMessage="No había saldos pendientes al cierre del día."
+          balances={report.outstandingBalances}
+        />
+      </div>
+
+      <BalanceTable
+        id="partial-payments-title"
+        title="Pagos parciales al cierre"
+        emptyMessage="No había canastas parcialmente pagadas al cierre del día."
+        balances={report.partialPayments}
+      />
+      <PaymentHistory report={report} />
+    </section>
+  );
+}
+
+function RevenueByMethod({ report }: Readonly<{ report: PaymentReport }>) {
+  return (
+    <section
+      aria-labelledby="revenue-by-method-title"
+      className="overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)]"
+    >
+      <h3
+        id="revenue-by-method-title"
+        className="border-b border-[var(--color-border)] px-5 py-4 text-lg font-bold"
+      >
+        Ingresos por método
+      </h3>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]">
+            <tr>
+              <th scope="col" className="px-4 py-3 font-semibold">
+                Método registrado
+              </th>
+              <th scope="col" className="px-4 py-3 text-right font-semibold">
+                Pagos
+              </th>
+              <th scope="col" className="px-4 py-3 text-right font-semibold">
+                Ingresos
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {report.revenueByMethod.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={3}
+                  className="px-4 py-4 text-[var(--color-text-muted)]"
+                >
+                  No se registraron pagos en el día.
+                </td>
+              </tr>
+            ) : (
+              report.revenueByMethod.map((method) => (
+                <tr
+                  key={`${method.paymentMethodCode}:${method.paymentMethodName}`}
+                  className="border-t border-[var(--color-border)]"
+                >
+                  <th scope="row" className="px-4 py-3 font-semibold">
+                    {method.paymentMethodName}
+                    <span className="mt-1 block text-xs font-normal text-[var(--color-text-muted)]">
+                      {method.paymentMethodCode}
+                    </span>
+                  </th>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {method.paymentCount}
+                  </td>
+                  <td className="px-4 py-3 text-right font-semibold tabular-nums">
+                    {formatMoney(method.amount)}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function BalanceTable({
+  id,
+  title,
+  emptyMessage,
+  balances,
+}: Readonly<{
+  id: string;
+  title: string;
+  emptyMessage: string;
+  balances: readonly PaymentBalance[];
+}>) {
+  return (
+    <section
+      aria-labelledby={id}
+      className="overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)]"
+    >
+      <h3
+        id={id}
+        className="border-b border-[var(--color-border)] px-5 py-4 text-lg font-bold"
+      >
+        {title}
+      </h3>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]">
+            <tr>
+              <th scope="col" className="px-4 py-3 font-semibold">
+                Orden / canasta
+              </th>
+              <th scope="col" className="px-4 py-3 text-right font-semibold">
+                Total
+              </th>
+              <th scope="col" className="px-4 py-3 text-right font-semibold">
+                Pagado
+              </th>
+              <th scope="col" className="px-4 py-3 text-right font-semibold">
+                Pendiente
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {balances.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-4 py-4 text-[var(--color-text-muted)]"
+                >
+                  {emptyMessage}
+                </td>
+              </tr>
+            ) : (
+              balances.map((balance) => (
+                <tr
+                  key={balance.basketId}
+                  className="border-t border-[var(--color-border)]"
+                >
+                  <th scope="row" className="px-4 py-3 font-semibold">
+                    {balance.orderNumber}
+                    <span className="mt-1 block font-mono text-xs font-normal text-[var(--color-text-muted)]">
+                      {balance.basketId}
+                    </span>
+                  </th>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {formatMoney(balance.basketTotal)}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {formatMoney(balance.paidAmount)}
+                  </td>
+                  <td className="px-4 py-3 text-right font-semibold tabular-nums">
+                    {formatMoney(balance.outstandingBalance)}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function PaymentHistory({ report }: Readonly<{ report: PaymentReport }>) {
+  return (
+    <section
+      aria-labelledby="payment-history-title"
+      className="overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)]"
+    >
+      <div className="border-b border-[var(--color-border)] px-5 py-4">
+        <h3 id="payment-history-title" className="text-lg font-bold">
+          Historial inmutable de pagos
+        </h3>
+        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+          Cada fila conserva el método, usuario, hora y evidencia registrados
+          con la transacción.
+        </p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-[960px] text-left text-sm">
+          <thead className="bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]">
+            <tr>
+              <th scope="col" className="px-4 py-3 font-semibold">
+                Hora
+              </th>
+              <th scope="col" className="px-4 py-3 font-semibold">
+                Orden / canasta
+              </th>
+              <th scope="col" className="px-4 py-3 font-semibold">
+                Método
+              </th>
+              <th scope="col" className="px-4 py-3 font-semibold">
+                Registrado por
+              </th>
+              <th scope="col" className="px-4 py-3 font-semibold">
+                Referencia y notas
+              </th>
+              <th scope="col" className="px-4 py-3 text-right font-semibold">
+                Importe
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {report.paymentHistory.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-4 py-4 text-[var(--color-text-muted)]"
+                >
+                  No se registraron pagos en el día.
+                </td>
+              </tr>
+            ) : (
+              report.paymentHistory.map((payment) => (
+                <tr
+                  key={payment.id}
+                  className="border-t border-[var(--color-border)] align-top"
+                >
+                  <td className="px-4 py-3 tabular-nums">
+                    {formatLocalTime(payment.recordedAt)}
+                  </td>
+                  <th scope="row" className="px-4 py-3 font-semibold">
+                    {payment.orderNumber}
+                    <span className="mt-1 block font-mono text-xs font-normal text-[var(--color-text-muted)]">
+                      {payment.basketId}
+                    </span>
+                  </th>
+                  <td className="px-4 py-3">
+                    {payment.paymentMethodName}
+                    <span className="mt-1 block text-xs text-[var(--color-text-muted)]">
+                      {payment.paymentMethodCode}
+                    </span>
+                  </td>
+                  <td className="max-w-52 break-all px-4 py-3 font-mono text-xs">
+                    {payment.recordedById}
+                  </td>
+                  <td className="max-w-72 px-4 py-3">
+                    <span className="block">
+                      {payment.referenceNumber ?? "Sin referencia"}
+                    </span>
+                    {payment.comments ? (
+                      <span className="mt-1 block text-[var(--color-text-muted)]">
+                        {payment.comments}
+                      </span>
+                    ) : null}
+                    {payment.overageReason ? (
+                      <span className="mt-2 block text-[var(--status-warning)]">
+                        Excedente autorizado: {payment.overageReason}
+                      </span>
+                    ) : null}
+                  </td>
+                  <td className="px-4 py-3 text-right font-semibold tabular-nums">
+                    {formatMoney(payment.amount)}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 
@@ -416,4 +716,14 @@ function Metric({ label, value }: Readonly<{ label: string; value: string }>) {
 
 function formatMoney(value: string) {
   return currency.format(Number(value));
+}
+
+function formatLocalTime(value: string) {
+  return new Intl.DateTimeFormat("es-EC", {
+    timeZone: "America/Guayaquil",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).format(new Date(value));
 }

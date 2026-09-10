@@ -5,9 +5,11 @@ const dependencies = vi.hoisted(() => ({
   authorize: vi.fn(),
   createService: vi.fn(),
   createOperationalService: vi.fn(),
+  createPaymentService: vi.fn(),
   listRestaurants: vi.fn(),
   read: vi.fn(),
   operationalRead: vi.fn(),
+  paymentRead: vi.fn(),
 }));
 
 vi.mock("@/lib/auth/server-authorization", () => ({
@@ -19,6 +21,9 @@ vi.mock("@/lib/daily-sales-report/server", () => ({
 vi.mock("@/lib/operational-performance-report/server", () => ({
   createOperationalPerformanceReportService:
     dependencies.createOperationalService,
+}));
+vi.mock("@/lib/payment-report/server", () => ({
+  createPaymentReportService: dependencies.createPaymentService,
 }));
 vi.mock("@/application", () => ({
   currentGuayaquilDate: () => "2026-09-06",
@@ -86,6 +91,51 @@ const populatedOperationalReport = Object.freeze({
     }),
   ]),
 });
+const paymentBalance = Object.freeze({
+  orderId: "40000000-0000-4000-8000-000000000001",
+  orderNumber: "ORD-001",
+  basketId: "50000000-0000-4000-8000-000000000001",
+  basketTotal: "20.00",
+  paidAmount: "5.00",
+  outstandingBalance: "15.00",
+});
+const paymentReport = Object.freeze({
+  restaurant: restaurants[0],
+  date: "2026-09-06",
+  timeZone: "America/Guayaquil" as const,
+  periodStart: "2026-09-06T05:00:00.000Z",
+  periodEnd: "2026-09-07T05:00:00.000Z",
+  totalRevenue: "10.00",
+  totalOutstanding: "15.00",
+  revenueByMethod: Object.freeze([
+    Object.freeze({
+      paymentMethodCode: "CASH",
+      paymentMethodName: "Efectivo",
+      paymentCount: 1,
+      amount: "10.00",
+    }),
+  ]),
+  outstandingBalances: Object.freeze([paymentBalance]),
+  partialPayments: Object.freeze([paymentBalance]),
+  paymentHistory: Object.freeze([
+    Object.freeze({
+      id: "60000000-0000-4000-8000-000000000001",
+      orderId: "40000000-0000-4000-8000-000000000002",
+      orderNumber: "ORD-002",
+      basketId: "50000000-0000-4000-8000-000000000002",
+      amount: "10.00",
+      paymentMethodCode: "CASH",
+      paymentMethodName: "Efectivo",
+      recordedById: actorId,
+      recordedAt: "2026-09-06T18:05:06.000Z",
+      referenceNumber: "REF-001",
+      comments: "Pago parcial",
+      overageAuthorizedById: null,
+      overageAuthorizedAt: null,
+      overageReason: null,
+    }),
+  ]),
+});
 
 beforeEach(() => {
   dependencies.authorize.mockReset().mockResolvedValue({ userId: actorId });
@@ -96,6 +146,9 @@ beforeEach(() => {
   dependencies.createOperationalService.mockReset().mockReturnValue({
     read: dependencies.operationalRead,
   });
+  dependencies.createPaymentService.mockReset().mockReturnValue({
+    read: dependencies.paymentRead,
+  });
   dependencies.listRestaurants.mockReset().mockResolvedValue({
     ok: true,
     value: restaurants,
@@ -104,6 +157,9 @@ beforeEach(() => {
   dependencies.operationalRead
     .mockReset()
     .mockResolvedValue({ ok: true, value: operationalReport });
+  dependencies.paymentRead
+    .mockReset()
+    .mockResolvedValue({ ok: true, value: paymentReport });
 });
 
 async function render(params: Record<string, string> = {}) {
@@ -130,6 +186,12 @@ describe("daily sales dashboard UI", () => {
       timeZone: "America/Guayaquil",
     });
     expect(dependencies.operationalRead).toHaveBeenCalledWith({
+      actorId,
+      restaurantId,
+      date: "2026-09-06",
+      timeZone: "America/Guayaquil",
+    });
+    expect(dependencies.paymentRead).toHaveBeenCalledWith({
       actorId,
       restaurantId,
       date: "2026-09-06",
@@ -162,7 +224,7 @@ describe("daily sales dashboard UI", () => {
     expect(markup).toContain("Ingresos cobrados en cada hora local");
     expect(markup).toContain("00:00");
     expect(markup).toContain("23:00");
-    expect(markup.match(/scope="row"/g)).toHaveLength(24);
+    expect(markup.match(/>\d{2}:00<\/th>/g)).toHaveLength(24);
   });
 
   it("shows a safe accessible error for invalid or failed report input", async () => {
@@ -196,7 +258,7 @@ describe("daily sales dashboard UI", () => {
     });
 
     const markup = await render({ date: "2026-09-06", restaurantId });
-    expect(markup.match(/scope="row"/g)).toHaveLength(24);
+    expect(markup.match(/>\d{2}:00<\/th>/g)).toHaveLength(24);
     expect(markup).toContain("$0,00");
   });
 
@@ -228,6 +290,55 @@ describe("daily sales dashboard UI", () => {
     const markup = await render({ date: "2026-09-06", restaurantId });
     expect(markup).toContain('role="alert"');
     expect(markup).toContain("No se pudo cargar el reporte operativo");
+    expect(markup).not.toContain("private database details");
+  });
+
+  it("renders revenue by immutable method snapshot, end-of-day balances, partial payments, and payment history", async () => {
+    const markup = await render({ date: "2026-09-06", restaurantId });
+
+    expect(markup).toContain("Conciliación de pagos");
+    expect(markup).toContain("Ingresos por método");
+    expect(markup).toContain("Efectivo");
+    expect(markup).toContain("Saldos pendientes al cierre");
+    expect(markup).toContain("Pagos parciales al cierre");
+    expect(markup).toContain("Historial inmutable de pagos");
+    expect(markup).toContain("ORD-001");
+    expect(markup).toContain("ORD-002");
+    expect(markup).toContain("REF-001");
+    expect(markup).toContain("Pago parcial");
+    expect(markup).toContain("13:05:06");
+    expect(markup).toContain("overflow-x-auto");
+  });
+
+  it("renders explicit empty payment-report states", async () => {
+    dependencies.paymentRead.mockResolvedValue({
+      ok: true,
+      value: {
+        ...paymentReport,
+        totalRevenue: "0.00",
+        totalOutstanding: "0.00",
+        revenueByMethod: [],
+        outstandingBalances: [],
+        partialPayments: [],
+        paymentHistory: [],
+      },
+    });
+
+    const markup = await render({ date: "2026-09-06", restaurantId });
+    expect(markup).toContain("No había saldos pendientes");
+    expect(markup).toContain("No había canastas parcialmente pagadas");
+    expect(markup.match(/No se registraron pagos en el día/g)).toHaveLength(2);
+  });
+
+  it("shows a safe accessible failure when the payment report cannot load", async () => {
+    dependencies.paymentRead.mockResolvedValue({
+      ok: false,
+      error: { code: "OPERATION_FAILED", detail: "private database details" },
+    });
+
+    const markup = await render({ date: "2026-09-06", restaurantId });
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain("No se pudo cargar el reporte de pagos");
     expect(markup).not.toContain("private database details");
   });
 });

@@ -385,6 +385,7 @@ model CustomerBasket {
 
   @@unique([restaurantId, id])
   @@index([restaurantId, orderId, status])
+  @@index([restaurantId, createdAt], map: "customer_baskets_restaurant_created_at_idx")
   @@map("customer_baskets")
 }
 

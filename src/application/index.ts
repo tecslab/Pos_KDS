@@ -70,6 +70,16 @@ export {
   type OperationalPerformanceReportReader,
   type OperationalProductSale,
 } from "./operational-performance-report";
+export {
+  PaymentReportService,
+  type PaymentBalance,
+  type PaymentMethodRevenue,
+  type PaymentReport,
+  type PaymentReportError,
+  type PaymentReportHistoryEntry,
+  type PaymentReportInput,
+  type PaymentReportReader,
+} from "./payment-report";
 export { recordInventoryAlertEvents } from "./inventory-alerts";
 export {
   DeliveryQueueService,

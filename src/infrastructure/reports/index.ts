@@ -7,3 +7,7 @@ export {
   SupabaseOperationalPerformanceReportReader,
   mapOperationalPerformanceReportRow,
 } from "./supabase-operational-performance-report-reader";
+export {
+  SupabasePaymentReportReader,
+  mapPaymentReportRow,
+} from "./supabase-payment-report-reader";

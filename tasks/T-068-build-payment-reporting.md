@@ -1,7 +1,7 @@
 ---
 id: T-068
 title: "Build payment reporting"
-status: todo
+status: done
 priority: medium
 size: small
 type: feature

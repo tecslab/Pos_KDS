@@ -70,7 +70,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-065 Build production registration and history UI
 - [x] T-066 Build the daily sales dashboard
 - [x] T-067 Build product, kitchen, and delivery performance reports
-- [ ] T-068 Build payment reporting
+- [x] T-068 Build payment reporting
 - [ ] T-069 Build inventory, production, and expense reporting
 - [ ] T-070 Add PDF and spreadsheet report exports
 - [ ] T-071 Add end-to-end coverage for the core order lifecycle

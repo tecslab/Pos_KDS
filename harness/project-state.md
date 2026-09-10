@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-068
-last_completed_task: T-067
+next_suggested_task: T-069
+last_completed_task: T-068
 last_commit: pending
-completed_tasks: 68
+completed_tasks: 69
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -116,6 +116,8 @@ T-065 — Build production registration and history UI (commit pending; the task
 
 T-067 — Build product, kitchen, and delivery performance reports (commit pending; the task commit cannot self-reference in this tracked state file). Persisted, permission-protected operational reporting provides product/category, kitchen, and delivery metrics. Human-approved historical category policy: legacy sale snapshots without transaction-time category data are grouped as `Unattributed historical category`, never inferred from mutable catalog data; future sale snapshots preserve a category snapshot so recategorization cannot revise historical reports.
 
+T-068 — Build payment reporting (commit pending; the task commit cannot self-reference in this tracked state file). `reports.view`-protected persisted reporting exposes revenue grouped by immutable payment-method snapshots, historical outstanding and partial balances, and immutable payment history. A forward-only remote repair reconstructs balances from pre-cutoff immutable line revisions, removals, cancellations, and payments, so later pending-order changes cannot rewrite past reports; both remote migrations and the rollback-only probe are verified.
+
 ## Current Task
 
 None.
@@ -126,7 +128,7 @@ None.
 
 ## Next Suggested Task
 
-T-068 — Build payment reporting.
+T-069 — Build inventory, production, and expense reporting.
 
 ## Human Checkpoints
 
