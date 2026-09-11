@@ -1,16 +1,20 @@
 import type {
   DailySalesReport,
   DailySalesReportRestaurant,
+  InventoryProductionExpenseReport,
   OperationalPerformanceReport,
   PaymentBalance,
   PaymentReport,
 } from "@/application";
+
+import { InventoryProductionExpenseReportPanel } from "./inventory-production-expense-report-panel";
 
 type DailySalesDashboardProps = Readonly<{
   report: DailySalesReport;
   restaurants: readonly DailySalesReportRestaurant[];
   operationalReport: OperationalPerformanceReport;
   paymentReport: PaymentReport;
+  inventoryProductionExpenseReport: InventoryProductionExpenseReport;
 }>;
 
 const currency = new Intl.NumberFormat("es-EC", {
@@ -25,6 +29,7 @@ export function DailySalesDashboard({
   restaurants,
   operationalReport,
   paymentReport,
+  inventoryProductionExpenseReport,
 }: DailySalesDashboardProps) {
   const peakRevenue = Math.max(
     0,
@@ -184,6 +189,9 @@ export function DailySalesDashboard({
 
       <OperationalPerformancePanel report={operationalReport} />
       <PaymentReportPanel report={paymentReport} />
+      <InventoryProductionExpenseReportPanel
+        report={inventoryProductionExpenseReport}
+      />
     </div>
   );
 }

@@ -569,6 +569,7 @@ model InventoryMovement {
   id                 String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   restaurantId       String                      @map("restaurant_id") @db.Uuid
   inventoryItemId    String                      @map("inventory_item_id") @db.Uuid
+  inventoryItemName  String                      @map("inventory_item_name_snapshot")
   type               InventoryMovementType
   quantityDelta      Decimal                     @map("quantity_delta") @db.Decimal(14, 3)
   unitOfMeasure      String                      @map("unit_of_measure")
@@ -719,6 +720,9 @@ model ProductionBatch {
   id               String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   restaurantId     String                @map("restaurant_id") @db.Uuid
   recipeVersionId  String                @map("recipe_version_id") @db.Uuid
+  recipeName       String                @map("recipe_name_snapshot")
+  outputItemId     String                @map("output_inventory_item_id_snapshot") @db.Uuid
+  outputItemName   String                @map("output_inventory_item_name_snapshot")
   status           ProductionBatchStatus
   plannedQuantity  Decimal               @map("planned_quantity") @db.Decimal(14, 3)
   producedQuantity Decimal?              @map("produced_quantity") @db.Decimal(14, 3)

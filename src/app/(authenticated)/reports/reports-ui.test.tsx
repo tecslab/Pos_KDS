@@ -6,10 +6,12 @@ const dependencies = vi.hoisted(() => ({
   createService: vi.fn(),
   createOperationalService: vi.fn(),
   createPaymentService: vi.fn(),
+  createInventoryProductionExpenseService: vi.fn(),
   listRestaurants: vi.fn(),
   read: vi.fn(),
   operationalRead: vi.fn(),
   paymentRead: vi.fn(),
+  inventoryProductionExpenseRead: vi.fn(),
 }));
 
 vi.mock("@/lib/auth/server-authorization", () => ({
@@ -24,6 +26,10 @@ vi.mock("@/lib/operational-performance-report/server", () => ({
 }));
 vi.mock("@/lib/payment-report/server", () => ({
   createPaymentReportService: dependencies.createPaymentService,
+}));
+vi.mock("@/lib/inventory-production-expense-report/server", () => ({
+  createInventoryProductionExpenseReportService:
+    dependencies.createInventoryProductionExpenseService,
 }));
 vi.mock("@/application", () => ({
   currentGuayaquilDate: () => "2026-09-06",
@@ -136,6 +142,109 @@ const paymentReport = Object.freeze({
     }),
   ]),
 });
+const inventoryProductionExpenseReport = Object.freeze({
+  restaurant: restaurants[0],
+  date: "2026-09-06",
+  timeZone: "America/Guayaquil" as const,
+  periodStart: "2026-09-06T05:00:00.000Z",
+  periodEnd: "2026-09-07T05:00:00.000Z",
+  monthStart: "2026-09-01T05:00:00.000Z",
+  monthEnd: "2026-10-01T05:00:00.000Z",
+  inventoryBalances: Object.freeze([
+    Object.freeze({
+      inventoryItemId: "40000000-0000-4000-8000-000000000001",
+      inventoryItemName: "Maíz",
+      inventoryItemType: "RAW_INGREDIENT",
+      unitOfMeasure: "kg",
+      minimumStockLevel: "5.000",
+      currentBalance: "4.000",
+      isBelowMinimum: true,
+    }),
+  ]),
+  activeAlerts: Object.freeze([
+    Object.freeze({
+      id: "41000000-0000-4000-8000-000000000001",
+      inventoryItemId: "40000000-0000-4000-8000-000000000001",
+      inventoryItemName: "Maíz",
+      unitOfMeasure: "kg",
+      threshold: "5.000",
+      observedBalance: "4.000",
+      openedAt: "2026-09-06T10:00:00.000Z",
+    }),
+  ]),
+  movements: Object.freeze([
+    Object.freeze({
+      id: "42000000-0000-4000-8000-000000000001",
+      inventoryItemId: "40000000-0000-4000-8000-000000000001",
+      inventoryItemName: "Maíz",
+      type: "ADJUSTMENT" as const,
+      quantityDelta: "1.000",
+      unitOfMeasure: "kg",
+      recordedById: actorId,
+      recordedAt: "2026-09-06T10:00:00.000Z",
+      businessOriginType: "ADJUSTMENT",
+      businessOriginId: "43000000-0000-4000-8000-000000000001",
+      comments: null,
+      reversedMovementId: null,
+    }),
+  ]),
+  purchases: Object.freeze([]),
+  productionBatches: Object.freeze([]),
+  adjustments: Object.freeze([
+    Object.freeze({
+      id: "43000000-0000-4000-8000-000000000001",
+      inventoryItemId: "40000000-0000-4000-8000-000000000001",
+      inventoryItemName: "Maíz",
+      inventoryMovementId: "42000000-0000-4000-8000-000000000001",
+      quantity: "1.000",
+      unitOfMeasure: "kg",
+      reason: "Conteo físico",
+      recordedById: actorId,
+      recordedAt: "2026-09-06T10:00:00.000Z",
+    }),
+  ]),
+  wasteRecords: Object.freeze([]),
+  expenses: Object.freeze([
+    Object.freeze({
+      id: "44000000-0000-4000-8000-000000000001",
+      amount: "8.50",
+      description: "Gas",
+      incurredAt: "2026-09-06T11:00:00.000Z",
+      recordedAt: "2026-09-06T11:00:00.000Z",
+      recordedById: actorId,
+      referenceNumber: null,
+      comments: null,
+      expenseCategoryCode: "UTILITIES",
+      expenseCategoryName: "Servicios",
+      originType: "MANUAL" as const,
+      originId: null,
+    }),
+  ]),
+  dailyExpenseTotal: "8.50",
+  monthlyExpenseTotal: "8.50",
+  dailyExpensesByCategory: Object.freeze([
+    Object.freeze({
+      expenseCategoryCode: "UTILITIES",
+      expenseCategoryName: "Servicios",
+      amount: "8.50",
+    }),
+  ]),
+  monthlyExpensesByCategory: Object.freeze([
+    Object.freeze({
+      expenseCategoryCode: "UTILITIES",
+      expenseCategoryName: "Servicios",
+      amount: "8.50",
+    }),
+  ]),
+  monthlyExpensesByDay: Object.freeze(
+    Array.from({ length: 30 }, (_, index) =>
+      Object.freeze({
+        date: `2026-09-${String(index + 1).padStart(2, "0")}`,
+        amount: index === 5 ? "8.50" : "0.00",
+      }),
+    ),
+  ),
+});
 
 beforeEach(() => {
   dependencies.authorize.mockReset().mockResolvedValue({ userId: actorId });
@@ -149,6 +258,9 @@ beforeEach(() => {
   dependencies.createPaymentService.mockReset().mockReturnValue({
     read: dependencies.paymentRead,
   });
+  dependencies.createInventoryProductionExpenseService
+    .mockReset()
+    .mockReturnValue({ read: dependencies.inventoryProductionExpenseRead });
   dependencies.listRestaurants.mockReset().mockResolvedValue({
     ok: true,
     value: restaurants,
@@ -160,6 +272,9 @@ beforeEach(() => {
   dependencies.paymentRead
     .mockReset()
     .mockResolvedValue({ ok: true, value: paymentReport });
+  dependencies.inventoryProductionExpenseRead
+    .mockReset()
+    .mockResolvedValue({ ok: true, value: inventoryProductionExpenseReport });
 });
 
 async function render(params: Record<string, string> = {}) {
@@ -192,6 +307,12 @@ describe("daily sales dashboard UI", () => {
       timeZone: "America/Guayaquil",
     });
     expect(dependencies.paymentRead).toHaveBeenCalledWith({
+      actorId,
+      restaurantId,
+      date: "2026-09-06",
+      timeZone: "America/Guayaquil",
+    });
+    expect(dependencies.inventoryProductionExpenseRead).toHaveBeenCalledWith({
       actorId,
       restaurantId,
       date: "2026-09-06",
@@ -339,6 +460,37 @@ describe("daily sales dashboard UI", () => {
     const markup = await render({ date: "2026-09-06", restaurantId });
     expect(markup).toContain('role="alert"');
     expect(markup).toContain("No se pudo cargar el reporte de pagos");
+    expect(markup).not.toContain("private database details");
+  });
+
+  it("renders current inventory, immutable day activity, and expense summaries", async () => {
+    const markup = await render({ date: "2026-09-06", restaurantId });
+
+    expect(markup).toContain("Existencias, producción y gastos");
+    expect(markup).toContain("Existencias actuales");
+    expect(markup).toContain("Alertas activas de stock");
+    expect(markup).toContain("Maíz");
+    expect(markup).toContain("Bajo mínimo");
+    expect(markup).toContain("Movimientos inmutables del día");
+    expect(markup).toContain("Conteo físico");
+    expect(markup).toContain("Gastos operativos");
+    expect(markup).toContain("Servicios");
+    expect(markup).toContain("$8,50");
+    expect(markup).toContain("Totales diarios del mes");
+    expect(markup).toContain("2026-09-30");
+  });
+
+  it("shows a safe accessible failure when the inventory and expense report cannot load", async () => {
+    dependencies.inventoryProductionExpenseRead.mockResolvedValue({
+      ok: false,
+      error: { code: "OPERATION_FAILED", detail: "private database details" },
+    });
+
+    const markup = await render({ date: "2026-09-06", restaurantId });
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain(
+      "No se pudo cargar el reporte de inventario, producción y gastos",
+    );
     expect(markup).not.toContain("private database details");
   });
 });

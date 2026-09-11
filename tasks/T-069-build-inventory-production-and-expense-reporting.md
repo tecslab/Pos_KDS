@@ -1,7 +1,7 @@
 ---
 id: T-069
 title: "Build inventory, production, and expense reporting"
-status: todo
+status: done
 priority: medium
 size: medium
 type: feature

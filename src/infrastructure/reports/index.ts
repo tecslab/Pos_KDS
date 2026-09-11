@@ -11,3 +11,7 @@ export {
   SupabasePaymentReportReader,
   mapPaymentReportRow,
 } from "./supabase-payment-report-reader";
+export {
+  SupabaseInventoryProductionExpenseReportReader,
+  mapInventoryProductionExpenseReportRow,
+} from "./supabase-inventory-production-expense-report-reader";
