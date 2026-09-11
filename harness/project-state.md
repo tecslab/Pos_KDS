@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-071
-last_completed_task: T-070
+next_suggested_task: T-072
+last_completed_task: T-071
 last_commit: pending
-completed_tasks: 71
+completed_tasks: 72
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -122,6 +122,8 @@ T-069 — Build inventory, production, and expense reporting (commit pending; th
 
 T-070 — Add PDF and spreadsheet report exports (commit pending; the task commit cannot self-reference in this tracked state file). `reports.view` plus `reports.export` protected PDF/XLSX exports re-read one aligned persisted report snapshot for the active Guayaquil reporting filters, preserve historical totals and labels, generate Spanish artifacts without retaining them, and append metadata-only export audits.
 
+T-071 — Add end-to-end coverage for the core order lifecycle (commit pending; the task commit cannot self-reference in this tracked state file). High-fidelity Vitest lifecycle coverage verifies authenticated sign-in, client-only split draft, confirmation, Kitchen Ready, Admin/Waiter delivery, independent partial basket settlement through Paid, authorized terminal cancellation with immutable reason/history/rollback evidence, and post-commit realtime-visible queue/payment outcomes. Browser/live-environment testing is intentionally out of scope because no runner or credentials are provided.
+
 ## Current Task
 
 None.
@@ -132,7 +134,7 @@ None.
 
 ## Next Suggested Task
 
-T-071 — Add end-to-end coverage for the core order lifecycle.
+T-072 — Add end-to-end coverage for inventory and production integrity.
 
 ## Human Checkpoints
 

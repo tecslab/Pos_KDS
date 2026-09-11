@@ -1,7 +1,7 @@
 ---
 id: T-071
 title: "Add end-to-end coverage for the core order lifecycle"
-status: todo
+status: done
 priority: critical
 size: medium
 type: testing
