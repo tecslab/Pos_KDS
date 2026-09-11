@@ -247,7 +247,10 @@ const inventoryProductionExpenseReport = Object.freeze({
 });
 
 beforeEach(() => {
-  dependencies.authorize.mockReset().mockResolvedValue({ userId: actorId });
+  dependencies.authorize.mockReset().mockResolvedValue({
+    userId: actorId,
+    permissionCodes: ["reports.view"],
+  });
   dependencies.createService.mockReset().mockReturnValue({
     listRestaurants: dependencies.listRestaurants,
     read: dependencies.read,
@@ -346,6 +349,20 @@ describe("daily sales dashboard UI", () => {
     expect(markup).toContain("00:00");
     expect(markup).toContain("23:00");
     expect(markup.match(/>\d{2}:00<\/th>/g)).toHaveLength(24);
+  });
+
+  it("shows export controls only when reports.export is granted", async () => {
+    expect(await render({ date: "2026-09-06", restaurantId })).not.toContain(
+      "Descargar PDF",
+    );
+
+    dependencies.authorize.mockResolvedValue({
+      userId: actorId,
+      permissionCodes: ["reports.view", "reports.export"],
+    });
+    const markup = await render({ date: "2026-09-06", restaurantId });
+    expect(markup).toContain("Descargar PDF");
+    expect(markup).toContain("Descargar Excel");
   });
 
   it("shows a safe accessible error for invalid or failed report input", async () => {

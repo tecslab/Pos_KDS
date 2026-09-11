@@ -1,7 +1,7 @@
 ---
 id: T-070
 title: "Add PDF and spreadsheet report exports"
-status: todo
+status: done
 priority: medium
 size: medium
 type: feature

@@ -8,6 +8,7 @@ import type {
 } from "@/application";
 
 import { InventoryProductionExpenseReportPanel } from "./inventory-production-expense-report-panel";
+import { ReportExportControls } from "./report-export-controls";
 
 type DailySalesDashboardProps = Readonly<{
   report: DailySalesReport;
@@ -15,6 +16,7 @@ type DailySalesDashboardProps = Readonly<{
   operationalReport: OperationalPerformanceReport;
   paymentReport: PaymentReport;
   inventoryProductionExpenseReport: InventoryProductionExpenseReport;
+  canExport?: boolean;
 }>;
 
 const currency = new Intl.NumberFormat("es-EC", {
@@ -30,6 +32,7 @@ export function DailySalesDashboard({
   operationalReport,
   paymentReport,
   inventoryProductionExpenseReport,
+  canExport = false,
 }: DailySalesDashboardProps) {
   const peakRevenue = Math.max(
     0,
@@ -100,6 +103,14 @@ export function DailySalesDashboard({
           </form>
         </div>
       </header>
+
+      {canExport ? (
+        <ReportExportControls
+          restaurantId={report.restaurant.id}
+          date={report.date}
+          timeZone={report.timeZone}
+        />
+      ) : null}
 
       <section
         aria-label="Indicadores diarios de ventas"

@@ -104,6 +104,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
       operationalReport={operationalReport.value}
       paymentReport={paymentReport.value}
       inventoryProductionExpenseReport={inventoryProductionExpenseReport.value}
+      canExport={authorization.permissionCodes.includes("reports.export")}
     />
   );
 }

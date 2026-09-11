@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-070
-last_completed_task: T-069
+next_suggested_task: T-071
+last_completed_task: T-070
 last_commit: pending
-completed_tasks: 70
+completed_tasks: 71
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -120,6 +120,8 @@ T-068 — Build payment reporting (commit pending; the task commit cannot self-r
 
 T-069 — Build inventory, production, and expense reporting (commit pending; the task commit cannot self-reference in this tracked state file). `reports.view`-protected persisted reports cover balances, alerts, movements, purchases, production, waste, adjustments, and daily/monthly operating expenses. Forward-only remote migrations preserve immutable inventory and recipe labels for historical reports; rollback probes cover ledger origins, expense boundaries, authorization, snapshots, and read-only behavior.
 
+T-070 — Add PDF and spreadsheet report exports (commit pending; the task commit cannot self-reference in this tracked state file). `reports.view` plus `reports.export` protected PDF/XLSX exports re-read one aligned persisted report snapshot for the active Guayaquil reporting filters, preserve historical totals and labels, generate Spanish artifacts without retaining them, and append metadata-only export audits.
+
 ## Current Task
 
 None.
@@ -130,7 +132,7 @@ None.
 
 ## Next Suggested Task
 
-T-069 — Build inventory, production, and expense reporting.
+T-071 — Add end-to-end coverage for the core order lifecycle.
 
 ## Human Checkpoints
 
