@@ -1,7 +1,7 @@
 ---
 id: T-072
 title: "Add end-to-end coverage for inventory and production integrity"
-status: todo
+status: done
 priority: critical
 size: medium
 type: testing

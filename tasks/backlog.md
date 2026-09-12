@@ -74,7 +74,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-069 Build inventory, production, and expense reporting
 - [x] T-070 Add PDF and spreadsheet report exports
 - [x] T-071 Add end-to-end coverage for the core order lifecycle
-- [ ] T-072 Add end-to-end coverage for inventory and production integrity
+- [x] T-072 Add end-to-end coverage for inventory and production integrity
 - [ ] T-073 Conduct authorization and input-security regression testing
 - [ ] T-074 Add operational logging and application telemetry
 - [ ] T-075 Optimize tablet accessibility, responsiveness, and critical-path performance
