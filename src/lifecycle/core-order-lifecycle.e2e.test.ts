@@ -77,6 +77,8 @@ import { authenticatePassword } from "../lib/auth/auth-actions";
 const waiterId = "10000000-0000-4000-8000-000000000001";
 const kitchenId = "10000000-0000-4000-8000-000000000002";
 const adminId = "10000000-0000-4000-8000-000000000003";
+const crossOwnerOperatorId = "10000000-0000-4000-8000-000000000004";
+const nominalAdministratorId = "10000000-0000-4000-8000-000000000005";
 const restaurantId = "30000000-0000-4000-8000-000000000001";
 const locationId = "31000000-0000-4000-8000-000000000001";
 const productVersionId = "36000000-0000-4000-8000-000000000001";
@@ -575,6 +577,19 @@ function profiles(): AuthorizationProfileReader {
         "payments.register",
         "payments.overage.authorize",
       ]),
+    ],
+    [
+      crossOwnerOperatorId,
+      profile(crossOwnerOperatorId, "cross_shift_operator", [
+        "kitchen.ready.mark",
+        "delivery.on_the_way.mark",
+        "delivery.delivered.mark",
+        "payments.register",
+      ]),
+    ],
+    [
+      nominalAdministratorId,
+      profile(nominalAdministratorId, "administrator", []),
     ],
   ]);
   return {
@@ -1075,5 +1090,107 @@ describe("core order lifecycle end-to-end", () => {
           entry.envelope.data.reason === "Customer changed plans",
       ),
     ).toBe(true);
+  });
+
+  it("uses exact grants across owners and leaves committed history unchanged after rejected input", async () => {
+    const store = new LifecycleStore();
+    const boundary = new RecordingBoundary();
+    const lifecycle = services(store, boundary);
+    const confirmation = await lifecycle.confirmation.confirm(
+      waiterId,
+      toConfirmationInput(buildTwoBasketDraft())!,
+    );
+    if (!confirmation.ok) throw new Error("fixture confirmation failed");
+    const order = store.orders[0]!;
+    const snapshot = () => ({
+      order: structuredClone(order),
+      commits: boundary.commits,
+      publications: structuredClone(lifecycle.realtime.publications),
+    });
+
+    const beforeNominalAdmin = snapshot();
+    await expect(
+      lifecycle.ready.markReady(nominalAdministratorId, { orderId: order.id }),
+    ).resolves.toEqual(err(orderReadyError("UNAUTHORIZED")));
+    expect(snapshot()).toEqual(beforeNominalAdmin);
+
+    await expect(
+      lifecycle.ready.markReady(crossOwnerOperatorId, { orderId: order.id }),
+    ).resolves.toMatchObject({
+      ok: true,
+      value: { status: "READY", markedReadyById: crossOwnerOperatorId },
+    });
+    await expect(
+      lifecycle.onTheWay.markOnTheWay(crossOwnerOperatorId, {
+        orderId: order.id,
+      }),
+    ).resolves.toMatchObject({
+      ok: true,
+      value: { status: "ON_THE_WAY", collectedById: crossOwnerOperatorId },
+    });
+    await expect(
+      lifecycle.delivered.markDelivered(crossOwnerOperatorId, {
+        orderId: order.id,
+      }),
+    ).resolves.toMatchObject({
+      ok: true,
+      value: { status: "DELIVERED", deliveredById: crossOwnerOperatorId },
+    });
+    expect(order.assignedWaiterId).toBe(waiterId);
+
+    const deliveredSnapshot = snapshot();
+    await expect(
+      lifecycle.delivered.markDelivered(crossOwnerOperatorId, {
+        orderId: "not-an-order-id",
+      }),
+    ).resolves.toEqual(
+      err(orderDeliveredError("INVALID_DELIVERED_TRANSITION")),
+    );
+    await expect(
+      lifecycle.payment.register(crossOwnerOperatorId, {
+        basketId: order.baskets[0]!.id,
+        paymentMethodId,
+        amount: "11.00",
+        overageReason: "Manager approved",
+      }),
+    ).resolves.toEqual(err(paymentError("OVERAGE_NOT_AUTHORIZED")));
+    expect(snapshot()).toEqual(deliveredSnapshot);
+
+    const overage = await lifecycle.payment.register(adminId, {
+      basketId: order.baskets[0]!.id,
+      paymentMethodId,
+      amount: "11.00",
+      overageReason: "  Customer   left the change  ",
+    });
+    expect(overage).toMatchObject({
+      ok: true,
+      value: {
+        recordedById: adminId,
+        amount: "11.00",
+        overageAuthorizedById: adminId,
+        overageReason: "Customer left the change",
+      },
+    });
+    const successfulPayment = structuredClone(order.baskets[0]!.payments[0]);
+    const successfulHistory = structuredClone(order.history);
+    const afterOverage = snapshot();
+
+    await expect(
+      lifecycle.payment.register(adminId, {
+        basketId: order.baskets[1]!.id,
+        paymentMethodId,
+        amount: "not-money",
+        overageReason: "should never persist",
+      }),
+    ).resolves.toEqual(err(paymentError("INVALID_PAYMENT")));
+    await expect(
+      lifecycle.onTheWay.markOnTheWay(crossOwnerOperatorId, {
+        orderId: order.id,
+      }),
+    ).resolves.toEqual(err(orderOnTheWayError("ORDER_NOT_READY")));
+
+    expect(snapshot()).toEqual(afterOverage);
+    expect(order.baskets[0]!.payments[0]).toEqual(successfulPayment);
+    expect(order.history).toEqual(successfulHistory);
   });
 });

@@ -60,11 +60,13 @@ describe("POST /api/v1/reports/exports", () => {
       ok: false,
       error: { code: "UNAUTHORIZED" },
     });
-    const response = await POST(request());
+    const json = vi.fn();
+    const response = await POST({ json } as unknown as Request);
 
     expect(response.status).toBe(403);
     expect(dependencies.authorize).toHaveBeenCalledTimes(1);
     expect(dependencies.authorize).toHaveBeenCalledWith("reports.view");
+    expect(json).not.toHaveBeenCalled();
     expect(dependencies.createService).not.toHaveBeenCalled();
   });
 
@@ -75,10 +77,34 @@ describe("POST /api/v1/reports/exports", () => {
         ok: false,
         error: { code: "UNAUTHORIZED" },
       });
+    const json = vi.fn();
 
-    expect((await POST(request())).status).toBe(403);
+    expect((await POST({ json } as unknown as Request)).status).toBe(403);
     expect(dependencies.authorize).toHaveBeenNthCalledWith(2, "reports.export");
+    expect(json).not.toHaveBeenCalled();
     expect(dependencies.createService).not.toHaveBeenCalled();
+  });
+
+  it("rejects mismatched authorization actors before reading the body", async () => {
+    dependencies.authorize
+      .mockResolvedValueOnce({ ok: true, value: { userId: actorId } })
+      .mockResolvedValueOnce({
+        ok: true,
+        value: { userId: "10000000-0000-4000-8000-000000000002" },
+      });
+    const json = vi.fn();
+
+    const response = await POST({ json } as unknown as Request);
+
+    expect(response.status).toBe(403);
+    expect(json).not.toHaveBeenCalled();
+    expect(dependencies.createService).not.toHaveBeenCalled();
+    expect(await response.json()).toEqual({
+      error: {
+        code: "UNAUTHORIZED",
+        message: "You are not authorized to perform this operation.",
+      },
+    });
   });
 
   it("passes filters only with the verified actor and returns hardened attachment headers", async () => {

@@ -45,6 +45,8 @@ import {
 
 const adminId = "10000000-0000-4000-8000-000000000001";
 const waiterId = "10000000-0000-4000-8000-000000000002";
+const customInventoryOperatorId = "10000000-0000-4000-8000-000000000003";
+const nominalAdministratorId = "10000000-0000-4000-8000-000000000004";
 const restaurantId = "30000000-0000-4000-8000-000000000001";
 const locationId = "31000000-0000-4000-8000-000000000001";
 const rawItemId = "32000000-0000-4000-8000-000000000001";
@@ -571,6 +573,19 @@ function authorizationProfiles(): AuthorizationProfileReader {
       ]),
     ],
     [waiterId, profile(waiterId, "waiter", ["orders.create"])],
+    [
+      customInventoryOperatorId,
+      profile(customInventoryOperatorId, "stock_control", [
+        "inventory.purchases.register",
+        "inventory.adjustments.register",
+        "inventory.waste.register",
+        "production.batch.create",
+      ]),
+    ],
+    [
+      nominalAdministratorId,
+      profile(nominalAdministratorId, "administrator", []),
+    ],
   ]);
   return {
     findByAuthenticatedUserId: async (userId) => profiles.get(userId) ?? null,
@@ -1100,5 +1115,81 @@ describe("inventory and production integrity end-to-end", () => {
     }).toEqual(before);
     expect(workflow.boundary.commits).toBe(0);
     expect(workflow.publisher.events).toEqual([]);
+  });
+
+  it("uses exact custom grants and rejects malformed mutations without rewriting history", async () => {
+    const store = new InventoryProductionStore();
+    const workflow = services(store);
+    const snapshot = () => ({
+      balances: [...store.balances],
+      movements: structuredClone(store.movements),
+      expenses: structuredClone(store.expenses),
+      audits: structuredClone(store.audits),
+      batches: structuredClone(store.batches),
+      commits: workflow.boundary.commits,
+      events: structuredClone(workflow.publisher.events),
+    });
+
+    const empty = snapshot();
+    await expect(
+      workflow.purchase.register(nominalAdministratorId, purchaseInput()),
+    ).resolves.toEqual(err(purchaseError("UNAUTHORIZED")));
+    expect(snapshot()).toEqual(empty);
+
+    const purchase = await workflow.purchase.register(
+      customInventoryOperatorId,
+      purchaseInput(),
+    );
+    expect(purchase).toMatchObject({
+      ok: true,
+      value: { recordedById: customInventoryOperatorId },
+    });
+    const persistedPurchaseMovements = structuredClone(store.movements);
+    const persistedPurchaseAudit = structuredClone(store.audits[0]);
+    const afterPurchase = snapshot();
+
+    await expect(
+      workflow.purchase.register(customInventoryOperatorId, {
+        ...purchaseInput(),
+        lines: [
+          { inventoryItemId: rawItemId, quantity: "1", unitPrice: "2" },
+          { inventoryItemId: rawItemId, quantity: "1", unitPrice: "2" },
+        ],
+      }),
+    ).resolves.toEqual(err(purchaseError("INVALID_PURCHASE")));
+    await expect(
+      workflow.movement.register(customInventoryOperatorId, {
+        restaurantId,
+        inventoryItemId: rawItemId,
+        operation: "ADJUSTMENT",
+        quantity: "0",
+        reason: "Must not persist",
+      }),
+    ).resolves.toEqual(err(adjustmentError("INVALID_MOVEMENT")));
+    await expect(
+      workflow.movement.register(customInventoryOperatorId, {
+        restaurantId,
+        inventoryItemId: rawItemId,
+        operation: "WASTE",
+        quantity: "-1",
+        reason: "Must not persist",
+      }),
+    ).resolves.toEqual(err(adjustmentError("INVALID_MOVEMENT")));
+    await expect(
+      workflow.production.complete(customInventoryOperatorId, {
+        restaurantId,
+        recipeVersionId,
+        producedQuantity: "0",
+        notes: "Must not persist",
+      }),
+    ).resolves.toEqual(err(productionError("INVALID_BATCH")));
+
+    expect(snapshot()).toEqual(afterPurchase);
+    expect(store.movements).toEqual(persistedPurchaseMovements);
+    expect(store.audits[0]).toEqual(persistedPurchaseAudit);
+    expect(store.movements.every((movement) => Object.isFrozen(movement))).toBe(
+      true,
+    );
+    expect(Object.isFrozen(store.audits[0])).toBe(true);
   });
 });

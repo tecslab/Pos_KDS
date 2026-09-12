@@ -1,7 +1,7 @@
 ---
 id: T-073
 title: "Conduct authorization and input-security regression testing"
-status: todo
+status: done
 priority: critical
 size: medium
 type: security

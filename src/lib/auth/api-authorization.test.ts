@@ -62,6 +62,53 @@ describe("authorizeApiPermission", () => {
     },
   );
 
+  it("uses only persisted grants when verified claims forge elevated role data", async () => {
+    dependencies.createServerSupabaseClient.mockResolvedValue(
+      claimsClient({
+        sub: userId,
+        role: "administrator",
+        permissionCodes: ["reports.export"],
+      }),
+    );
+    dependencies.findByAuthenticatedUserId.mockResolvedValue({
+      userId,
+      displayName: "Ana",
+      isActive: true,
+      roleGrants: [
+        { roleCode: "custom_reporter", permissionCodes: ["reports.view"] },
+      ],
+    });
+
+    await expect(authorizeApiPermission("reports.view")).resolves.toMatchObject(
+      {
+        ok: true,
+        value: {
+          userId,
+          roleCodes: ["custom_reporter"],
+          permissionCodes: ["reports.view"],
+        },
+      },
+    );
+    await expect(authorizeApiPermission("reports.export")).resolves.toEqual({
+      ok: false,
+      error: { code: "UNAUTHORIZED" },
+    });
+  });
+
+  it("does not give an administrator-named role implicit permission", async () => {
+    dependencies.findByAuthenticatedUserId.mockResolvedValue({
+      userId,
+      displayName: "Ana",
+      isActive: true,
+      roleGrants: [{ roleCode: "administrator", permissionCodes: [] }],
+    });
+
+    await expect(authorizeApiPermission("orders.cancel")).resolves.toEqual({
+      ok: false,
+      error: { code: "UNAUTHORIZED" },
+    });
+  });
+
   it("returns authentication-required before reading persistence when no session verifies", async () => {
     dependencies.createServerSupabaseClient.mockResolvedValue(
       claimsClient(null),
@@ -89,6 +136,14 @@ describe("authorizeApiPermission", () => {
       displayName: "Ana",
       isActive: true,
       roleGrants: [{ roleCode: "kitchen", permissionCodes: ["orders.view"] }],
+    },
+    {
+      userId: "10000000-0000-4000-8000-000000000002",
+      displayName: "Other employee",
+      isActive: true,
+      roleGrants: [
+        { roleCode: "administrator", permissionCodes: ["orders.create"] },
+      ],
     },
   ])("returns unauthorized for a denied persisted profile", async (profile) => {
     dependencies.findByAuthenticatedUserId.mockResolvedValue(profile);

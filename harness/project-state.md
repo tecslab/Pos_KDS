@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-073
-last_completed_task: T-072
+next_suggested_task: T-074
+last_completed_task: T-073
 last_commit: pending
-completed_tasks: 73
+completed_tasks: 74
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -126,6 +126,8 @@ T-071 — Add end-to-end coverage for the core order lifecycle (commit pending; 
 
 T-072 — Add end-to-end coverage for inventory and production integrity (commit pending; the task commit cannot self-reference in this tracked state file). High-fidelity in-process coverage proves permission-gated purchase, adjustment, waste, resale sale, cancellation rollback, and production behavior; it verifies immutable movement origins/audit metadata, recipe-version historical retention, derived balances, both configured negative-stock outcomes, and atomic insufficient-stock rejection without physical reconciliation or supplier integration.
 
+T-073 — Conduct authorization and input-security regression testing (commit pending; the task commit cannot self-reference in this tracked state file). Automated server/API and lifecycle regressions prove persisted role-derived permission enforcement, fail-closed authentication/authorization, ownership-independent custom-role operations, untrusted input rejection without side effects, approved payment-overage rules, and immutable history/audit/event preservation after rejected attempts. Formal external audit and penetration testing remain excluded.
+
 ## Current Task
 
 None.
@@ -136,7 +138,7 @@ None.
 
 ## Next Suggested Task
 
-T-073 — Conduct authorization and input-security regression testing.
+T-074 — Add operational logging and application telemetry.
 
 ## Human Checkpoints
 
