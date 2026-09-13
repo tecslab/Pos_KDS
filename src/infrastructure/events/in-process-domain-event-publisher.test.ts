@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import type { DomainEvent } from "../../domain";
 
@@ -21,6 +21,48 @@ const paid = (paymentId: string): OrderPaid => ({
 });
 
 describe("InProcessDomainEventPublisher", () => {
+  it("records type-and-count metrics for each committed event before post-commit dispatch", async () => {
+    const record = vi.fn();
+    const publisher = new InProcessDomainEventPublisher<TestEvent>({ record });
+    publisher.subscribe("order.placed", vi.fn());
+
+    await publisher.publish([placed("private-order-id")]);
+
+    expect(record).toHaveBeenCalledWith({
+      event: "business_event.published",
+      eventType: "order.placed",
+      count: 1,
+    });
+    expect(JSON.stringify(record.mock.calls)).not.toContain("private-order-id");
+  });
+
+  it("keeps committed metrics when a post-commit handler fails and isolates telemetry failure", async () => {
+    const failedRecord = vi.fn();
+    const failed = new InProcessDomainEventPublisher<TestEvent>({
+      record: failedRecord,
+    });
+    failed.subscribe("order.placed", () => {
+      throw new Error("handler failed");
+    });
+    await expect(failed.publish([placed("order-1")])).rejects.toThrow(
+      "handler failed",
+    );
+    expect(failedRecord).toHaveBeenCalledWith({
+      event: "business_event.published",
+      eventType: "order.placed",
+      count: 1,
+    });
+
+    const isolated = new InProcessDomainEventPublisher<TestEvent>({
+      record() {
+        throw new Error("telemetry failed");
+      },
+    });
+    await expect(
+      isolated.publish([paid("payment-1")]),
+    ).resolves.toBeUndefined();
+  });
+
   it("dispatches FIFO events to matching handlers in registration order", async () => {
     const activity: string[] = [];
     const publisher = new InProcessDomainEventPublisher<TestEvent>();

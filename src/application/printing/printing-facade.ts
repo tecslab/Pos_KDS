@@ -14,6 +14,10 @@ import type {
   PrinterService,
   SanitizedPrintFailure,
 } from "./printing";
+import {
+  NoOpOperationalTelemetryRecorder,
+  type OperationalTelemetryRecorder,
+} from "../observability";
 
 const stopRetry: PrintRetryDecision = Object.freeze({ action: "STOP" });
 
@@ -43,6 +47,7 @@ export class PrintingFacade {
     private readonly printer: PrinterService,
     private readonly retryAdvisor: PrintRetryAdvisor,
     private readonly errorReporter: PrintErrorReporter,
+    private readonly telemetry: OperationalTelemetryRecorder = new NoOpOperationalTelemetryRecorder(),
   ) {}
 
   async printAfterPersistence(request: PrintRequest): Promise<PrintOutcome> {
@@ -168,6 +173,8 @@ export class PrintingFacade {
       // Error reporting is best effort and cannot compromise persisted work.
     }
 
+    this.recordFailure(safeRequest, failure);
+
     return Object.freeze({
       status: "failed",
       jobId: safeRequest.jobId,
@@ -178,6 +185,7 @@ export class PrintingFacade {
   }
 
   private fallbackFailureOutcome(request: PrintRequest): PrintOutcome {
+    this.recordFailure(request, invalidRequestFailure);
     return Object.freeze({
       status: "failed",
       jobId: safeIdentifier(readProperty(request, "jobId")),
@@ -185,6 +193,35 @@ export class PrintingFacade {
       failure: invalidRequestFailure,
       retry: stopRetry,
     });
+  }
+
+  private recordFailure(
+    request: PrintRequest,
+    failure: SanitizedPrintFailure,
+  ): void {
+    try {
+      const documentType = readProperty(
+        readProperty(request, "document"),
+        "type",
+      );
+      const attemptNumber = readProperty(request, "attemptNumber");
+      this.telemetry.record({
+        event: "printer.failed",
+        documentType:
+          documentType === "KITCHEN_TICKET" ||
+          documentType === "PAYMENT_RECEIPT"
+            ? documentType
+            : "UNKNOWN",
+        failureCode: failure.code,
+        retryable: failure.retryable,
+        attemptNumber:
+          Number.isSafeInteger(attemptNumber) && (attemptNumber as number) > 0
+            ? attemptNumber
+            : 0,
+      });
+    } catch {
+      // Telemetry cannot affect best-effort printing outcomes.
+    }
   }
 }
 

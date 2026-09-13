@@ -1,4 +1,8 @@
 import { safeLocalPath } from "./auth-paths";
+import {
+  NoOpOperationalTelemetryRecorder,
+  type OperationalTelemetryRecorder,
+} from "../../application";
 
 export type PasswordSignInService = Readonly<{
   signInWithPassword(credentials: {
@@ -20,20 +24,35 @@ export type SignInActionResult = Readonly<{
 export async function authenticatePassword(
   formData: FormData,
   service: PasswordSignInService,
+  telemetry: OperationalTelemetryRecorder = new NoOpOperationalTelemetryRecorder(),
 ): Promise<SignInActionResult> {
   const nextPath = safeLocalPath(formData.get("next"));
   const email = formValue(formData.get("email"));
   const password = formValue(formData.get("password"));
 
   if (email === null || password === null) {
+    recordAuthFailure(telemetry, "MISSING_OR_INVALID_SESSION");
     return Object.freeze({ ok: false, nextPath });
   }
 
   try {
     const { error } = await service.signInWithPassword({ email, password });
+    if (error !== null) recordAuthFailure(telemetry, "PROVIDER_FAILURE");
     return Object.freeze({ ok: error === null, nextPath });
   } catch {
+    recordAuthFailure(telemetry, "PROVIDER_FAILURE");
     return Object.freeze({ ok: false, nextPath });
+  }
+}
+
+function recordAuthFailure(
+  telemetry: OperationalTelemetryRecorder,
+  reason: "MISSING_OR_INVALID_SESSION" | "PROVIDER_FAILURE",
+): void {
+  try {
+    telemetry.record({ event: "authentication.failed", reason });
+  } catch {
+    // Authentication behavior is independent from operational telemetry.
   }
 }
 

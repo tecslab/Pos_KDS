@@ -6,8 +6,9 @@ import { authorizeApiPermission } from "../../../../lib/auth/api-authorization";
 import { mapPaymentRegistrationErrorToHttp } from "../../../../lib/http";
 import { createPaymentRegistrationService } from "../../../../lib/payment-registration/server";
 import { dispatchPaymentReceiptAfterPersistence } from "../../../../lib/payment-receipts/server";
+import { observeApiRoute } from "../../../../lib/observability/api-route";
 
-export async function POST(request: Request) {
+async function handlePost(request: Request) {
   try {
     const authorization = await authorizeApiPermission("payments.register");
     if (!authorization.ok) {
@@ -89,3 +90,5 @@ function internalError() {
 function errorResponse(status: number, code: string, message: string) {
   return Response.json({ error: { code, message } }, { status });
 }
+
+export const POST = observeApiRoute("POST", handlePost);

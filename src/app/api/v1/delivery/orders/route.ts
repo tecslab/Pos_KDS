@@ -1,6 +1,7 @@
 import type { DeliveryQueueFilterInput } from "../../../../../application";
 import { authorizeApiPermission } from "../../../../../lib/auth/api-authorization";
 import { createDeliveryQueueService } from "../../../../../lib/delivery-queue/server";
+import { observeApiRoute } from "../../../../../lib/observability/api-route";
 
 const supportedFilters = new Set([
   "serviceLocationId",
@@ -8,7 +9,7 @@ const supportedFilters = new Set([
   "minimumWaitingMinutes",
 ]);
 
-export async function GET(request: Request) {
+async function handleGet(request: Request) {
   try {
     const authorization = await authorizeApiPermission("delivery.panel.view");
     if (!authorization.ok)
@@ -73,3 +74,5 @@ function internalError() {
 function errorResponse(status: number, code: string, message: string) {
   return Response.json({ error: { code, message } }, { status });
 }
+
+export const GET = observeApiRoute("GET", handleGet);

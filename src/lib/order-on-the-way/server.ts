@@ -14,12 +14,20 @@ import {
 } from "../../infrastructure/orders";
 import { SupabaseRealtimePublisher } from "../../infrastructure/realtime";
 import { createSupabaseAdminClient } from "../supabase/admin";
+import {
+  operationalTelemetry,
+  operationalTelemetryClock,
+} from "../observability/recorder";
 
 export function createOrderOnTheWayService() {
   const client = createSupabaseAdminClient();
-  const dispatcher = new InProcessDomainEventPublisher();
+  const dispatcher = new InProcessDomainEventPublisher(operationalTelemetry);
   const realtimePublisher = new OrderOnTheWayRealtimePublisher(
-    new SupabaseRealtimePublisher(client),
+    new SupabaseRealtimePublisher(
+      client,
+      operationalTelemetry,
+      operationalTelemetryClock,
+    ),
   );
 
   dispatcher.subscribe("order.on-the-way", (event) =>

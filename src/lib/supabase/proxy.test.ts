@@ -32,6 +32,58 @@ function factory(
 }
 
 describe("Supabase auth proxy", () => {
+  it("records safe auth failure without URL or cookies", async () => {
+    const record = vi.fn();
+    const request = new NextRequest(
+      "https://carnales.example/orders?customer=private",
+      { headers: { cookie: "token=secret" } },
+    );
+
+    const response = await routeAuthenticatedRequest(request, factory(false), {
+      record,
+    });
+
+    expect(response.status).toBe(307);
+    expect(record.mock.calls.map(([entry]) => entry)).toEqual([
+      {
+        event: "authentication.failed",
+        reason: "MISSING_OR_INVALID_SESSION",
+      },
+    ]);
+    expect(JSON.stringify(record.mock.calls)).not.toContain("customer");
+    expect(JSON.stringify(record.mock.calls)).not.toContain("secret");
+  });
+
+  it("returns a generic 500 and records a classified unexpected request exception", async () => {
+    const record = vi.fn();
+    const original = new NextRequest("https://carnales.example/orders");
+    const malformed = new Proxy(original, {
+      get(target, property) {
+        if (property === "nextUrl") {
+          throw Object.assign(new Error("private request details"), {
+            code: "ECONNRESET",
+          });
+        }
+        return Reflect.get(target, property, target);
+      },
+    });
+
+    const response = await routeAuthenticatedRequest(malformed, factory(true), {
+      record,
+    });
+
+    expect(response.status).toBe(500);
+    expect(await response.text()).toBe("");
+    expect(record.mock.calls.map(([entry]) => entry)).toEqual([
+      {
+        event: "exception.unexpected",
+        boundary: "request",
+        errorClass: "NETWORK",
+      },
+    ]);
+    expect(JSON.stringify(record.mock.calls)).not.toContain("private request");
+  });
+
   it("redirects an unauthenticated protected request to login with local next", async () => {
     const request = new NextRequest(
       "https://carnales.example/orders?status=ready",

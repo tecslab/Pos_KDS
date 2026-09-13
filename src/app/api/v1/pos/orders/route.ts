@@ -8,6 +8,7 @@ import { createActiveOrderQueryService } from "../../../../../lib/active-orders/
 import { mapOrderConfirmationErrorToHttp } from "../../../../../lib/http";
 import { createOrderConfirmationService } from "../../../../../lib/order-confirmation/server";
 import { requestKitchenTicketAfterPersistence } from "../../../../../lib/printing/server";
+import { observeApiRoute } from "../../../../../lib/observability/api-route";
 
 const authenticationRequired = Object.freeze({
   status: 401,
@@ -49,7 +50,7 @@ const internalError = Object.freeze({
   }),
 });
 
-export async function GET() {
+async function handleGet() {
   try {
     const authorization = await authorizeApiPermission("orders.view");
     if (!authorization.ok) {
@@ -72,7 +73,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+async function handlePost(request: Request) {
   try {
     const authorization = await authorizeApiPermission("orders.create");
     if (!authorization.ok) {
@@ -160,3 +161,6 @@ function toPublicLine(value: unknown): ConfirmOrderLineInput {
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
+
+export const GET = observeApiRoute("GET", handleGet);
+export const POST = observeApiRoute("POST", handlePost);

@@ -91,6 +91,51 @@ function fakeClient(
 }
 
 describe("SupabaseRealtimePublisher", () => {
+  it("records safe publication health while preserving success and failure", async () => {
+    const successRecord = vi.fn();
+    const success = fakeClient();
+    await new SupabaseRealtimePublisher(
+      success.client,
+      { record: successRecord },
+      { now: vi.fn().mockReturnValueOnce(3).mockReturnValueOnce(8) },
+    ).publish([event("inventory.alert")]);
+    expect(successRecord).toHaveBeenCalledWith({
+      event: "realtime.operation",
+      operation: "publish",
+      outcome: "success",
+      durationMs: 5,
+    });
+    expect(JSON.stringify(successRecord.mock.calls)).not.toContain(
+      restaurantId,
+    );
+
+    const failureRecord = vi.fn();
+    const failure = fakeClient(() => {
+      const channel = new FakeChannel();
+      channel.httpSend.mockRejectedValue(
+        Object.assign(new Error("private payload"), { code: "ETIMEDOUT" }),
+      );
+      return channel;
+    });
+    await expect(
+      new SupabaseRealtimePublisher(
+        failure.client,
+        { record: failureRecord },
+        { now: vi.fn().mockReturnValueOnce(10).mockReturnValueOnce(12) },
+      ).publish([event("inventory.alert")]),
+    ).rejects.toThrow("private payload");
+    expect(failureRecord).toHaveBeenCalledWith({
+      event: "realtime.operation",
+      operation: "publish",
+      outcome: "failure",
+      durationMs: 2,
+      errorClass: "TIMEOUT",
+    });
+    expect(JSON.stringify(failureRecord.mock.calls)).not.toContain(
+      "private payload",
+    );
+  });
+
   it("publishes fan-out sequentially to private topics in stable order", async () => {
     const activity: string[] = [];
     const fake = fakeClient(() => {
@@ -215,6 +260,33 @@ describe("SupabaseRealtimePublisher", () => {
 });
 
 describe("SupabaseRealtimeSubscriber", () => {
+  it("records subscription readiness without restaurant or topic data", async () => {
+    const record = vi.fn();
+    const fake = fakeClient();
+    const subscriber = new SupabaseRealtimeSubscriber(
+      fake.client,
+      { record },
+      { now: vi.fn().mockReturnValueOnce(2).mockReturnValueOnce(9) },
+    );
+    const pending = subscriber.subscribe({
+      restaurantId,
+      topic: "payments",
+      onMessage: vi.fn(),
+    });
+    fake.channels[0]!.emitStatus("SUBSCRIBED");
+    const subscription = await pending;
+
+    expect(record).toHaveBeenCalledWith({
+      event: "realtime.operation",
+      operation: "subscribe",
+      outcome: "success",
+      durationMs: 7,
+    });
+    expect(JSON.stringify(record.mock.calls)).not.toContain(restaurantId);
+    expect(JSON.stringify(record.mock.calls)).not.toContain("payments");
+    await subscription.unsubscribe();
+  });
+
   it("waits for readiness, validates messages, and removes exactly once", async () => {
     const fake = fakeClient();
     const subscriber = new SupabaseRealtimeSubscriber(fake.client);

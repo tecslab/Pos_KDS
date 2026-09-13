@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { KitchenQueueOrder } from "@/application";
+import {
+  operationalTelemetry,
+  operationalTelemetryClock,
+} from "../../../lib/observability/recorder";
 
 import {
   elapsedMilliseconds,
@@ -140,6 +144,8 @@ export function KitchenQueueBoard({
         const controller = new KitchenQueueRealtimeController({
           subscriber: new SupabaseRealtimeSubscriber(
             createBrowserSupabaseClient(),
+            operationalTelemetry,
+            operationalTelemetryClock,
           ),
           restaurantIds: thresholds.map((entry) => entry.restaurantId),
           refreshQueue,

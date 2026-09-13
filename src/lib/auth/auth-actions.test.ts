@@ -60,6 +60,26 @@ describe("authentication action core", () => {
     expect(signInWithPassword).not.toHaveBeenCalled();
   });
 
+  it("records only a safe reason for authentication failures", async () => {
+    const record = vi.fn();
+    const signInWithPassword = vi.fn().mockResolvedValue({
+      error: new Error("email and password are private"),
+    });
+
+    await authenticatePassword(
+      signInForm(),
+      { signInWithPassword },
+      { record },
+    );
+
+    expect(record).toHaveBeenCalledWith({
+      event: "authentication.failed",
+      reason: "PROVIDER_FAILURE",
+    });
+    expect(JSON.stringify(record.mock.calls)).not.toContain("email");
+    expect(JSON.stringify(record.mock.calls)).not.toContain("password");
+  });
+
   it("sanitizes an external return location", async () => {
     const signInWithPassword = vi.fn().mockResolvedValue({ error: null });
 

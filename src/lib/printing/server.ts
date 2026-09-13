@@ -8,6 +8,7 @@ import {
   type PrintRequest,
 } from "../../application";
 import { NoOpPrinterService } from "../../infrastructure/printing";
+import { operationalTelemetry } from "../observability/recorder";
 
 export interface KitchenTicketRequester {
   printAfterPersistence(request: PrintRequest): Promise<unknown>;
@@ -84,5 +85,6 @@ function createKitchenTicketRequester(): KitchenTicketRequester {
       },
     },
     { async report() {} },
+    operationalTelemetry,
   );
 }

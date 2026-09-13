@@ -1,10 +1,11 @@
 import type { PaymentQueryFilterInput } from "../../../../../application";
 import { authorizeApiPermission } from "../../../../../lib/auth/api-authorization";
 import { createPaymentQueryService } from "../../../../../lib/payment-queries/server";
+import { observeApiRoute } from "../../../../../lib/observability/api-route";
 
 const supportedFilters = new Set(["serviceLocationId", "orderNumber"]);
 
-export async function GET(request: Request) {
+async function handleGet(request: Request) {
   try {
     const authorization = await authorizeApiPermission("payments.view");
     if (!authorization.ok) {
@@ -66,3 +67,5 @@ function internalError() {
 function errorResponse(status: number, code: string, message: string) {
   return Response.json({ error: { code, message } }, { status });
 }
+
+export const GET = observeApiRoute("GET", handleGet);

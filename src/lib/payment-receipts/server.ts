@@ -15,6 +15,7 @@ import {
 } from "../../infrastructure/printing";
 import { SupabasePaymentReceiptSnapshotReader } from "../../infrastructure/payments";
 import { createSupabaseAdminClient } from "../supabase/admin";
+import { operationalTelemetry } from "../observability/recorder";
 
 export async function dispatchPaymentReceiptAfterPersistence(
   actorId: string,
@@ -47,5 +48,6 @@ export function createPaymentReceiptService(
     },
     { async report() {} },
     randomUUID,
+    operationalTelemetry,
   );
 }

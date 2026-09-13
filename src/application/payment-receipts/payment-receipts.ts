@@ -1,5 +1,9 @@
 import type { RegisteredPayment } from "../payment-registration";
 import {
+  NoOpOperationalTelemetryRecorder,
+  type OperationalTelemetryRecorder,
+} from "../observability";
+import {
   AuthorizationService,
   type AuthorizationProfileReader,
 } from "../authorization";
@@ -93,6 +97,7 @@ export class PaymentReceiptService {
     private readonly retryAdvisor: PrintRetryAdvisor,
     private readonly errorReporter: PrintErrorReporter,
     private readonly createAttemptId: () => string,
+    private readonly telemetry: OperationalTelemetryRecorder = new NoOpOperationalTelemetryRecorder(),
   ) {}
 
   async dispatch(
@@ -149,6 +154,7 @@ export class PaymentReceiptService {
         this.printer,
         this.retryAdvisor,
         this.errorReporter,
+        this.telemetry,
       ).printAfterPersistence(request);
     } catch {
       return paymentReceiptPreparationFailure(jobId);

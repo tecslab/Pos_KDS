@@ -102,6 +102,7 @@ describe("payment receipt server composition", () => {
       expect.objectContaining({ decide: expect.any(Function) }),
       expect.objectContaining({ report: expect.any(Function) }),
       expect.any(Function),
+      expect.any(Object),
     ]);
   });
 

@@ -1,9 +1,10 @@
 import { authorizeApiPermission } from "../../../../../../lib/auth/api-authorization";
 import { createPaymentQueryService } from "../../../../../../lib/payment-queries/server";
+import { observeApiRoute } from "../../../../../../lib/observability/api-route";
 
 type RouteContext = Readonly<{ params: Promise<{ orderId: string }> }>;
 
-export async function GET(_request: Request, context: RouteContext) {
+async function handleGet(_request: Request, context: RouteContext) {
   try {
     const authorization = await authorizeApiPermission("payments.view");
     if (!authorization.ok) {
@@ -54,3 +55,5 @@ function internalError() {
 function errorResponse(status: number, code: string, message: string) {
   return Response.json({ error: { code, message } }, { status });
 }
+
+export const GET = observeApiRoute("GET", handleGet);

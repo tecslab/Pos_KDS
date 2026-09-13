@@ -16,17 +16,29 @@ import {
 } from "../../infrastructure/production";
 import { SupabaseRealtimePublisher } from "../../infrastructure/realtime";
 import { createSupabaseAdminClient } from "../supabase/admin";
+import {
+  operationalTelemetry,
+  operationalTelemetryClock,
+} from "../observability/recorder";
 
 export function createProductionBatchCompletionService() {
   const client = createSupabaseAdminClient();
   const dispatcher = new InProcessDomainEventPublisher<
     ProductionCompleted | InventoryAlertChanged
-  >();
+  >(operationalTelemetry);
   const productionPublisher = new ProductionCompletedRealtimePublisher(
-    new SupabaseRealtimePublisher(client),
+    new SupabaseRealtimePublisher(
+      client,
+      operationalTelemetry,
+      operationalTelemetryClock,
+    ),
   );
   const inventoryAlertPublisher = new InventoryAlertChangedRealtimePublisher(
-    new SupabaseRealtimePublisher(client),
+    new SupabaseRealtimePublisher(
+      client,
+      operationalTelemetry,
+      operationalTelemetryClock,
+    ),
   );
 
   dispatcher.subscribe("production.completed", (event) =>

@@ -19,18 +19,30 @@ import {
 } from "../../infrastructure/inventory";
 import { SupabaseRealtimePublisher } from "../../infrastructure/realtime";
 import { createSupabaseAdminClient } from "../supabase/admin";
+import {
+  operationalTelemetry,
+  operationalTelemetryClock,
+} from "../observability/recorder";
 
 export function createInventoryAdjustmentWasteRegistrationService() {
   const client = createSupabaseAdminClient();
   const dispatcher = new InProcessDomainEventPublisher<
     InventoryAdjustmentWasteRegistered | InventoryAlertChanged
-  >();
+  >(operationalTelemetry);
   const realtimePublisher =
     new InventoryAdjustmentWasteRegisteredRealtimePublisher(
-      new SupabaseRealtimePublisher(client),
+      new SupabaseRealtimePublisher(
+        client,
+        operationalTelemetry,
+        operationalTelemetryClock,
+      ),
     );
   const inventoryAlertPublisher = new InventoryAlertChangedRealtimePublisher(
-    new SupabaseRealtimePublisher(client),
+    new SupabaseRealtimePublisher(
+      client,
+      operationalTelemetry,
+      operationalTelemetryClock,
+    ),
   );
 
   dispatcher.subscribe("inventory.adjustment.registered", (event) =>

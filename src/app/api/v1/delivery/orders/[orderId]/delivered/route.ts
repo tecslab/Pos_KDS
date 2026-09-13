@@ -1,10 +1,11 @@
 import { authorizeApiPermission } from "../../../../../../../lib/auth/api-authorization";
 import { mapOrderDeliveredErrorToHttp } from "../../../../../../../lib/http";
 import { createOrderDeliveredService } from "../../../../../../../lib/order-delivered/server";
+import { observeApiRoute } from "../../../../../../../lib/observability/api-route";
 
 type RouteContext = Readonly<{ params: Promise<{ orderId: string }> }>;
 
-export async function PATCH(_request: Request, context: RouteContext) {
+async function handlePatch(_request: Request, context: RouteContext) {
   try {
     const authorization = await authorizeApiPermission(
       "delivery.delivered.mark",
@@ -52,3 +53,5 @@ function internalError() {
 function errorResponse(status: number, code: string, message: string) {
   return Response.json({ error: { code, message } }, { status });
 }
+
+export const PATCH = observeApiRoute("PATCH", handlePatch);

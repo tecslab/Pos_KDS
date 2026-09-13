@@ -1,7 +1,8 @@
 import { authorizeApiPermission } from "../../../../lib/auth/api-authorization";
 import { createInventoryViewsService } from "../../../../lib/inventory-views/server";
+import { observeApiRoute } from "../../../../lib/observability/api-route";
 
-export async function GET() {
+async function handleGet() {
   try {
     const authorization = await authorizeApiPermission("inventory.view");
     if (!authorization.ok)
@@ -34,3 +35,5 @@ function internalError() {
 function errorResponse(status: number, code: string, message: string) {
   return Response.json({ error: { code, message } }, { status });
 }
+
+export const GET = observeApiRoute("GET", handleGet);

@@ -1,5 +1,6 @@
 import { authorizeApiPermission } from "../../../../../lib/auth/api-authorization";
 import { createKitchenQueueService } from "../../../../../lib/kitchen-queue/server";
+import { observeApiRoute } from "../../../../../lib/observability/api-route";
 
 const errorResponses = Object.freeze({
   AUTHENTICATION_REQUIRED: Object.freeze({
@@ -31,7 +32,7 @@ const errorResponses = Object.freeze({
   }),
 });
 
-export async function GET() {
+async function handleGet() {
   try {
     const authorization = await authorizeApiPermission("kitchen.queue.view");
     if (!authorization.ok) {
@@ -51,3 +52,5 @@ export async function GET() {
     return Response.json(response.body, { status: response.status });
   }
 }
+
+export const GET = observeApiRoute("GET", handleGet);

@@ -1,7 +1,7 @@
 ---
 id: T-074
 title: "Add operational logging and application telemetry"
-status: todo
+status: done
 priority: high
 size: small
 type: infrastructure

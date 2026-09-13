@@ -4,8 +4,14 @@ import {
 } from "@supabase/supabase-js";
 
 import {
+  NoOpOperationalTelemetryRecorder,
+  classifyTelemetryError,
   parseRealtimeMessage,
   realtimeTopicName,
+  telemetryDuration,
+  telemetryNow,
+  type MonotonicClock,
+  type OperationalTelemetryRecorder,
   type RealtimeMessageHandler,
   type RealtimeSubscriber,
   type RealtimeSubscription,
@@ -13,6 +19,7 @@ import {
   type RealtimeSubscriptionRequest,
   type RealtimeTopic,
 } from "../../application";
+import { SystemMonotonicClock } from "../observability/system-monotonic-clock";
 
 import type { SupabaseRealtimeClient } from "./supabase-realtime-client";
 import { SupabaseRealtimeError } from "./supabase-realtime-error";
@@ -42,9 +49,33 @@ const terminalFailure: RealtimeSubscriptionFailure = Object.freeze({
 export class SupabaseRealtimeSubscriber implements RealtimeSubscriber {
   private readonly channels = new Map<string, SharedChannel>();
 
-  constructor(private readonly client: SupabaseRealtimeClient) {}
+  constructor(
+    private readonly client: SupabaseRealtimeClient,
+    private readonly telemetry: OperationalTelemetryRecorder = new NoOpOperationalTelemetryRecorder(),
+    private readonly clock: MonotonicClock = new SystemMonotonicClock(),
+  ) {}
 
   async subscribe(
+    request: RealtimeSubscriptionRequest,
+  ): Promise<RealtimeSubscription> {
+    const startedAt = telemetryNow(this.clock);
+
+    try {
+      const subscription = await this.subscribeObserved(request);
+      this.recordOperation("subscribe", "success", undefined, startedAt);
+      return subscription;
+    } catch (error) {
+      this.recordOperation(
+        "subscribe",
+        "failure",
+        classifyTelemetryError(error),
+        startedAt,
+      );
+      throw error;
+    }
+  }
+
+  private async subscribeObserved(
     request: RealtimeSubscriptionRequest,
   ): Promise<RealtimeSubscription> {
     const topicName = realtimeTopicName(request.restaurantId, request.topic);
@@ -228,6 +259,26 @@ export class SupabaseRealtimeSubscriber implements RealtimeSubscriber {
     topicName: string,
     shared: SharedChannel,
   ): Promise<void> {
+    const startedAt = telemetryNow(this.clock);
+
+    try {
+      await this.recoverObserved(topicName, shared);
+      this.recordOperation("recover", "success", undefined, startedAt);
+    } catch (error) {
+      this.recordOperation(
+        "recover",
+        "failure",
+        classifyTelemetryError(error),
+        startedAt,
+      );
+      throw error;
+    }
+  }
+
+  private async recoverObserved(
+    topicName: string,
+    shared: SharedChannel,
+  ): Promise<void> {
     await this.removeCurrentChannel(shared);
 
     if (
@@ -258,6 +309,25 @@ export class SupabaseRealtimeSubscriber implements RealtimeSubscriber {
         reject,
       );
     });
+  }
+
+  private recordOperation(
+    operation: "subscribe" | "recover",
+    outcome: "success" | "failure",
+    errorClass: ReturnType<typeof classifyTelemetryError> | undefined,
+    startedAt: number,
+  ): void {
+    try {
+      this.telemetry.record({
+        event: "realtime.operation",
+        operation,
+        outcome,
+        durationMs: telemetryDuration(this.clock, startedAt),
+        ...(errorClass === undefined ? {} : { errorClass }),
+      });
+    } catch {
+      // Custom telemetry implementations cannot affect subscriptions.
+    }
   }
 
   private terminate(topicName: string, shared: SharedChannel): void {

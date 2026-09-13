@@ -11,10 +11,11 @@ import {
 } from "../../../../../../lib/http";
 import { createOrderCancellationService } from "../../../../../../lib/order-cancellation/server";
 import { createOrderModificationService } from "../../../../../../lib/order-modification/server";
+import { observeApiRoute } from "../../../../../../lib/observability/api-route";
 
 type RouteContext = Readonly<{ params: Promise<{ orderId: string }> }>;
 
-export async function GET(_request: Request, context: RouteContext) {
+async function handleGet(_request: Request, context: RouteContext) {
   try {
     const authorization = await authorizeApiPermission("orders.view");
     if (!authorization.ok)
@@ -46,7 +47,7 @@ export async function GET(_request: Request, context: RouteContext) {
   }
 }
 
-export async function PATCH(request: Request, context: RouteContext) {
+async function handlePatch(request: Request, context: RouteContext) {
   try {
     const authorization = await authorizeApiPermission("orders.edit");
     if (!authorization.ok)
@@ -79,7 +80,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 }
 
-export async function DELETE(request: Request, context: RouteContext) {
+async function handleDelete(request: Request, context: RouteContext) {
   try {
     const authorization = await authorizeApiPermission("orders.cancel");
     if (!authorization.ok)
@@ -211,3 +212,7 @@ function internalError() {
 function errorResponse(status: number, code: string, message: string) {
   return Response.json({ error: { code, message } }, { status });
 }
+
+export const GET = observeApiRoute("GET", handleGet);
+export const PATCH = observeApiRoute("PATCH", handlePatch);
+export const DELETE = observeApiRoute("DELETE", handleDelete);

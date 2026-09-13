@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-074
-last_completed_task: T-073
+next_suggested_task: T-075
+last_completed_task: T-074
 last_commit: pending
-completed_tasks: 74
+completed_tasks: 75
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -128,6 +128,8 @@ T-072 — Add end-to-end coverage for inventory and production integrity (commit
 
 T-073 — Conduct authorization and input-security regression testing (commit pending; the task commit cannot self-reference in this tracked state file). Automated server/API and lifecycle regressions prove persisted role-derived permission enforcement, fail-closed authentication/authorization, ownership-independent custom-role operations, untrusted input rejection without side effects, approved payment-overage rules, and immutable history/audit/event preservation after rejected attempts. Formal external audit and penetration testing remain excluded.
 
+T-074 — Add operational logging and application telemetry (commit pending; the task commit cannot self-reference in this tracked state file). Vendor-neutral structured operational telemetry records only allowlisted safe dimensions for completed API request latency/error rates, authentication failures, unexpected exceptions, database and realtime health, printer failures, and committed business-event counts. Telemetry is best effort, cannot alter business outcomes, and does not replace or invoke immutable audit history.
+
 ## Current Task
 
 None.
@@ -138,7 +140,7 @@ None.
 
 ## Next Suggested Task
 
-T-074 — Add operational logging and application telemetry.
+T-075 — Optimize tablet accessibility, responsiveness, and critical-path performance.
 
 ## Human Checkpoints
 

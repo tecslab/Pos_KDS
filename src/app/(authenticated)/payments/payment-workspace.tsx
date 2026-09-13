@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { PendingPaymentOrder } from "@/application";
+import {
+  operationalTelemetry,
+  operationalTelemetryClock,
+} from "../../../lib/observability/recorder";
 
 import {
   amountExceedsBalance,
@@ -227,6 +231,8 @@ export function PaymentWorkspace({
         const controller = new PaymentRealtimeController({
           subscriber: new SupabaseRealtimeSubscriber(
             createBrowserSupabaseClient(),
+            operationalTelemetry,
+            operationalTelemetryClock,
           ),
           restaurantIds,
           refreshPayments: refreshOrders,

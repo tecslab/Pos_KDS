@@ -16,17 +16,29 @@ import {
 } from "../../infrastructure/orders";
 import { SupabaseRealtimePublisher } from "../../infrastructure/realtime";
 import { createSupabaseAdminClient } from "../supabase/admin";
+import {
+  operationalTelemetry,
+  operationalTelemetryClock,
+} from "../observability/recorder";
 
 export function createOrderCancellationService() {
   const client = createSupabaseAdminClient();
   const dispatcher = new InProcessDomainEventPublisher<
     OrderCancelled | InventoryAlertChanged
-  >();
+  >(operationalTelemetry);
   const realtimePublisher = new OrderCancelledRealtimePublisher(
-    new SupabaseRealtimePublisher(client),
+    new SupabaseRealtimePublisher(
+      client,
+      operationalTelemetry,
+      operationalTelemetryClock,
+    ),
   );
   const inventoryAlertPublisher = new InventoryAlertChangedRealtimePublisher(
-    new SupabaseRealtimePublisher(client),
+    new SupabaseRealtimePublisher(
+      client,
+      operationalTelemetry,
+      operationalTelemetryClock,
+    ),
   );
 
   dispatcher.subscribe("order.cancelled", (event) =>

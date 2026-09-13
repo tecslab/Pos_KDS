@@ -50,15 +50,15 @@ vi.mock("../../infrastructure/audit", () => ({
 }));
 vi.mock("../../infrastructure/realtime", () => ({
   SupabaseRealtimePublisher: class {
-    constructor(client: unknown) {
-      dependencies.realtimePublisher(client);
+    constructor(...ports: unknown[]) {
+      dependencies.realtimePublisher(...ports);
     }
   },
 }));
 vi.mock("../../infrastructure/events", () => ({
   InProcessDomainEventPublisher: class {
-    constructor() {
-      dependencies.dispatcher();
+    constructor(...ports: unknown[]) {
+      dependencies.dispatcher(...ports);
     }
     subscribe(type: unknown, handler: unknown) {
       dependencies.subscribe(type, handler);
@@ -123,6 +123,8 @@ describe("createOrderModificationService", () => {
     expect(dependencies.gateway).toHaveBeenCalledWith(dependencies.client);
     expect(dependencies.realtimePublisher).toHaveBeenCalledWith(
       dependencies.client,
+      expect.any(Object),
+      expect.any(Object),
     );
     expect(dependencies.clock).toHaveBeenCalledOnce();
     expect(dependencies.transaction).toHaveBeenCalledOnce();

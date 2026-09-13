@@ -1,12 +1,19 @@
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 import {
+  NoOpOperationalTelemetryRecorder,
+  classifyTelemetryError,
   mapDomainEventToRealtime,
   realtimeTopicName,
+  telemetryDuration,
+  telemetryNow,
   type DomainEventPublisher,
+  type MonotonicClock,
+  type OperationalTelemetryRecorder,
   type RealtimeDomainEvent,
   type RealtimePublication,
 } from "../../application";
+import { SystemMonotonicClock } from "../observability/system-monotonic-clock";
 
 import type { SupabaseRealtimeClient } from "./supabase-realtime-client";
 import { SupabaseRealtimeError } from "./supabase-realtime-error";
@@ -16,7 +23,11 @@ import { SupabaseRealtimeError } from "./supabase-realtime-error";
  * broadcast acknowledgement is awaited before the next publication begins.
  */
 export class SupabaseRealtimePublisher implements DomainEventPublisher<RealtimeDomainEvent> {
-  constructor(private readonly client: SupabaseRealtimeClient) {}
+  constructor(
+    private readonly client: SupabaseRealtimeClient,
+    private readonly telemetry: OperationalTelemetryRecorder = new NoOpOperationalTelemetryRecorder(),
+    private readonly clock: MonotonicClock = new SystemMonotonicClock(),
+  ) {}
 
   async publish(events: readonly RealtimeDomainEvent[]): Promise<void> {
     for (const event of events) {
@@ -33,6 +44,20 @@ export class SupabaseRealtimePublisher implements DomainEventPublisher<RealtimeD
   }
 
   private async publishOne(publication: RealtimePublication): Promise<void> {
+    const startedAt = telemetryNow(this.clock);
+
+    try {
+      await this.publishOneObserved(publication);
+      this.recordOperation("success", undefined, startedAt);
+    } catch (error) {
+      this.recordOperation("failure", classifyTelemetryError(error), startedAt);
+      throw error;
+    }
+  }
+
+  private async publishOneObserved(
+    publication: RealtimePublication,
+  ): Promise<void> {
     const topicName = realtimeTopicName(
       publication.envelope.restaurantId,
       publication.topic,
@@ -74,6 +99,24 @@ export class SupabaseRealtimePublisher implements DomainEventPublisher<RealtimeD
       if (ownsChannel) {
         await this.removeChannel(channel, publishFailed);
       }
+    }
+  }
+
+  private recordOperation(
+    outcome: "success" | "failure",
+    errorClass: ReturnType<typeof classifyTelemetryError> | undefined,
+    startedAt: number,
+  ): void {
+    try {
+      this.telemetry.record({
+        event: "realtime.operation",
+        operation: "publish",
+        outcome,
+        durationMs: telemetryDuration(this.clock, startedAt),
+        ...(errorClass === undefined ? {} : { errorClass }),
+      });
+    } catch {
+      // Custom telemetry implementations cannot affect publication.
     }
   }
 

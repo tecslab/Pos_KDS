@@ -16,17 +16,29 @@ import {
 } from "../../infrastructure/orders";
 import { SupabaseRealtimePublisher } from "../../infrastructure/realtime";
 import { createSupabaseAdminClient } from "../supabase/admin";
+import {
+  operationalTelemetry,
+  operationalTelemetryClock,
+} from "../observability/recorder";
 
 export function createOrderConfirmationService() {
   const client = createSupabaseAdminClient();
   const dispatcher = new InProcessDomainEventPublisher<
     OrderConfirmed | InventoryAlertChanged
-  >();
+  >(operationalTelemetry);
   const realtimePublisher = new OrderConfirmedRealtimePublisher(
-    new SupabaseRealtimePublisher(client),
+    new SupabaseRealtimePublisher(
+      client,
+      operationalTelemetry,
+      operationalTelemetryClock,
+    ),
   );
   const inventoryAlertPublisher = new InventoryAlertChangedRealtimePublisher(
-    new SupabaseRealtimePublisher(client),
+    new SupabaseRealtimePublisher(
+      client,
+      operationalTelemetry,
+      operationalTelemetryClock,
+    ),
   );
   dispatcher.subscribe("order.confirmed", (event) =>
     realtimePublisher.publish(Object.freeze([event])),

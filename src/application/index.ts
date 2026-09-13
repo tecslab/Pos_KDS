@@ -47,6 +47,19 @@ export {
 export type { DomainEventPublisher } from "./domain-event-publisher";
 export type { DomainEventRecorder } from "./domain-event-recorder";
 export {
+  NoOpOperationalTelemetryRecorder,
+  SafeOperationalTelemetryRecorder,
+  classifyTelemetryError,
+  telemetryDuration,
+  telemetryNow,
+  type MonotonicClock,
+  type OperationalTelemetryEvent,
+  type OperationalTelemetryRecord,
+  type OperationalTelemetryRecorder,
+  type OperationalTelemetrySink,
+  type TelemetryErrorClass,
+} from "./observability";
+export {
   DailySalesReportService,
   REPORTING_TIME_ZONE,
   currentGuayaquilDate,

@@ -76,7 +76,7 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-071 Add end-to-end coverage for the core order lifecycle
 - [x] T-072 Add end-to-end coverage for inventory and production integrity
 - [x] T-073 Conduct authorization and input-security regression testing
-- [ ] T-074 Add operational logging and application telemetry
+- [x] T-074 Add operational logging and application telemetry
 - [ ] T-075 Optimize tablet accessibility, responsiveness, and critical-path performance
 - [ ] T-076 Prepare backup, recovery, and production deployment runbooks
 - [ ] T-077 Configure and verify production backup and deployment services

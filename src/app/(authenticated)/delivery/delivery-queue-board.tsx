@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { DeliveryQueueItem } from "@/application";
+import {
+  operationalTelemetry,
+  operationalTelemetryClock,
+} from "../../../lib/observability/recorder";
 
 import {
   DeliveryQueueRealtimeController,
@@ -156,6 +160,8 @@ export function DeliveryQueueBoard({
         const controller = new DeliveryQueueRealtimeController({
           subscriber: new SupabaseRealtimeSubscriber(
             createBrowserSupabaseClient(),
+            operationalTelemetry,
+            operationalTelemetryClock,
           ),
           restaurantIds: thresholds.map((entry) => entry.restaurantId),
           refreshQueue,

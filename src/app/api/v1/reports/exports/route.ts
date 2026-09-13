@@ -1,5 +1,6 @@
 import { authorizeApiPermission } from "../../../../../lib/auth/api-authorization";
 import { createReportExportService } from "../../../../../lib/report-export/server";
+import { observeApiRoute } from "../../../../../lib/observability/api-route";
 
 export const runtime = "nodejs";
 
@@ -10,7 +11,7 @@ const supportedProperties = new Set([
   "format",
 ]);
 
-export async function POST(request: Request) {
+async function handlePost(request: Request) {
   try {
     const viewAuthorization = await authorizeApiPermission("reports.view");
     if (!viewAuthorization.ok) {
@@ -116,3 +117,5 @@ function errorResponse(status: number, code: string, message: string) {
     { status, headers: { "Cache-Control": "no-store" } },
   );
 }
+
+export const POST = observeApiRoute("POST", handlePost);

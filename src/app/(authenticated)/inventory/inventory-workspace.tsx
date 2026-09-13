@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { InventoryViews } from "@/application";
+import {
+  operationalTelemetry,
+  operationalTelemetryClock,
+} from "../../../lib/observability/recorder";
 
 import {
   InventoryRealtimeController,
@@ -82,6 +86,8 @@ export function InventoryWorkspace({ initialViews }: InventoryWorkspaceProps) {
         const controller = new InventoryRealtimeController({
           subscriber: new SupabaseRealtimeSubscriber(
             createBrowserSupabaseClient(),
+            operationalTelemetry,
+            operationalTelemetryClock,
           ),
           restaurantIds,
           refreshInventory,

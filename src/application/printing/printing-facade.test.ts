@@ -168,6 +168,43 @@ describe("PrintingFacade", () => {
     expect(Object.isFrozen(report?.retry)).toBe(true);
   });
 
+  it("emits metadata-only printer failure telemetry without changing the outcome", async () => {
+    const fixture = dependencies();
+    const record = vi.fn();
+    fixture.print.mockResolvedValue({
+      status: "failed",
+      failure: { code: "PRINT_FAILED", retryable: false },
+    });
+    const facade = new PrintingFacade(
+      { select: fixture.select },
+      { print: fixture.print },
+      { decide: fixture.decide },
+      { report: fixture.report },
+      { record },
+    );
+
+    const result = await facade.printAfterPersistence(
+      request({
+        document: {
+          id: "private-document-id",
+          type: "PAYMENT_RECEIPT",
+          lines: [{ text: "card token secret" }],
+        },
+      }),
+    );
+
+    expect(result.status).toBe("failed");
+    expect(record).toHaveBeenCalledWith({
+      event: "printer.failed",
+      documentType: "PAYMENT_RECEIPT",
+      failureCode: "PRINT_FAILED",
+      retryable: false,
+      attemptNumber: 1,
+    });
+    expect(JSON.stringify(record.mock.calls)).not.toContain("secret");
+    expect(JSON.stringify(record.mock.calls)).not.toContain("private-document");
+  });
+
   it("never rejects when selection or error reporting throws", async () => {
     const fixture = dependencies();
     const selectionError = new Error("selector secret detail");

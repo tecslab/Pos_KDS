@@ -1,9 +1,10 @@
 import { authorizeApiPermission } from "../../../../../lib/auth/api-authorization";
 import { createOperationalPerformanceReportService } from "../../../../../lib/operational-performance-report/server";
+import { observeApiRoute } from "../../../../../lib/observability/api-route";
 
 const supportedParameters = new Set(["restaurantId", "date", "timeZone"]);
 
-export async function GET(request: Request) {
+async function handleGet(request: Request) {
   try {
     const authorization = await authorizeApiPermission("reports.view");
     if (!authorization.ok)
@@ -71,3 +72,5 @@ function internalError() {
 function errorResponse(status: number, code: string, message: string) {
   return Response.json({ error: { code, message } }, { status });
 }
+
+export const GET = observeApiRoute("GET", handleGet);
