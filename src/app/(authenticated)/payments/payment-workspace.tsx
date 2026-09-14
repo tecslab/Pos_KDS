@@ -399,6 +399,7 @@ export function PaymentWorkspace({
           <p
             role="status"
             aria-live="polite"
+            aria-atomic="true"
             className="text-right text-sm text-white/80"
           >
             {connectionPresentation[connection]}
@@ -440,8 +441,9 @@ export function PaymentWorkspace({
         </p>
       ) : null}
 
-      <div className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(18rem,0.8fr)_minmax(26rem,1.2fr)]">
+      <div className="mt-5 grid items-start gap-5 2xl:grid-cols-[minmax(18rem,0.8fr)_minmax(26rem,1.2fr)]">
         <section
+          aria-busy={refreshing}
           aria-label="Órdenes con pagos pendientes"
           className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-sm)]"
         >
@@ -522,7 +524,7 @@ export function PaymentWorkspace({
                   Actualizando detalle…
                 </p>
               ) : null}
-              <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(13rem,0.75fr)_minmax(18rem,1.25fr)]">
+              <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(13rem,0.75fr)_minmax(18rem,1.25fr)]">
                 <section aria-label="Cuentas de clientes">
                   <h3 className="font-bold">Cuentas de clientes</h3>
                   <div className="mt-3 grid gap-2">

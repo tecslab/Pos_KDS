@@ -22,6 +22,7 @@
   --shadow-md: 0 8px 24px rgba(16, 24, 20, 0.12);
   --sidebar-width: 280px;
   --topbar-height: 64px;
+  --touch-target: 48px;
   --kds-card-min: 280px;
   --content-max: 1440px;
 }
@@ -38,4 +39,23 @@ body {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+}
+
+/* A visible focus indicator is required even for controls that do not supply
+ * their own Tailwind focus utility. Keep it consistent with the operational
+ * green used throughout the tablet UI. */
+:focus-visible {
+  outline: 2px solid var(--brand-green);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

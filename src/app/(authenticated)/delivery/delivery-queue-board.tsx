@@ -234,9 +234,11 @@ export function DeliveryQueueBoard({
             <p
               role="status"
               aria-live="polite"
+              aria-atomic="true"
               className="text-sm text-white/80"
             >
-              {connectionPresentation[connection]}
+              {connectionPresentation[connection]} · {orders.length}{" "}
+              {orders.length === 1 ? "orden lista" : "órdenes listas"}
             </p>
           </div>
           <button
@@ -252,10 +254,10 @@ export function DeliveryQueueBoard({
 
       <form
         onSubmit={applyFilters}
-        className="mt-5 grid gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-sm)] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_10rem_auto_auto]"
+        className="mt-5 grid gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-sm)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,10rem)_max-content_max-content]"
         aria-label="Filtros de órdenes listas"
       >
-        <label className="grid gap-1 text-sm font-semibold">
+        <label className="min-w-0 grid gap-1 text-sm font-semibold">
           Mesa o ubicación
           <select
             value={draftFilters.serviceLocationId}
@@ -265,7 +267,7 @@ export function DeliveryQueueBoard({
                 serviceLocationId: event.target.value,
               }))
             }
-            className="min-h-12 rounded-md border border-[var(--color-border-strong)] bg-white px-3 text-base focus:outline-2 focus:outline-offset-2 focus:outline-[var(--brand-green)]"
+            className="min-h-12 w-full rounded-md border border-[var(--color-border-strong)] bg-white px-3 text-base focus:outline-2 focus:outline-offset-2 focus:outline-[var(--brand-green)]"
           >
             <option value="">Todas las mesas</option>
             {locations.map((location) => (
@@ -275,7 +277,7 @@ export function DeliveryQueueBoard({
             ))}
           </select>
         </label>
-        <label className="grid gap-1 text-sm font-semibold">
+        <label className="min-w-0 grid gap-1 text-sm font-semibold">
           Número de orden
           <input
             value={draftFilters.orderNumber}
@@ -286,10 +288,10 @@ export function DeliveryQueueBoard({
               }))
             }
             maxLength={100}
-            className="min-h-12 rounded-md border border-[var(--color-border-strong)] bg-white px-3 text-base focus:outline-2 focus:outline-offset-2 focus:outline-[var(--brand-green)]"
+            className="min-h-12 w-full rounded-md border border-[var(--color-border-strong)] bg-white px-3 text-base focus:outline-2 focus:outline-offset-2 focus:outline-[var(--brand-green)]"
           />
         </label>
-        <label className="grid gap-1 text-sm font-semibold">
+        <label className="min-w-0 grid gap-1 text-sm font-semibold">
           Espera mínima
           <span className="relative">
             <input
@@ -329,7 +331,7 @@ export function DeliveryQueueBoard({
           <p
             id="delivery-filter-error"
             role="alert"
-            className="md:col-span-5 text-sm font-semibold text-[var(--status-critical)]"
+            className="lg:col-span-5 text-sm font-semibold text-[var(--status-critical)]"
           >
             {filterError}
           </p>
@@ -354,6 +356,7 @@ export function DeliveryQueueBoard({
         </section>
       ) : (
         <section
+          aria-busy={refreshing}
           aria-label="Órdenes listas para entregar"
           className="mt-5 grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--kds-card-min)),1fr))]"
         >

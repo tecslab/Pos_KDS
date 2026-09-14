@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const dependencies = vi.hoisted(() => ({
   authorize: vi.fn(),
@@ -280,6 +280,8 @@ beforeEach(() => {
     .mockResolvedValue({ ok: true, value: inventoryProductionExpenseReport });
 });
 
+afterEach(() => vi.useRealTimers());
+
 async function render(params: Record<string, string> = {}) {
   return renderToStaticMarkup(
     await ReportsPage({ searchParams: Promise.resolve(params) }),
@@ -287,6 +289,50 @@ async function render(params: Record<string, string> = {}) {
 }
 
 describe("daily sales dashboard UI", () => {
+  it("completes authorization, restaurant context, concurrent reports, and composition before the three-second target", async () => {
+    vi.useFakeTimers();
+    const resolvesAfter = <T,>(value: T) =>
+      new Promise<T>((resolve) => setTimeout(() => resolve(value), 2_799));
+    dependencies.authorize.mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () =>
+              resolve({ userId: actorId, permissionCodes: ["reports.view"] }),
+            100,
+          ),
+        ),
+    );
+    dependencies.listRestaurants.mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ ok: true, value: restaurants }), 100),
+        ),
+    );
+    dependencies.read.mockImplementation(() =>
+      resolvesAfter({ ok: true, value: report }),
+    );
+    dependencies.operationalRead.mockImplementation(() =>
+      resolvesAfter({ ok: true, value: operationalReport }),
+    );
+    dependencies.paymentRead.mockImplementation(() =>
+      resolvesAfter({ ok: true, value: paymentReport }),
+    );
+    dependencies.inventoryProductionExpenseRead.mockImplementation(() =>
+      resolvesAfter({ ok: true, value: inventoryProductionExpenseReport }),
+    );
+
+    const pending = render({ date: "2026-09-06", restaurantId });
+    await vi.advanceTimersByTimeAsync(2_999);
+
+    expect(await pending).toContain("Ventas del día");
+    expect(dependencies.authorize).toHaveBeenCalledOnce();
+    expect(dependencies.listRestaurants).toHaveBeenCalledOnce();
+    expect(dependencies.read).toHaveBeenCalledOnce();
+    expect(dependencies.operationalRead).toHaveBeenCalledOnce();
+    expect(dependencies.paymentRead).toHaveBeenCalledOnce();
+  });
+
   it("authorizes at the page boundary before composing or reading report data", async () => {
     const markup = await render({ date: "2026-09-06", restaurantId });
 

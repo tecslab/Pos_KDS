@@ -1,7 +1,7 @@
 ---
 id: T-075
 title: "Optimize tablet accessibility, responsiveness, and critical-path performance"
-status: todo
+status: done
 priority: high
 size: medium
 type: quality

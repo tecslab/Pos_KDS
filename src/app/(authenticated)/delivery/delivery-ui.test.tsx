@@ -21,6 +21,7 @@ vi.mock("@/lib/operating-settings/server", () => ({
 }));
 
 import DeliveryPage from "./page";
+import { DeliveryQueueBoard } from "./delivery-queue-board";
 
 const restaurantId = "30000000-0000-4000-8000-000000000001";
 const order = Object.freeze({
@@ -67,6 +68,42 @@ beforeEach(() => {
 });
 
 describe("waiter delivery panel", () => {
+  it("keeps every delivery filter track shrinkable at tablet widths", async () => {
+    const source = await readFile(
+      new URL("./delivery-queue-board.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(source).toContain(
+      "lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,10rem)_max-content_max-content]",
+    );
+    expect(source).toContain(
+      'className="min-w-0 grid gap-1 text-sm font-semibold"',
+    );
+    expect(source).toContain("min-h-12 w-full rounded-md");
+  });
+
+  it("announces the Spanish live queue count and exposes its refresh state", () => {
+    const markup = renderToStaticMarkup(
+      <DeliveryQueueBoard
+        initialOrders={[order]}
+        thresholds={[
+          {
+            restaurantId,
+            warningMinutes: 5,
+            criticalMinutes: 8,
+          },
+        ]}
+      />,
+    );
+
+    expect(markup).toContain('aria-live="polite"');
+    expect(markup).toContain('aria-atomic="true"');
+    expect(markup).toContain("1 orden lista");
+    expect(markup).toContain('aria-busy="false"');
+    expect(markup).toContain("En tiempo");
+  });
+
   it("authorizes before loading and renders every Ready-queue field", async () => {
     const markup = renderToStaticMarkup(await DeliveryPage());
 

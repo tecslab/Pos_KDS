@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-075
-last_completed_task: T-074
+next_suggested_task: T-076
+last_completed_task: T-075
 last_commit: pending
-completed_tasks: 75
+completed_tasks: 76
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -130,6 +130,8 @@ T-073 — Conduct authorization and input-security regression testing (commit pe
 
 T-074 — Add operational logging and application telemetry (commit pending; the task commit cannot self-reference in this tracked state file). Vendor-neutral structured operational telemetry records only allowlisted safe dimensions for completed API request latency/error rates, authentication failures, unexpected exceptions, database and realtime health, printer failures, and committed business-event counts. Telemetry is best effort, cannot alter business outcomes, and does not replace or invoke immutable audit history.
 
+T-075 — Optimize tablet accessibility, responsiveness, and critical-path performance (commit pending; the task commit cannot self-reference in this tracked state file). Tablet layouts preserve usable single-column or shrink-safe grids after authenticated-shell width is consumed; 48 px touch/focus, Spanish live-status, and loading semantics are verified. Repeatable jsdom evidence measures a representative rendered PoS add-to-draft interaction through its visible DOM commit below the 200 ms NFR-001 target; authorized realtime and daily-report deadline coverage remains in place.
+
 ## Current Task
 
 None.
@@ -140,7 +142,7 @@ None.
 
 ## Next Suggested Task
 
-T-075 — Optimize tablet accessibility, responsiveness, and critical-path performance.
+T-076 — Prepare backup, recovery, and production deployment runbooks.
 
 ## Human Checkpoints
 

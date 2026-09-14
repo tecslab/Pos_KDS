@@ -43,6 +43,10 @@ describe("PoS draft composer UI", () => {
     expect(source).toContain('role="status"');
     expect(source).toContain("min-h-12");
     expect(source).toContain("aria-pressed");
+    expect(source).toContain("lg:grid-cols-2");
+    expect(source).toContain("2xl:grid-cols");
+    expect(source).toContain("lg:col-span-2");
+    expect(source).toContain("2xl:col-span-1");
   });
 
   it("uses the protected confirmation endpoint with pending-state duplicate protection", async () => {

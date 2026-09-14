@@ -21,6 +21,7 @@ vi.mock("@/lib/operating-settings/server", () => ({
 }));
 
 import KitchenPage from "./page";
+import { KitchenQueueBoard } from "./kitchen-queue-board";
 
 const restaurantId = "30000000-0000-4000-8000-000000000001";
 const order = Object.freeze({
@@ -84,6 +85,29 @@ beforeEach(() => {
 });
 
 describe("live kitchen queue UI", () => {
+  it("announces Spanish queue and connection status without relying on card color", () => {
+    const markup = renderToStaticMarkup(
+      <KitchenQueueBoard
+        initialOrders={[order]}
+        thresholds={[
+          {
+            restaurantId,
+            warningMinutes: 5,
+            criticalMinutes: 8,
+          },
+        ]}
+        canMarkReady={false}
+      />,
+    );
+
+    expect(markup).toContain("Sistema de visualización de cocina");
+    expect(markup).toContain('aria-live="polite"');
+    expect(markup).toContain('aria-atomic="true"');
+    expect(markup).toContain("1 orden activa");
+    expect(markup).toContain('aria-busy="false"');
+    expect(markup).toContain("En tiempo");
+  });
+
   it("authorizes the page before loading and renders configured queue details", async () => {
     const markup = renderToStaticMarkup(await KitchenPage());
 

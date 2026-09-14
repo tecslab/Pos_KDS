@@ -205,7 +205,7 @@ export function OrderDraftComposer() {
           orden.
         </StatusPanel>
       ) : (
-        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(15rem,0.8fr)_minmax(24rem,1.4fr)_minmax(20rem,1fr)]">
+        <div className="mt-5 grid gap-5 lg:grid-cols-2 2xl:grid-cols-[minmax(15rem,0.8fr)_minmax(24rem,1.4fr)_minmax(20rem,1fr)]">
           <aside className={panelClass} aria-label="Ubicación y cuentas">
             <h2 className="text-xl font-bold">Ubicación</h2>
             <div className="mt-4 grid gap-2">
@@ -365,7 +365,7 @@ export function OrderDraftComposer() {
           </section>
 
           <aside
-            className={`${panelClass} xl:sticky xl:top-24 xl:self-start`}
+            className={`${panelClass} lg:col-span-2 2xl:col-span-1 2xl:sticky 2xl:top-24 2xl:self-start`}
             aria-labelledby="order-summary-title"
           >
             <h2 id="order-summary-title" className="text-xl font-bold">

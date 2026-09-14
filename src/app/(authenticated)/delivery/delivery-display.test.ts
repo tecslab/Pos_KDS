@@ -130,6 +130,44 @@ describe("delivery display presentation", () => {
 });
 
 describe("DeliveryQueueRealtimeController", () => {
+  it("propagates an authorized queue refresh to the display before the one-second target", async () => {
+    vi.useFakeTimers();
+    let request: RealtimeSubscriptionRequest | undefined;
+    const subscriber: RealtimeSubscriber = {
+      subscribe: vi.fn(async (candidate) => {
+        request = candidate;
+        return { unsubscribe: vi.fn().mockResolvedValue(undefined) };
+      }),
+    };
+    let displayedOrderCount = 0;
+    const refreshQueue = vi
+      .fn<() => Promise<void>>()
+      .mockResolvedValueOnce(undefined)
+      .mockImplementation(
+        () =>
+          new Promise<void>((resolve) => {
+            setTimeout(() => {
+              displayedOrderCount = 1;
+              resolve();
+            }, 999);
+          }),
+      );
+    const controller = new DeliveryQueueRealtimeController({
+      subscriber,
+      restaurantIds: [restaurantId],
+      refreshQueue,
+      onStatus: vi.fn(),
+    });
+
+    await controller.start();
+    request!.onMessage(message("kitchen.status.updated"));
+    await vi.advanceTimersByTimeAsync(999);
+
+    expect(refreshQueue).toHaveBeenCalledTimes(2);
+    expect(displayedOrderCount).toBe(1);
+    await controller.stop();
+  });
+
   it("refetches applicable delivery events on the delivery topic", async () => {
     const requests: RealtimeSubscriptionRequest[] = [];
     const subscriber: RealtimeSubscriber = {

@@ -216,7 +216,7 @@ export function KitchenQueueBoard({
       <header className="flex flex-wrap items-start justify-between gap-4 rounded-lg bg-[var(--color-text)] p-5 text-white shadow-[var(--shadow-sm)]">
         <div>
           <p className="text-sm font-semibold text-[var(--status-new-bg)]">
-            Kitchen Display System
+            Sistema de visualización de cocina
           </p>
           <h1 className="mt-1 text-3xl font-bold">Cola de cocina</h1>
           <p className="mt-2 text-sm text-white/80">
@@ -231,9 +231,11 @@ export function KitchenQueueBoard({
             <p
               role="status"
               aria-live="polite"
+              aria-atomic="true"
               className="text-sm text-white/80"
             >
-              {connectionPresentation[connection]}
+              {connectionPresentation[connection]} · {orders.length}{" "}
+              {orders.length === 1 ? "orden activa" : "órdenes activas"}
             </p>
           </div>
           <button
@@ -265,6 +267,7 @@ export function KitchenQueueBoard({
         </section>
       ) : (
         <section
+          aria-busy={refreshing}
           aria-label="Órdenes pendientes de cocina"
           className="mt-5 grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--kds-card-min)),1fr))]"
         >

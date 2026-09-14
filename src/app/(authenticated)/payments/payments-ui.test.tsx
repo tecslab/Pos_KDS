@@ -176,6 +176,12 @@ describe("split and partial payment UI", () => {
     expect(workspace).toContain("await refreshOrders()");
     expect(workspace).toContain("await loadDetail(current)");
     expect(workspace).toContain("min-h-12");
+    expect(workspace).toContain(
+      "2xl:grid-cols-[minmax(18rem,0.8fr)_minmax(26rem,1.2fr)]",
+    );
+    expect(workspace).toContain(
+      "2xl:grid-cols-[minmax(13rem,0.75fr)_minmax(18rem,1.25fr)]",
+    );
     expect(workspace).not.toMatch(/\.from\(|\.rpc\(/);
     expect(display).toContain('topic: "payments"');
     expect(display).toContain('"order.created"');
