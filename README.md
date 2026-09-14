@@ -16,6 +16,12 @@ Use `npm run build` for a production build and `npm start` to serve it. The
 production build uses Next.js's supported webpack compiler for compatibility
 with restricted build environments.
 
+## Operations
+
+Production deployment, migration, rollback, backup/restore, incident, and
+credential procedures are in the
+[production operations runbook](docs/operations/production-runbook.md).
+
 ## Database schema and migrations
 
 Prisma is the repository source for the PostgreSQL schema, generated client,

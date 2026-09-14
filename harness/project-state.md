@@ -3,10 +3,10 @@ schema_version: 1
 current_milestone: M1
 current_task: null
 current_phase: idle
-next_suggested_task: T-076
-last_completed_task: T-075
+next_suggested_task: T-077
+last_completed_task: T-076
 last_commit: pending
-completed_tasks: 76
+completed_tasks: 77
 total_tasks: 79
 active_blockers: []
 pending_human_checkpoints:
@@ -132,6 +132,8 @@ T-074 — Add operational logging and application telemetry (commit pending; the
 
 T-075 — Optimize tablet accessibility, responsiveness, and critical-path performance (commit pending; the task commit cannot self-reference in this tracked state file). Tablet layouts preserve usable single-column or shrink-safe grids after authenticated-shell width is consumed; 48 px touch/focus, Spanish live-status, and loading semantics are verified. Repeatable jsdom evidence measures a representative rendered PoS add-to-draft interaction through its visible DOM commit below the 200 ms NFR-001 target; authorized realtime and daily-report deadline coverage remains in place.
 
+T-076 — Prepare backup, recovery, and production deployment runbooks (commit pending; the task commit cannot self-reference in this tracked state file). Documents safe Vercel/Supabase deployment and MCP migration procedures, application rollback versus forward-only database correction, policy-gated backup verification and isolated recovery rehearsal, metadata-only health checks, incident response, and secret rotation. It deliberately applies no production configuration or services; T-077 owns the required production policy and configuration evidence.
+
 ## Current Task
 
 None.
@@ -142,7 +144,7 @@ None.
 
 ## Next Suggested Task
 
-T-076 — Prepare backup, recovery, and production deployment runbooks.
+T-077 — Configure and verify production backup and deployment services.
 
 ## Human Checkpoints
 

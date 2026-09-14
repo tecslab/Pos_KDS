@@ -78,6 +78,6 @@ Each item is intended to fit in one implementation commit. Tasks marked **Waitin
 - [x] T-073 Conduct authorization and input-security regression testing
 - [x] T-074 Add operational logging and application telemetry
 - [x] T-075 Optimize tablet accessibility, responsiveness, and critical-path performance
-- [ ] T-076 Prepare backup, recovery, and production deployment runbooks
+- [x] T-076 Prepare backup, recovery, and production deployment runbooks
 - [ ] T-077 Configure and verify production backup and deployment services
 - [ ] T-078 Confirm printer hardware and local print-service deployment
