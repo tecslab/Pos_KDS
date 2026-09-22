@@ -64,7 +64,7 @@ describe("ReportExportControls", () => {
 
   it("posts filters only, downloads the returned artifact, and revokes its URL", async () => {
     fetchMock.mockResolvedValue(
-      new Response(new Blob(["pdf"]), {
+      new Response("pdf", {
         status: 200,
         headers: { "Content-Type": "application/pdf" },
       }),
