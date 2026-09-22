@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "db:schema:format": "prisma format",
     "db:schema:validate": "prisma validate",
