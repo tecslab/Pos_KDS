@@ -21,7 +21,11 @@ export type InvitedUser = Readonly<{
 
 export interface UserAdministrationGateway {
   listUsers(): Promise<readonly ManagedUser[]>;
-  inviteUser(email: string, displayName: string): Promise<InvitedUser>;
+  inviteUser(
+    email: string,
+    displayName: string,
+    redirectTo?: string,
+  ): Promise<InvitedUser>;
   setUserActive(userId: string, active: boolean): Promise<ManagedUser>;
   sendPasswordReset(userId: string): Promise<ManagedUser>;
 }
@@ -49,12 +53,17 @@ export class UserAdministrationService {
 
   async invite(
     actorId: string,
-    input: Readonly<{ email: string; displayName: string }>,
+    input: Readonly<{ email: string; displayName: string; redirectTo?: string }>,
   ): Promise<Result<InvitedUser, UserAdministrationError>> {
     const email = normalizeEmail(input.email);
     const displayName = normalizeDisplayName(input.displayName);
 
-    if (!isUuid(actorId) || email === null || displayName === null) {
+    if (
+      !isUuid(actorId) ||
+      email === null ||
+      displayName === null ||
+      (input.redirectTo !== undefined && !isHttpUrl(input.redirectTo))
+    ) {
       return failure("INVALID_INPUT");
     }
 
@@ -69,7 +78,10 @@ export class UserAdministrationService {
 
     let invited: InvitedUser;
     try {
-      invited = await this.gateway.inviteUser(email, displayName);
+      invited =
+        input.redirectTo === undefined
+          ? await this.gateway.inviteUser(email, displayName)
+          : await this.gateway.inviteUser(email, displayName, input.redirectTo);
     } catch {
       await this.recordOutcomeSafely({
         actorId,
@@ -226,4 +238,13 @@ function isUuid(value: unknown): value is string {
       value,
     )
   );
+}
+
+function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
 }

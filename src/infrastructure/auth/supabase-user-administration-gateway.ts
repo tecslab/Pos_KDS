@@ -48,14 +48,17 @@ export class SupabaseUserAdministrationGateway implements UserAdministrationGate
     }
   }
 
-  async inviteUser(email: string, displayName: string): Promise<InvitedUser> {
+  async inviteUser(
+    email: string,
+    displayName: string,
+    redirectTo?: string,
+  ): Promise<InvitedUser> {
     try {
-      const { data, error } = await this.client.auth.admin.inviteUserByEmail(
-        email,
-        {
-          data: { display_name: displayName },
-        },
-      );
+      const options: { data: { display_name: string }; redirectTo?: string } = {
+        data: { display_name: displayName },
+      };
+      if (redirectTo !== undefined) options.redirectTo = redirectTo;
+      const { data, error } = await this.client.auth.admin.inviteUserByEmail(email, options);
       if (error !== null || data.user === null) throw new Error();
       return Object.freeze({ id: data.user.id, email, displayName });
     } catch {

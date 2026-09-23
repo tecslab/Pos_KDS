@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 import { requireServerPermission } from "@/lib/auth/server-authorization";
 import { createUserAdministrationService } from "@/lib/user-administration/server";
@@ -12,9 +13,15 @@ export async function inviteUser(formData: FormData): Promise<never> {
     "administration.users.manage",
     PAGE_PATH,
   );
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get("origin");
+  const redirectTo = origin
+    ? new URL("/auth/accept-invite", origin).toString()
+    : "";
   const result = await createUserAdministrationService().invite(actor.userId, {
     email: stringValue(formData.get("email")),
     displayName: stringValue(formData.get("displayName")),
+    redirectTo,
   });
   redirect(statusPath(result.ok ? "invited" : result.error.code.toLowerCase()));
 }

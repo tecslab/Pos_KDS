@@ -76,7 +76,9 @@ export async function routeAuthenticatedRequest(
 
     const isLogin = request.nextUrl.pathname === LOGIN_PATH;
     const isPublicAuthRoute =
-      isLogin || request.nextUrl.pathname === ACCESS_DENIED_PATH;
+      isLogin ||
+      request.nextUrl.pathname === ACCESS_DENIED_PATH ||
+      request.nextUrl.pathname === "/auth/accept-invite";
 
     if (!authenticated && !isPublicAuthRoute) {
       safelyRecord(recorder, {
