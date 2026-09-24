@@ -6,6 +6,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Carnales — Sistema de restaurante",
   description: "Gestión de operaciones del restaurante Carnales",
+  icons: { icon: "/icon.svg" },
 };
 
 type RootLayoutProps = Readonly<{
