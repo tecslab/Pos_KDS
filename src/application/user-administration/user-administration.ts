@@ -27,7 +27,7 @@ export interface UserAdministrationGateway {
     redirectTo?: string,
   ): Promise<InvitedUser>;
   setUserActive(userId: string, active: boolean): Promise<ManagedUser>;
-  sendPasswordReset(userId: string): Promise<ManagedUser>;
+  sendPasswordReset(userId: string, redirectTo?: string): Promise<ManagedUser>;
 }
 
 export type UserAdministrationError = Readonly<{
@@ -53,7 +53,11 @@ export class UserAdministrationService {
 
   async invite(
     actorId: string,
-    input: Readonly<{ email: string; displayName: string; redirectTo?: string }>,
+    input: Readonly<{
+      email: string;
+      displayName: string;
+      redirectTo?: string;
+    }>,
   ): Promise<Result<InvitedUser, UserAdministrationError>> {
     const email = normalizeEmail(input.email);
     const displayName = normalizeDisplayName(input.displayName);
@@ -152,8 +156,13 @@ export class UserAdministrationService {
   async requestPasswordReset(
     actorId: string,
     userId: string,
+    redirectTo?: string,
   ): Promise<Result<void, UserAdministrationError>> {
-    if (!isUuid(actorId) || !isUuid(userId)) {
+    if (
+      !isUuid(actorId) ||
+      !isUuid(userId) ||
+      (redirectTo !== undefined && !isHttpUrl(redirectTo))
+    ) {
       return failure("INVALID_INPUT");
     }
 
@@ -167,7 +176,10 @@ export class UserAdministrationService {
 
     let target: ManagedUser;
     try {
-      target = await this.gateway.sendPasswordReset(userId);
+      target =
+        redirectTo === undefined
+          ? await this.gateway.sendPasswordReset(userId)
+          : await this.gateway.sendPasswordReset(userId, redirectTo);
     } catch {
       await this.recordOutcomeSafely({
         actorId,

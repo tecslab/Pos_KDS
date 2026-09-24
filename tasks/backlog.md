@@ -2,6 +2,8 @@
 
 Each item is intended to fit in one implementation commit. Tasks marked **Waiting for Human** are explicit checkpoints: dependent AI work must not start until the required input or external setup is available.
 
+- [x] T-080 Secure Supabase invite and recovery password links
+
 - [x] T-001 Initialize the Next.js modular-monolith workspace
 - [x] T-002 Establish code quality and automated test tooling
 - [x] T-003 Confirm initial restaurant operating configuration

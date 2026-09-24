@@ -36,4 +36,17 @@ describe("administrator user management UI", () => {
     expect(page).toContain('role={statusIsError ? "alert" : "status"}');
     expect(page).toContain("--status-critical");
   });
+
+  it("dispatches invitation and recovery through their explicit callback modes", async () => {
+    const actions = await readFile(
+      new URL("./actions.ts", import.meta.url),
+      "utf8",
+    );
+
+    expect(actions).toContain('"invite"');
+    expect(actions).toContain('"recovery"');
+    expect(actions).toContain("buildPasswordLinkCallbackUrl");
+    expect(actions).not.toContain('new URL("/auth/accept-invite"');
+    expect(actions).not.toContain("/auth/callback");
+  });
 });

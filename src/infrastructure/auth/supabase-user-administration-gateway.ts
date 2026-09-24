@@ -58,7 +58,10 @@ export class SupabaseUserAdministrationGateway implements UserAdministrationGate
         data: { display_name: displayName },
       };
       if (redirectTo !== undefined) options.redirectTo = redirectTo;
-      const { data, error } = await this.client.auth.admin.inviteUserByEmail(email, options);
+      const { data, error } = await this.client.auth.admin.inviteUserByEmail(
+        email,
+        options,
+      );
       if (error !== null || data.user === null) throw new Error();
       return Object.freeze({ id: data.user.id, email, displayName });
     } catch {
@@ -99,12 +102,18 @@ export class SupabaseUserAdministrationGateway implements UserAdministrationGate
     }
   }
 
-  async sendPasswordReset(userId: string): Promise<ManagedUser> {
+  async sendPasswordReset(
+    userId: string,
+    redirectTo?: string,
+  ): Promise<ManagedUser> {
     try {
       const target = await this.getManagedUser(userId);
-      const { error } = await this.client.auth.resetPasswordForEmail(
-        target.email,
-      );
+      const { error } =
+        redirectTo === undefined
+          ? await this.client.auth.resetPasswordForEmail(target.email)
+          : await this.client.auth.resetPasswordForEmail(target.email, {
+              redirectTo,
+            });
       if (error !== null) throw new Error();
       return target;
     } catch {

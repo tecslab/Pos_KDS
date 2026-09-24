@@ -123,6 +123,26 @@ describe("Supabase auth proxy", () => {
     expect(response.headers.get("location")).toBeNull();
   });
 
+  it("keeps the password-link page public", async () => {
+    const response = await routeAuthenticatedRequest(
+      new NextRequest("https://carnales.example/auth/accept-invite"),
+      factory(false),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("keeps the bootstrap protected without a recipient session", async () => {
+    const response = await routeAuthenticatedRequest(
+      new NextRequest("https://carnales.example/auth/accept-invite/bootstrap"),
+      factory(false),
+    );
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toContain("/login?next=");
+  });
+
   it("redirects an authenticated login request to a safe local destination", async () => {
     const response = await routeAuthenticatedRequest(
       new NextRequest(

@@ -169,4 +169,16 @@ describe("SupabaseUserAdministrationGateway", () => {
 
     expect(resetPasswordForEmail).toHaveBeenCalledWith("user@example.com");
   });
+
+  it("dispatches recovery with the explicit password-link callback", async () => {
+    const { gateway, resetPasswordForEmail } = clientFor();
+    const redirectTo =
+      "https://carnales.example/auth/accept-invite?mode=recovery";
+
+    await gateway.sendPasswordReset(userId, redirectTo);
+
+    expect(resetPasswordForEmail).toHaveBeenCalledWith("user@example.com", {
+      redirectTo,
+    });
+  });
 });

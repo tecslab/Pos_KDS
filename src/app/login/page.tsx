@@ -15,6 +15,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const nextPath = safeLocalPath(first(params.next));
   const showError = first(params.error) === "authentication_failed";
+  const passwordUpdated = first(params.status) === "password_updated";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[var(--color-bg)] px-4 py-8 text-[var(--color-text)]">
@@ -39,6 +40,15 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           >
             No se pudo iniciar sesión. Verifica tus credenciales e inténtalo de
             nuevo.
+          </p>
+        ) : null}
+
+        {passwordUpdated ? (
+          <p
+            role="status"
+            className="mt-5 rounded-md border border-[var(--color-border)] bg-[var(--status-new-bg)] p-3 text-sm text-[var(--color-text)]"
+          >
+            La contraseña fue actualizada. Ya puedes iniciar sesión.
           </p>
         ) : null}
 

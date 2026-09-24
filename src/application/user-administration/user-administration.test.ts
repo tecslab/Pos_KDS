@@ -139,6 +139,42 @@ describe("UserAdministrationService", () => {
     ).not.toMatch(/password|token|secret/i);
   });
 
+  it("passes a validated recovery callback while preserving reset audits", async () => {
+    const { service, gateway, appended } = setup();
+    const redirectTo =
+      "https://carnales.example/auth/accept-invite?mode=recovery";
+
+    const result = await service.requestPasswordReset(
+      actorId,
+      userId,
+      redirectTo,
+    );
+
+    expect(result).toEqual({ ok: true, value: undefined });
+    expect(gateway.sendPasswordReset).toHaveBeenCalledWith(userId, redirectTo);
+    expect(appended.map((event) => event.action)).toEqual([
+      "user.password_reset_requested",
+      "user.password_reset_dispatched",
+    ]);
+  });
+
+  it("rejects a malformed recovery callback before dispatch", async () => {
+    const { service, gateway, appended } = setup();
+
+    const result = await service.requestPasswordReset(
+      actorId,
+      userId,
+      "javascript:unsafe",
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      error: { kind: "user-administration-error", code: "INVALID_INPUT" },
+    });
+    expect(gateway.sendPasswordReset).not.toHaveBeenCalled();
+    expect(appended).toHaveLength(0);
+  });
+
   it("returns a sanitized failure when infrastructure rejects", async () => {
     const { service, gateway } = setup();
     vi.mocked(gateway.listUsers).mockRejectedValueOnce(

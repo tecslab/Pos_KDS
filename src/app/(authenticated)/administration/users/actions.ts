@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 
 import { requireServerPermission } from "@/lib/auth/server-authorization";
+import { buildPasswordLinkCallbackUrl } from "@/lib/auth/password-link";
 import { createUserAdministrationService } from "@/lib/user-administration/server";
 
 const PAGE_PATH = "/administration/users";
@@ -14,10 +15,11 @@ export async function inviteUser(formData: FormData): Promise<never> {
     PAGE_PATH,
   );
   const requestHeaders = await headers();
-  const origin = requestHeaders.get("origin");
-  const redirectTo = origin
-    ? new URL("/auth/accept-invite", origin).toString()
-    : "";
+  const redirectTo = buildPasswordLinkCallbackUrl(
+    requestHeaders.get("origin"),
+    "invite",
+  );
+  if (redirectTo === null) redirect(statusPath("operation_failed"));
   const result = await createUserAdministrationService().invite(actor.userId, {
     email: stringValue(formData.get("email")),
     displayName: stringValue(formData.get("displayName")),
@@ -57,9 +59,16 @@ export async function requestPasswordReset(formData: FormData): Promise<never> {
     "administration.users.manage",
     PAGE_PATH,
   );
+  const requestHeaders = await headers();
+  const redirectTo = buildPasswordLinkCallbackUrl(
+    requestHeaders.get("origin"),
+    "recovery",
+  );
+  if (redirectTo === null) redirect(statusPath("operation_failed"));
   const result = await createUserAdministrationService().requestPasswordReset(
     actor.userId,
     stringValue(formData.get("userId")),
+    redirectTo,
   );
   redirect(
     statusPath(result.ok ? "reset_sent" : result.error.code.toLowerCase()),
